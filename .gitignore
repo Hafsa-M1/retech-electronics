@@ -1,0 +1,68 @@
+ # =====================================
+# Python / Django
+# =====================================
+__pycache__/
+*.py[cod]
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.env
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+pip-log.txt
+pip-delete-this-directory.txt
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+# *.sqlite3               # Commented out - we are using PostgreSQL only
+# db.sqlite3-journal      # Commented out - we are using PostgreSQL only
+media/
+staticfiles/
+*.log
+*.pot
+
+# =====================================
+# Node.js / React / Frontend
+# =====================================
+node_modules/
+.pnp
+.pnp.js
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
+.yarn-integrity
+build/
+dist/
+coverage/
+.next/
+*.log
+
+# =====================================
+# IDE / Editor files
+# =====================================
+.idea/
+.vscode/
+*.code-workspace
+*.sublime-project
+*.sublime-workspace
+.history/
+*.swp
+*.swo
+
+# =====================================
+# OS / Miscellaneous
+# =====================================
+.DS_Store
+Thumbs.db
+desktop.ini
+*.bak
+*.tmp
