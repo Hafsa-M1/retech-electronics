@@ -1,6 +1,6 @@
-import { Link } from 'react-router-dom';
-import { useState } from 'react';
-import { FaUser, FaEnvelope, FaLock, FaPhone, FaEye, FaEyeSlash, FaGoogle, FaCheck, FaBuilding, FaMapMarkerAlt } from 'react-icons/fa';
+import { Link, useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { FaUser, FaEnvelope, FaLock, FaPhone, FaEye, FaEyeSlash, FaCheck, FaBuilding, FaTimes } from 'react-icons/fa';
 import logo from "../../assets/retech-logo.png";
 
 export default function CustomerSignup() {
@@ -12,7 +12,6 @@ export default function CustomerSignup() {
     password: '',
     confirmPassword: '',
     businessName: '',
-    address: '',
     acceptTerms: false
   });
 
@@ -20,6 +19,9 @@ export default function CustomerSignup() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [activeStep, setActiveStep] = useState(1);
+  const [errors, setErrors] = useState({});
+  const [notification, setNotification] = useState({ show: false, type: '', message: '' });
+  const navigate = useNavigate();
 
   const steps = [
     { number: 1, title: "Personal Info" },
@@ -34,34 +36,210 @@ export default function CustomerSignup() {
     { icon: "📱", title: "Early Access", description: "Be first to see new inventory" }
   ];
 
+  // Auto-hide notification after 5 seconds
+  useEffect(() => {
+    if (notification.show) {
+      const timer = setTimeout(() => {
+        setNotification({ show: false, type: '', message: '' });
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [notification.show]);
+
+  const showNotification = (type, message) => {
+    setNotification({ show: true, type, message });
+  };
+
+  const hideNotification = () => {
+    setNotification({ show: false, type: '', message: '' });
+  };
+
+  const validateStep = () => {
+    const newErrors = {};
+
+    switch (activeStep) {
+      case 1:
+        if (!formData.firstName.trim()) newErrors.firstName = 'First name is required';
+        if (!formData.lastName.trim()) newErrors.lastName = 'Last name is required';
+        if (!formData.email.trim()) {
+          newErrors.email = 'Email is required';
+        } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+          newErrors.email = 'Email is invalid';
+        }
+        if (!formData.phone.trim()) newErrors.phone = 'Phone number is required';
+        break;
+      case 2:
+        if (!formData.password) {
+          newErrors.password = 'Password is required';
+        } else if (formData.password.length < 8) {
+          newErrors.password = 'Password must be at least 8 characters';
+        } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(formData.password)) {
+          newErrors.password = 'Password must contain uppercase, lowercase, and numbers';
+        }
+        if (formData.password !== formData.confirmPassword) {
+          newErrors.confirmPassword = 'Passwords do not match';
+        }
+        break;
+      case 3:
+        if (!formData.acceptTerms) newErrors.acceptTerms = 'You must accept the terms and conditions';
+        break;
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData(prev => ({
       ...prev,
       [name]: type === 'checkbox' ? checked : value
     }));
+    
+    // Clear error when user starts typing
+    if (errors[name]) {
+      setErrors(prev => ({ ...prev, [name]: '' }));
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsSubmitting(true);
     
-    // Simulate API call
-    setTimeout(() => {
+    // Validate all steps before submitting
+    const step1Valid = validateStep();
+    if (!step1Valid) {
+      if (errors.firstName || errors.lastName || errors.email || errors.phone) {
+        setActiveStep(1);
+        return;
+      }
+    }
+    
+    // Validate step 2
+    const step2Valid = validateStep();
+    if (!step2Valid) {
+      if (errors.password || errors.confirmPassword) {
+        setActiveStep(2);
+        return;
+      }
+    }
+    
+    // Validate step 3
+    const step3Valid = validateStep();
+    if (!step3Valid) {
+      if (errors.acceptTerms) {
+        setActiveStep(3);
+        return;
+      }
+    }
+    
+    setIsSubmitting(true);
+    setErrors({});
+
+    try {
+      // Prepare data for backend
+      const requestData = {
+        first_name: formData.firstName,
+        last_name: formData.lastName,
+        email: formData.email,
+        phone: formData.phone,
+        password: formData.password,
+        business_name: formData.businessName || '',
+      };
+
+      const response = await fetch('http://127.0.0.1:8000/api/users/signup/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestData),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Show custom success notification
+        showNotification('success', data.message || '🎉 Account created successfully! Welcome to ReTech!');
+        
+        // Reset form
+        setFormData({
+          firstName: '',
+          lastName: '',
+          email: '',
+          phone: '',
+          password: '',
+          confirmPassword: '',
+          businessName: '',
+          acceptTerms: false
+        });
+        setActiveStep(1);
+        
+        // Redirect to login page after successful signup
+        setTimeout(() => {
+          navigate('/customer-login');
+        }, 3000);
+      } else {
+        // Handle validation errors from backend
+        if (data.errors) {
+          const backendErrors = {};
+          Object.keys(data.errors).forEach(key => {
+            const fieldMap = {
+              'first_name': 'firstName',
+              'last_name': 'lastName',
+              'business_name': 'businessName',
+              'confirm_password': 'confirmPassword',
+              'accept_terms': 'acceptTerms'
+            };
+            const frontendKey = fieldMap[key] || key;
+            backendErrors[frontendKey] = data.errors[key].join(' ');
+          });
+          setErrors(backendErrors);
+          
+          // Determine which step to show based on errors
+          if (backendErrors.firstName || backendErrors.lastName || backendErrors.email || backendErrors.phone) {
+            setActiveStep(1);
+          } else if (backendErrors.password || backendErrors.confirmPassword) {
+            setActiveStep(2);
+          } else if (backendErrors.acceptTerms || backendErrors.businessName) {
+            setActiveStep(3);
+          }
+          
+          // Show error notification
+          showNotification('error', 'Please fix the errors in the form.');
+        } else {
+          showNotification('error', data.error || 'An error occurred. Please try again.');
+        }
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      showNotification('error', 'Something went wrong. Please check your connection and try again.');
+    } finally {
       setIsSubmitting(false);
-      // Handle successful signup
-    }, 1500);
+    }
   };
 
   const nextStep = () => {
-    if (activeStep < 3) {
-      setActiveStep(activeStep + 1);
+    if (validateStep()) {
+      if (activeStep < 3) {
+        setActiveStep(activeStep + 1);
+      }
+    } else {
+      // Scroll to first error
+      const firstError = Object.keys(errors)[0];
+      if (firstError) {
+        const element = document.querySelector(`[name="${firstError}"]`);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          element.focus();
+        }
+      }
+      showNotification('error', 'Please fix the errors before continuing.');
     }
   };
 
   const prevStep = () => {
     if (activeStep > 1) {
       setActiveStep(activeStep - 1);
+      setErrors({});
     }
   };
 
@@ -79,9 +257,10 @@ export default function CustomerSignup() {
                   value={formData.firstName}
                   onChange={handleChange}
                   placeholder="First Name"
-                  className="w-full pl-12 pr-4 py-4 bg-white/5 border border-gray-700 rounded-2xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+                  className={`w-full pl-12 pr-4 py-4 bg-white/5 border ${errors.firstName ? 'border-red-500' : 'border-gray-700'} rounded-2xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all`}
                   required
                 />
+                {errors.firstName && <p className="text-red-500 text-xs mt-1 ml-2">{errors.firstName}</p>}
               </div>
               
               <div className="relative">
@@ -92,9 +271,10 @@ export default function CustomerSignup() {
                   value={formData.lastName}
                   onChange={handleChange}
                   placeholder="Last Name"
-                  className="w-full pl-12 pr-4 py-4 bg-white/5 border border-gray-700 rounded-2xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+                  className={`w-full pl-12 pr-4 py-4 bg-white/5 border ${errors.lastName ? 'border-red-500' : 'border-gray-700'} rounded-2xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all`}
                   required
                 />
+                {errors.lastName && <p className="text-red-500 text-xs mt-1 ml-2">{errors.lastName}</p>}
               </div>
             </div>
 
@@ -106,9 +286,10 @@ export default function CustomerSignup() {
                 value={formData.email}
                 onChange={handleChange}
                 placeholder="Email Address"
-                className="w-full pl-12 pr-4 py-4 bg-white/5 border border-gray-700 rounded-2xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+                className={`w-full pl-12 pr-4 py-4 bg-white/5 border ${errors.email ? 'border-red-500' : 'border-gray-700'} rounded-2xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all`}
                 required
               />
+              {errors.email && <p className="text-red-500 text-xs mt-1 ml-2">{errors.email}</p>}
             </div>
 
             <div className="relative">
@@ -119,9 +300,10 @@ export default function CustomerSignup() {
                 value={formData.phone}
                 onChange={handleChange}
                 placeholder="Phone Number"
-                className="w-full pl-12 pr-4 py-4 bg-white/5 border border-gray-700 rounded-2xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+                className={`w-full pl-12 pr-4 py-4 bg-white/5 border ${errors.phone ? 'border-red-500' : 'border-gray-700'} rounded-2xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all`}
                 required
               />
+              {errors.phone && <p className="text-red-500 text-xs mt-1 ml-2">{errors.phone}</p>}
             </div>
           </div>
         );
@@ -138,7 +320,7 @@ export default function CustomerSignup() {
                   value={formData.password}
                   onChange={handleChange}
                   placeholder="Create Password"
-                  className="w-full pl-12 pr-12 py-4 bg-white/5 border border-gray-700 rounded-2xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+                  className={`w-full pl-12 pr-12 py-4 bg-white/5 border ${errors.password ? 'border-red-500' : 'border-gray-700'} rounded-2xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all`}
                   required
                 />
                 <button
@@ -149,6 +331,7 @@ export default function CustomerSignup() {
                   {showPassword ? <FaEyeSlash className="w-5 h-5" /> : <FaEye className="w-5 h-5" />}
                 </button>
               </div>
+              {errors.password && <p className="text-red-500 text-xs mt-1 ml-2">{errors.password}</p>}
               <div className="mt-2 text-xs text-gray-400">
                 Password must contain at least 8 characters with uppercase, lowercase, and numbers
               </div>
@@ -163,7 +346,7 @@ export default function CustomerSignup() {
                   value={formData.confirmPassword}
                   onChange={handleChange}
                   placeholder="Confirm Password"
-                  className="w-full pl-12 pr-12 py-4 bg-white/5 border border-gray-700 rounded-2xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+                  className={`w-full pl-12 pr-12 py-4 bg-white/5 border ${errors.confirmPassword ? 'border-red-500' : 'border-gray-700'} rounded-2xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all`}
                   required
                 />
                 <button
@@ -174,6 +357,7 @@ export default function CustomerSignup() {
                   {showConfirmPassword ? <FaEyeSlash className="w-5 h-5" /> : <FaEye className="w-5 h-5" />}
                 </button>
               </div>
+              {errors.confirmPassword && <p className="text-red-500 text-xs mt-1 ml-2">{errors.confirmPassword}</p>}
             </div>
 
             <div className="space-y-2">
@@ -208,21 +392,12 @@ export default function CustomerSignup() {
                 value={formData.businessName}
                 onChange={handleChange}
                 placeholder="Business/Shop Name (Optional)"
-                className="w-full pl-12 pr-4 py-4 bg-white/5 border border-gray-700 rounded-2xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+                className={`w-full pl-12 pr-4 py-4 bg-white/5 border ${errors.businessName ? 'border-red-500' : 'border-gray-700'} rounded-2xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all`}
               />
-            </div>
-
-            <div className="relative">
-              <FaMapMarkerAlt className="absolute left-4 top-4 w-5 h-5 text-gray-400" />
-              <textarea
-                name="address"
-                value={formData.address}
-                onChange={handleChange}
-                placeholder="Shipping Address"
-                rows="3"
-                className="w-full pl-12 pr-4 py-4 bg-white/5 border border-gray-700 rounded-2xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all resize-none"
-                required
-              ></textarea>
+              {errors.businessName && <p className="text-red-500 text-xs mt-1 ml-2">{errors.businessName}</p>}
+              <p className="text-xs text-gray-400 mt-2 ml-2">
+                Optional: Provide if you're registering as a business
+              </p>
             </div>
 
             <div className="flex items-start gap-3">
@@ -231,7 +406,7 @@ export default function CustomerSignup() {
                 name="acceptTerms"
                 checked={formData.acceptTerms}
                 onChange={handleChange}
-                className="mt-1 w-5 h-5 text-emerald-600 bg-gray-800 border-gray-700 rounded focus:ring-emerald-500 focus:ring-offset-gray-900"
+                className={`mt-1 w-5 h-5 text-emerald-600 bg-gray-800 ${errors.acceptTerms ? 'border-red-500' : 'border-gray-700'} rounded focus:ring-emerald-500 focus:ring-offset-gray-900`}
                 required
               />
               <label className="text-sm text-gray-300">
@@ -244,6 +419,16 @@ export default function CustomerSignup() {
                   Privacy Policy
                 </Link>
               </label>
+              {errors.acceptTerms && <p className="text-red-500 text-xs mt-1 ml-2">{errors.acceptTerms}</p>}
+            </div>
+
+            {/* Note about pickup service */}
+            <div className="bg-blue-900/20 border border-blue-700/30 rounded-xl p-4">
+              <h3 className="text-blue-300 font-medium mb-2">📦 Pickup Service Information</h3>
+              <p className="text-sm text-gray-300">
+                Since we don't offer delivery, you'll need to pick up your purchases from our store location. 
+                We'll contact you via email/phone for pickup arrangements after purchase.
+              </p>
             </div>
           </div>
         );
@@ -255,6 +440,46 @@ export default function CustomerSignup() {
 
   return (
     <div className="min-h-screen font-sans bg-gradient-to-br from-gray-900 via-gray-800 to-emerald-900">
+      {/* Custom Notification */}
+      {notification.show && (
+        <div className={`fixed top-24 right-4 z-50 max-w-md ${
+          notification.type === 'success' 
+            ? 'bg-gradient-to-r from-green-500 to-emerald-600' 
+            : 'bg-gradient-to-r from-red-500 to-pink-500'
+        } text-white p-4 rounded-xl shadow-2xl animate-slide-in`}>
+          <div className="flex items-start justify-between">
+            <div className="flex items-start space-x-3">
+              <div className={`mt-1 p-1 rounded-full ${notification.type === 'success' ? 'bg-emerald-600' : 'bg-red-600'}`}>
+                {notification.type === 'success' ? (
+                  <FaCheck className="w-4 h-4" />
+                ) : (
+                  <FaTimes className="w-4 h-4" />
+                )}
+              </div>
+              <div className="flex-1">
+                <p className="font-semibold">
+                  {notification.type === 'success' ? 'Success!' : 'Error!'}
+                </p>
+                <p className="text-sm mt-1">{notification.message}</p>
+              </div>
+            </div>
+            <button
+              onClick={hideNotification}
+              className="text-white/80 hover:text-white ml-4"
+            >
+              <FaTimes className="w-4 h-4" />
+            </button>
+          </div>
+          {/* Progress bar */}
+          <div className="mt-3 h-1 bg-white/20 rounded-full overflow-hidden">
+            <div 
+              className={`h-full ${notification.type === 'success' ? 'bg-emerald-300' : 'bg-red-300'} animate-progress`}
+              style={{ animationDuration: '5s' }}
+            ></div>
+          </div>
+        </div>
+      )}
+
       {/* Navbar */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md h-20 flex items-center justify-between px-6 border-b border-gray-200">
         <Link to="/" className="flex items-center">
@@ -287,7 +512,7 @@ export default function CustomerSignup() {
               <div className="mb-10">
                 <div className="flex items-center justify-between mb-6">
                   {steps.map((step, index) => (
-                    <div key={step.number} className="flex flex-col items-center">
+                    <div key={step.number} className="flex flex-col items-center relative">
                       <div className={`relative z-10 w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 ${
                         step.number === activeStep 
                           ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-lg shadow-emerald-500/30' 
@@ -307,7 +532,7 @@ export default function CustomerSignup() {
                         {step.title}
                       </span>
                       {index < steps.length - 1 && (
-                        <div className={`absolute h-0.5 w-1/4 -translate-x-1/2 mt-6 ${
+                        <div className={`absolute h-0.5 w-1/4 translate-x-12 mt-6 ${
                           step.number < activeStep ? 'bg-emerald-500' : 'bg-gray-700'
                         }`}></div>
                       )}
@@ -325,8 +550,6 @@ export default function CustomerSignup() {
                   Create your account to start trading refurbished electronics
                 </p>
               </div>
-
-              
 
               {/* Form */}
               <form onSubmit={handleSubmit}>
@@ -459,8 +682,20 @@ export default function CustomerSignup() {
                   </div>
                   <div className="flex items-center gap-3 text-sm">
                     <FaCheck className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+                    <span className="text-gray-300">Store pickup service only</span>
+                  </div>
+                  <div className="flex items-center gap-3 text-sm">
+                    <FaCheck className="w-4 h-4 text-emerald-400 flex-shrink-0" />
                     <span className="text-gray-300">24/7 customer support</span>
                   </div>
+                </div>
+
+                {/* Pickup Information */}
+                <div className="mt-8 p-4 bg-emerald-900/20 border border-emerald-700/30 rounded-xl">
+                  <h3 className="text-emerald-300 font-medium mb-2">📍 Store Pickup Only</h3>
+                  <p className="text-sm text-gray-300">
+                    All purchases require in-store pickup. Our location details will be provided after registration.
+                  </p>
                 </div>
               </div>
             </div>
@@ -473,6 +708,7 @@ export default function CustomerSignup() {
         <div className="container mx-auto px-4 text-center text-gray-400 text-sm">
           <p>By creating an account, you agree to our Terms of Service and Privacy Policy.</p>
           <p className="mt-2">Need help? <Link to="/contact-us" className="text-emerald-400 hover:text-emerald-300 underline">Contact Support</Link></p>
+          <p className="mt-2 text-xs text-gray-500">Note: Delivery service is not available. All items require store pickup.</p>
         </div>
       </div>
 
@@ -485,6 +721,34 @@ export default function CustomerSignup() {
           50% {
             transform: translateY(-20px);
           }
+        }
+
+        @keyframes slideIn {
+          from {
+            transform: translateX(100%);
+            opacity: 0;
+          }
+          to {
+            transform: translateX(0);
+            opacity: 1;
+          }
+        }
+
+        @keyframes progress {
+          from {
+            width: 100%;
+          }
+          to {
+            width: 0%;
+          }
+        }
+
+        .animate-slide-in {
+          animation: slideIn 0.3s ease-out forwards;
+        }
+
+        .animate-progress {
+          animation: progress 5s linear forwards;
         }
 
         .animate-float {

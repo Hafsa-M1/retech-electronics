@@ -1,9 +1,11 @@
-import { Link } from 'react-router-dom';
-import { useState } from 'react';
-import { FaEnvelope, FaLock, FaEye, FaEyeSlash, FaGoogle, FaArrowRight, FaUser } from 'react-icons/fa';
+import { Link, useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { FaEnvelope, FaLock, FaEye, FaEyeSlash, FaArrowRight, FaLock as FaLockIcon, FaCheck, FaTimes } from 'react-icons/fa';
 import logo from "../../assets/retech-logo.png";
 
 export default function CustomerLogin() {
+  const navigate = useNavigate(); // Step 2: Initialize navigate
+
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -14,6 +16,7 @@ export default function CustomerLogin() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [loginError, setLoginError] = useState('');
   const [forgotPassword, setForgotPassword] = useState(false);
+  const [notification, setNotification] = useState({ show: false, type: '', message: '' });
 
   const benefits = [
     { icon: "💰", title: "Best Prices", description: "Save up to 70% on certified devices" },
@@ -22,13 +25,30 @@ export default function CustomerLogin() {
     { icon: "⚡", title: "Fast Access", description: "Instant access to inventory" }
   ];
 
+  // Auto-hide notification after 5 seconds
+  useEffect(() => {
+    if (notification.show) {
+      const timer = setTimeout(() => {
+        setNotification({ show: false, type: '', message: '' });
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [notification.show]);
+
+  const showNotification = (type, message) => {
+    setNotification({ show: true, type, message });
+  };
+
+  const hideNotification = () => {
+    setNotification({ show: false, type: '', message: '' });
+  };
+
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData(prev => ({
       ...prev,
       [name]: type === 'checkbox' ? checked : value
     }));
-    // Clear error when user starts typing
     if (loginError) setLoginError('');
   };
 
@@ -36,16 +56,21 @@ export default function CustomerLogin() {
     e.preventDefault();
     setIsSubmitting(true);
     setLoginError('');
-    
+
     // Simulate API call
     setTimeout(() => {
       setIsSubmitting(false);
-      // Simulate login error for demo
+
+      // Demo login validation
       if (formData.email === 'demo@error.com') {
         setLoginError('Invalid email or password. Please try again.');
+        showNotification('error', 'Invalid email or password. Please try again.');
       } else {
-        // Handle successful login
-        console.log('Login successful');
+        // Show success notification before redirecting
+        showNotification('success', 'Login successful! Redirecting to dashboard...');
+        setTimeout(() => {
+          navigate('/customer-dashboard');
+        }, 1500);
       }
     }, 1500);
   };
@@ -58,32 +83,65 @@ export default function CustomerLogin() {
   const handleResetPassword = (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
+
     // Simulate password reset
     setTimeout(() => {
       setIsSubmitting(false);
       setForgotPassword(false);
-      // Show success message
-      alert('Password reset link has been sent to your email!');
+      showNotification('success', 'Password reset link has been sent to your email!');
     }, 1500);
   };
 
   return (
     <div className="min-h-screen font-sans bg-gradient-to-br from-gray-50 via-white to-emerald-50">
+      {/* Custom Notification */}
+      {notification.show && (
+        <div className={`fixed top-24 right-4 z-50 max-w-md ${
+          notification.type === 'success' 
+            ? 'bg-gradient-to-r from-green-500 to-emerald-600' 
+            : 'bg-gradient-to-r from-red-500 to-pink-500'
+        } text-white p-4 rounded-xl shadow-2xl animate-slide-in`}>
+          <div className="flex items-start justify-between">
+            <div className="flex items-start space-x-3">
+              <div className={`mt-1 p-1 rounded-full ${notification.type === 'success' ? 'bg-emerald-600' : 'bg-red-600'}`}>
+                {notification.type === 'success' ? (
+                  <FaCheck className="w-4 h-4" />
+                ) : (
+                  <FaTimes className="w-4 h-4" />
+                )}
+              </div>
+              <div className="flex-1">
+                <p className="font-semibold">
+                  {notification.type === 'success' ? 'Success!' : 'Error!'}
+                </p>
+                <p className="text-sm mt-1">{notification.message}</p>
+              </div>
+            </div>
+            <button
+              onClick={hideNotification}
+              className="text-white/80 hover:text-white ml-4"
+            >
+              <FaTimes className="w-4 h-4" />
+            </button>
+          </div>
+          {/* Progress bar */}
+          <div className="mt-3 h-1 bg-white/20 rounded-full overflow-hidden">
+            <div 
+              className={`h-full ${notification.type === 'success' ? 'bg-emerald-300' : 'bg-red-300'} animate-progress`}
+              style={{ animationDuration: '5s' }}
+            ></div>
+          </div>
+        </div>
+      )}
+
       {/* Navbar */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md h-20 flex items-center justify-between px-6 border-b border-gray-200 shadow-sm">
         <Link to="/" className="flex items-center">
-          <img
-            src={logo}
-            alt="ReTech Logo"
-            className="h-30 w-auto"
-          />
+          <img src={logo} alt="ReTech Logo" className="h-30 w-auto" />
         </Link>
 
         <div className="hidden md:flex items-center space-x-6">
-          <span className="text-gray-600 font-medium">
-            New to ReTech?
-          </span>
+          <span className="text-gray-600 font-medium">New to ReTech?</span>
           <Link
             to="/customer-signup"
             className="px-6 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-medium rounded-xl hover:from-emerald-600 hover:to-teal-600 transition-all duration-300 transform hover:-translate-y-0.5 shadow-lg shadow-emerald-500/20"
@@ -98,12 +156,8 @@ export default function CustomerLogin() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 max-w-7xl mx-auto">
             {/* Left Side - Form */}
             <div className="bg-white rounded-3xl shadow-2xl p-8 md:p-12 border border-gray-100">
-              {/* Back to Home */}
               <div className="mb-8">
-                <Link 
-                  to="/" 
-                  className="inline-flex items-center gap-2 text-gray-600 hover:text-emerald-600 transition-colors group"
-                >
+                <Link to="/" className="inline-flex items-center gap-2 text-gray-600 hover:text-emerald-600 transition-colors group">
                   <svg className="w-4 h-4 transform group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                   </svg>
@@ -132,8 +186,6 @@ export default function CustomerLogin() {
                   </div>
                 </div>
               )}
-
-              
 
               {/* Login Form */}
               {!forgotPassword ? (
@@ -205,11 +257,11 @@ export default function CustomerLogin() {
                             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                           </svg>
-                          Signing in...
+                          Logging in...
                         </span>
                       ) : (
                         <>
-                          <span>Sign In</span>
+                          <span>Log In</span>
                           <FaArrowRight className="w-4 h-4" />
                         </>
                       )}
@@ -217,7 +269,7 @@ export default function CustomerLogin() {
                   </div>
                 </form>
               ) : (
-                /* Forgot Password Form */
+                // Forgot Password Form (unchanged)
                 <form onSubmit={handleResetPassword}>
                   <div className="space-y-6">
                     <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-6">
@@ -226,7 +278,6 @@ export default function CustomerLogin() {
                         Enter your email address and we'll send you a link to reset your password.
                       </p>
                     </div>
-
                     <div className="relative">
                       <FaEnvelope className="absolute left-4 top-4 w-5 h-5 text-gray-400" />
                       <input
@@ -237,7 +288,6 @@ export default function CustomerLogin() {
                         required
                       />
                     </div>
-
                     <div className="flex gap-4">
                       <button
                         type="button"
@@ -258,7 +308,6 @@ export default function CustomerLogin() {
                 </form>
               )}
 
-              {/* Signup Link */}
               <div className="mt-8 pt-8 border-t border-gray-100 text-center">
                 <p className="text-gray-600">
                   Don't have an account?{' '}
@@ -361,7 +410,7 @@ export default function CustomerLogin() {
                 <div className="mt-10 pt-6 border-t border-gray-700">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 bg-emerald-500/20 rounded-full flex items-center justify-center border border-emerald-400/50">
-                      <FaLock className="w-5 h-5 text-emerald-400" />
+                      <FaLockIcon className="w-5 h-5 text-emerald-400" />
                     </div>
                     <div>
                       <div className="font-bold text-white">Secure Login</div>
@@ -375,7 +424,7 @@ export default function CustomerLogin() {
         </div>
       </div>
 
-      {/* Footer */}
+      {/* Footer (unchanged) */}
       <div className="border-t border-gray-200 py-8">
         <div className="container mx-auto px-4 text-center">
           <p className="text-gray-600 text-sm">
@@ -396,30 +445,6 @@ export default function CustomerLogin() {
           </p>
         </div>
       </div>
-
-      {/* Add Custom Styles */}
-      <style>{`
-        @keyframes float {
-          0%, 100% {
-            transform: translateY(0px);
-          }
-          50% {
-            transform: translateY(-10px);
-          }
-        }
-
-        .animate-float {
-          animation: float 6s ease-in-out infinite;
-        }
-
-        input:-webkit-autofill,
-        input:-webkit-autofill:hover,
-        input:-webkit-autofill:focus {
-          -webkit-text-fill-color: #111827;
-          -webkit-box-shadow: 0 0 0px 1000px #f9fafb inset;
-          transition: background-color 5000s ease-in-out 0s;
-        }
-      `}</style>
     </div>
   );
 }

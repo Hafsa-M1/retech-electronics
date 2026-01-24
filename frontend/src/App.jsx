@@ -6,8 +6,13 @@ import AboutUs from './pages/common/AboutUs';
 import ContactUs from './pages/common/ContactUs';
 import PrivacyPolicy from './pages/common/PrivacyPolicy';
 import BrowseCatalog from './pages/common/BrowseCatalog'; // Keep this import
+
+//Customer Pages
 import CustomerLogin from './pages/customer/CustomerLogin';
 import CustomerSignup from './pages/customer/CustomerSignup';
+import CustomerDashboard from './pages/customer/CustomerDashboard';
+
+//Staff Pages
 import StaffLogin from './pages/staff/StaffLogin';
 
 // Footer
@@ -27,6 +32,7 @@ function App() {
             <Route path="/catalog" element={<BrowseCatalog />} /> {/* Changed from /browse-catalog to /catalog */}
             <Route path="/customer-login" element={<CustomerLogin />} />
             <Route path="/customer-signup" element={<CustomerSignup />} />
+            <Route path="/customer-dashboard" element={<CustomerDashboard />} />
             <Route path="/staff-login" element={<StaffLogin />} />
             {/* Add more routes here later */}
           </Routes>
