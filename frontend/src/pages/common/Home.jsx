@@ -276,7 +276,7 @@ export default function Home() {
             : 'bg-white shadow-md'
         }`}
       >
-        <div className="container mx-auto px-6 h-20 flex items-center justify-between">
+        <div className="container mx-auto px-6 flex items-center justify-between" style={{ height: 'calc(80px - 1mm)' }}>
           {/* Logo */}
           <Link to="/" className="flex items-center" style={{ marginLeft: '-50px', marginTop: '4mm' }}>
             <img
@@ -320,79 +320,80 @@ export default function Home() {
         </div>
       </nav>
 
-      {/* Hero Section */}
+      {/* Hero Section - UPDATED COLORS */}
       <header className="relative min-h-screen pt-20 overflow-hidden">
         {/* Animated Background Gradient */}
-        <div className="absolute inset-0 bg-gradient-to-br from-green-400/10 via-blue-400/5 to-purple-400/10"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-emerald-900/20 via-teal-800/10 to-cyan-900/5"></div>
         
         {/* Background Image with Parallax */}
         <div
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-90"
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
           style={{
             backgroundImage: `url(${heroImage})`,
             transform: `translateY(${scrollY * 0.4}px)`,
-            transition: 'transform 0.1s ease-out'
+            transition: 'transform 0.1s ease-out',
+            opacity: 0.7
           }}
         />
 
-        {/* Enhanced Gradient Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-black/30"></div>
+        {/* Enhanced Gradient Overlay - Softer and more balanced */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/10"></div>
 
-        {/* Floating Elements */}
-        <div className="absolute top-1/4 left-10 w-72 h-72 bg-green-500/10 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-1/4 right-10 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
+        {/* Floating Elements - Softer colors */}
+        <div className="absolute top-1/4 left-10 w-72 h-72 bg-emerald-500/5 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-1/4 right-10 w-96 h-96 bg-cyan-500/5 rounded-full blur-3xl animate-pulse delay-1000"></div>
 
-        {/* Hero Content */}
-        <div className="relative z-10 min-h-screen flex items-center justify-center px-4">
+        {/* Hero Content - Improved colors for better readability */}
+        <div className="relative z-10 min-h-screen flex items-center justify-center px-4 pb-4">
           <div className="container mx-auto text-center">
-            {/* Badge */}
-            <div className="inline-flex items-center gap-2 bg-green-500/20 backdrop-blur-sm px-4 py-2 rounded-full mb-8 border border-green-400/50 animate-fade-in-up delay-100">
-              <svg className="w-4 h-4 text-green-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            {/* Badge - Softer green */}
+            <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md px-4 py-2 rounded-full mb-8 border border-emerald-400/30 animate-fade-in-up delay-100">
+              <svg className="w-4 h-4 text-emerald-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
               </svg>
-              <span className="text-sm font-medium text-green-100">Trusted by 10,000+ Customers</span>
+              <span className="text-sm font-medium text-emerald-100">Trusted by 10,000+ Customers</span>
             </div>
 
-            {/* Main Headline */}
+            {/* Main Headline - Softer gradient */}
             <h1 className="text-5xl md:text-7xl lg:text-8xl font-black mb-6 leading-tight animate-fade-in-up delay-200">
-              <span className="bg-gradient-to-r from-green-300 via-emerald-300 to-cyan-300 bg-clip-text text-transparent drop-shadow-lg">
+              <span className="bg-gradient-to-r from-emerald-200 via-teal-200 to-cyan-200 bg-clip-text text-transparent drop-shadow-2xl">
                 ReTech
               </span>
             </h1>
 
-            {/* Subheadline */}
+            {/* Subheadline - Better contrast */}
             <p className="text-2xl md:text-4xl font-bold text-white mb-6 max-w-4xl mx-auto leading-snug drop-shadow-2xl animate-fade-in-up delay-300">
               Premium Refurbished Electronics
-              <span className="block text-xl md:text-2xl font-normal text-emerald-200 mt-2 animate-fade-in-up delay-400">
+              <span className="block text-xl md:text-2xl font-normal text-emerald-100 mt-3 animate-fade-in-up delay-400">
                 Affordable • Certified • Sustainable
               </span>
             </p>
 
-            {/* Description */}
-            <p className="text-lg md:text-xl text-gray-100 max-w-2xl mx-auto mb-12 leading-relaxed drop-shadow-lg animate-fade-in-up delay-500">
+            {/* Description - Improved readability */}
+            <p className="text-lg md:text-xl text-emerald-50 max-w-2xl mx-auto mb-12 leading-relaxed drop-shadow-lg animate-fade-in-up delay-500">
               Discover like-new devices with full certification, extended warranties, and prices that make sense for your wallet and the planet.
             </p>
 
-            {/* CTA Buttons */}
+            {/* CTA Buttons - Improved contrast */}
             <div className="flex flex-col sm:flex-row gap-6 justify-center items-center animate-fade-in-up delay-600">
               <Link
                 to="/customer-signup"
-                className="group relative px-10 py-5 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-bold text-lg rounded-2xl shadow-2xl hover:shadow-3xl transition-all duration-300 transform hover:-translate-y-1 hover:scale-105 min-w-[280px] text-center"
+                className="group relative px-10 py-5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold text-lg rounded-2xl shadow-2xl hover:shadow-3xl transition-all duration-300 transform hover:-translate-y-1 hover:scale-105 min-w-[280px] text-center"
               >
                 <span className="relative z-10">Start Your Tech Journey</span>
-                <div className="absolute inset-0 bg-gradient-to-r from-green-700 to-emerald-700 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-emerald-700 to-teal-700 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               </Link>
 
               <Link
                 to="/catalog"
-                className="group relative px-10 py-5 bg-white/10 backdrop-blur-sm hover:bg-white/20 text-white font-bold text-lg rounded-2xl border-2 border-white/40 hover:border-white/60 shadow-2xl hover:shadow-3xl transition-all duration-300 transform hover:-translate-y-1 hover:scale-105 min-w-[280px] text-center"
+                className="group relative px-10 py-5 bg-white/15 backdrop-blur-md hover:bg-white/25 text-white font-bold text-lg rounded-2xl border-2 border-emerald-300/40 hover:border-emerald-300/60 shadow-2xl hover:shadow-3xl transition-all duration-300 transform hover:-translate-y-1 hover:scale-105 min-w-[280px] text-center"
               >
                 <span className="relative z-10">Explore Devices</span>
-                <div className="absolute inset-0 bg-white/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <div className="absolute inset-0 bg-white/10 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               </Link>
             </div>
 
-            {/* Quick Stats */}
+            {/* Quick Stats - Better contrast */}
             <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto animate-fade-in-up delay-600">
               {[
                 { label: "Devices Sold", value: "10K+" },
@@ -400,19 +401,19 @@ export default function Home() {
                 { label: "CO₂ Saved", value: "50T" },
                 { label: "Avg Savings", value: "65%" }
               ].map((stat, index) => (
-                <div key={index} className="text-center p-4 backdrop-blur-sm bg-white/10 rounded-2xl border border-white/20 animate-fade-in-scale" style={{ animationDelay: `${0.6 + index * 0.1}s` }}>
+                <div key={index} className="text-center p-4 backdrop-blur-md bg-white/10 rounded-2xl border border-emerald-300/20 animate-fade-in-scale" style={{ animationDelay: `${0.6 + index * 0.1}s` }}>
                   <div className="text-2xl font-bold text-emerald-200">{stat.value}</div>
-                  <div className="text-sm text-gray-200 mt-1">{stat.label}</div>
+                  <div className="text-sm text-emerald-100 mt-1">{stat.label}</div>
                 </div>
               ))}
             </div>
           </div>
         </div>
 
-        {/* Scroll Indicator */}
+        {/* Scroll Indicator - Better visibility */}
         <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
-          <div className="w-6 h-10 border-2 border-white/30 rounded-full flex justify-center">
-            <div className="w-1 h-3 bg-white/50 rounded-full mt-2"></div>
+          <div className="w-6 h-10 border-2 border-emerald-300/40 rounded-full flex justify-center">
+            <div className="w-1 h-3 bg-emerald-300 rounded-full mt-2"></div>
           </div>
         </div>
       </header>
@@ -504,48 +505,75 @@ export default function Home() {
         </div>
       </section>
 
+      <style>{`
+        @keyframes slideIn {
+          from { transform: translateX(-100%); opacity: 0; }
+          to { transform: translateX(0); opacity: 0.1; }
+        }
+        
+        .animate-slide-in {
+          animation: slideIn 20s linear infinite;
+        }
+      `}</style>
+
       {/* Final CTA Section */}
-      <section className="py-20 px-4" data-scroll-section id="cta">
+      <section className="py-16 px-4 relative overflow-hidden" data-scroll-section id="cta">
         <div className="container mx-auto">
-          <div className={`bg-gradient-to-r from-green-600 via-emerald-500 to-teal-500 rounded-3xl p-12 md:p-16 text-center shadow-2xl scroll-hidden ${visibleSections['cta'] ? 'scroll-visible' : ''}`}>
-            <h2 className={`text-4xl md:text-5xl font-bold text-white mb-6 ${visibleSections['cta'] ? 'animate-fade-in-left delay-200' : ''}`}>
-              Ready to Upgrade Your Tech?
-            </h2>
-            <p className={`text-xl text-white/95 mb-10 max-w-2xl mx-auto ${visibleSections['cta'] ? 'animate-fade-in-right delay-300' : ''}`}>
-              Join thousands of satisfied customers who chose quality, sustainability, and savings.
-            </p>
-            <div className={`flex flex-col sm:flex-row gap-6 justify-center ${visibleSections['cta'] ? 'animate-fade-in-up delay-400' : ''}`}>
-              <Link
-                to="/catalog"
-                className="px-10 py-4 bg-white text-green-700 font-bold text-lg rounded-xl hover:bg-gray-100 transition-all duration-300 transform hover:scale-105 shadow-lg"
-              >
-                Browse All Devices
-              </Link>
-              <Link
-                to="/customer-signup"
-                className="px-10 py-4 bg-transparent border-2 border-white text-white font-bold text-lg rounded-xl hover:bg-white/10 transition-all duration-300 transform hover:scale-105"
-              >
-                Create Free Account
-              </Link>
+          <div className={`bg-gradient-to-r from-emerald-600 to-teal-600 rounded-2xl p-10 md:p-12 text-center shadow-2xl scroll-hidden relative overflow-hidden ${visibleSections['cta'] ? 'scroll-visible' : ''}`}>
+            {/* Modern pattern background */}
+            <div className="absolute inset-0">
+              <svg className="absolute inset-0 w-full h-full opacity-5" preserveAspectRatio="none" viewBox="0 0 1200 120">
+                <defs>
+                  <pattern id="dots" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
+                    <circle cx="20" cy="20" r="2" fill="white"/>
+                  </pattern>
+                </defs>
+                <rect width="1200" height="120" fill="url(#dots)"/>
+              </svg>
+              <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl -mr-20 -mt-20 animate-pulse"></div>
+              <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full blur-3xl -ml-20 -mb-20 animate-pulse delay-1000"></div>
             </div>
-            <div className={`mt-10 flex flex-wrap items-center justify-center gap-6 text-white/95 font-medium ${visibleSections['cta'] ? 'animate-fade-in-up delay-500' : ''}`}>
-              <div className="flex items-center">
-                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                </svg>
-                <span>90-Day Warranty</span>
+            
+            <div className="relative z-10">
+              <h2 className={`text-3xl md:text-5xl font-bold text-white mb-4 leading-tight ${visibleSections['cta'] ? 'animate-fade-in-up delay-200' : ''}`}>
+                Ready to Upgrade Your Tech?
+              </h2>
+              <p className={`text-lg text-white/90 mb-8 max-w-2xl mx-auto ${visibleSections['cta'] ? 'animate-fade-in-up delay-300' : ''}`}>
+                Join thousands of satisfied customers who chose quality, sustainability, and savings.
+              </p>
+              <div className={`flex flex-col sm:flex-row gap-4 justify-center mb-8 ${visibleSections['cta'] ? 'animate-fade-in-up delay-400' : ''}`}>
+                <Link
+                  to="/customer-signup"
+                  className="px-8 py-3 bg-white text-emerald-700 font-bold text-base rounded-lg hover:bg-gray-50 transition-all duration-300 transform hover:scale-105 shadow-lg"
+                >
+                  Get Started Now
+                </Link>
+                <Link
+                  to="/catalog"
+                  className="px-8 py-3 bg-white/20 hover:bg-white/30 text-white font-bold text-base rounded-lg border border-white/40 transition-all duration-300 transform hover:scale-105"
+                >
+                  Explore Devices
+                </Link>
               </div>
-              <div className="flex items-center">
-                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                </svg>
-                <span>Free Returns</span>
-              </div>
-              <div className="flex items-center">
-                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                </svg>
-                <span>Certified Quality</span>
+              <div className={`flex flex-wrap items-center justify-center gap-6 text-white/95 text-sm font-medium ${visibleSections['cta'] ? 'animate-fade-in-up delay-500' : ''}`}>
+                <div className="flex items-center">
+                  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                  </svg>
+                  <span>90-Day Warranty</span>
+                </div>
+                <div className="flex items-center">
+                  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </svg>
+                  <span>Free Returns</span>
+                </div>
+                <div className="flex items-center">
+                  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                  </svg>
+                  <span>Certified Quality</span>
+                </div>
               </div>
             </div>
           </div>
