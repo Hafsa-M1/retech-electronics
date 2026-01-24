@@ -22,4 +22,3 @@ ReTech is a full-stack web application for refurbishing and reselling used elect
 - **Backend**: Django + Django REST Framework
 - **Database**: PostgreSQL
 
-### Project Structure
