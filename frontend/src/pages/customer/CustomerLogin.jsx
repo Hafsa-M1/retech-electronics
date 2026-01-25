@@ -4,7 +4,7 @@ import { FaEnvelope, FaLock, FaEye, FaEyeSlash, FaArrowRight, FaLock as FaLockIc
 import logo from "../../assets/retech-logo.png";
 
 export default function CustomerLogin() {
-  const navigate = useNavigate(); // Step 2: Initialize navigate
+  const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
     email: '',
@@ -66,6 +66,10 @@ export default function CustomerLogin() {
         setLoginError('Invalid email or password. Please try again.');
         showNotification('error', 'Invalid email or password. Please try again.');
       } else {
+        // ✅ CRITICAL FIX: Save authentication data
+        localStorage.setItem('customerToken', 'mock-token-' + Date.now());
+        localStorage.setItem('customerEmail', formData.email);
+        
         // Show success notification before redirecting
         showNotification('success', 'Login successful! Redirecting to dashboard...');
         setTimeout(() => {
