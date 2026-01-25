@@ -28,12 +28,7 @@ export default function ContactUs() {
   const [submitSuccess, setSubmitSuccess] = useState(false);
 
   const contactInfo = [
-    {
-      icon: <FaEnvelope className="w-6 h-6" />,
-      title: "General Inquiries",
-      details: "info@retech.com",
-      description: "For partnership and general questions"
-    },
+    
     {
       icon: <FaPhone className="w-6 h-6" />,
       title: "Business Support",
@@ -46,12 +41,7 @@ export default function ContactUs() {
       details: "support@retech.com",
       description: "For device pickup and customer service"
     },
-    {
-      icon: <FaTools className="w-6 h-6" />,
-      title: "Technical Support",
-      details: "tech@retech.com",
-      description: "For technical issues and platform support"
-    }
+    
   ];
 
   const businessTypes = [
@@ -87,16 +77,9 @@ export default function ContactUs() {
     },
     {
       question: "How are refurbished devices certified?",
-      answer: "All devices undergo rigorous 50+ point testing, data wiping, cosmetic refurbishment, and quality certification before being listed for sale on our platform."
+      answer: "Devices are certified after undergoing standardized diagnostic testing conducted by shop staff. Devices that successfully pass the required functional checks are issued a unique certification ID, which serves as verifiable proof of quality before being listed for sale."
     },
-    {
-      question: "What support do you provide to partner shops?",
-      answer: "We offer technical training, marketing materials, inventory management tools, customer support, and access to our nationwide network of buyers."
-    },
-    {
-      question: "How do payments work?",
-      answer: "Partner shops receive payments for collected devices upfront, and earn commissions on refurbished sales. All transactions are processed securely through our platform."
-    }
+    
   ];
 
   const handleChange = (e) => {
@@ -207,7 +190,7 @@ export default function ContactUs() {
       {/* Contact Cards */}
       <section className="py-16 px-4 -mt-10">
         <div className="container mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl mx-auto">
             {contactInfo.map((item, index) => (
               <div 
                 key={index}

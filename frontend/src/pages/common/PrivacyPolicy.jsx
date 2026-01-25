@@ -150,25 +150,13 @@ export default function PrivacyPolicy() {
     {
       point: "Device Collection",
       data: "Pickup address, device details, condition assessment"
-    },
-    {
-      point: "Transactions",
-      data: "Payment information, purchase history, device certifications"
-    },
-    {
-      point: "Customer Support",
-      data: "Communication history, issue details, resolution notes"
-    },
-    {
-      point: "Website Usage",
-      data: "IP address, browser type, device information, cookies"
     }
   ];
 
   const dataRecipients = [
     {
       recipient: "Service Providers",
-      purpose: "Payment processing, shipping, technical support",
+      purpose: "Payment processing,  technical support",
       protection: "Contractual data protection agreements"
     },
     {
@@ -203,7 +191,7 @@ export default function PrivacyPolicy() {
         <div className="hidden md:flex items-center space-x-8">
           <Link to="/" className="text-gray-700 hover:text-green-600 font-medium">Home</Link>
           <Link to="/about-us" className="text-gray-700 hover:text-green-600 font-medium">About Us</Link>
-          <Link to="/contact-us" className="text-gray-700 hover:text-green-600 font-medium">Contact Us</Link>
+          <Link to="/contact-us" className="text-gray-700 hover:text-green-600 font-medium">Partner With Us</Link>
           <Link to="/privacy-policy" className="text-green-600 font-medium border-b-2 border-green-600 pb-1">Privacy Policy</Link>
           <Link to="/catalog" className="text-gray-700 hover:text-green-600 font-medium">Browse Catalog</Link>
           <Link to="/customer-login" className="text-gray-700 hover:text-green-600 font-medium">Login</Link>
@@ -237,12 +225,6 @@ export default function PrivacyPolicy() {
           <p className="text-xl md:text-2xl text-white/90 max-w-3xl mx-auto leading-relaxed">
             Protecting your data while enabling sustainable electronics commerce
           </p>
-          <div className="mt-8 inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full">
-            <svg className="w-4 h-4 text-green-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-            </svg>
-            <span className="text-sm font-medium text-white">Last Updated: January 2024</span>
-          </div>
         </div>
       </header>
 
@@ -330,21 +312,7 @@ export default function PrivacyPolicy() {
                         </ul>
                       </div>
 
-                      <h3 className="text-xl font-bold text-gray-900 mb-4">Platform-Specific Considerations</h3>
-                      <p className="text-gray-700 mb-6">
-                        As a B2B/B2C platform for refurbished electronics, we handle:
-                      </p>
-                      
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-                        <div className="border border-gray-200 rounded-xl p-4">
-                          <div className="font-bold text-gray-900 mb-2">Business Data</div>
-                          <p className="text-gray-600 text-sm">Shop information, business credentials, partnership agreements</p>
-                        </div>
-                        <div className="border border-gray-200 rounded-xl p-4">
-                          <div className="font-bold text-gray-900 mb-2">Transaction Data</div>
-                          <p className="text-gray-600 text-sm">Device specifications, certification details, payment information</p>
-                        </div>
-                      </div>
+
                     </div>
                   </div>
                 )}
@@ -414,7 +382,6 @@ export default function PrivacyPolicy() {
                           <ul className="space-y-2 text-green-100 text-sm">
                             <li>• Manage user accounts and authentication</li>
                             <li>• Process device collection and refurbishment</li>
-                            <li>• Facilitate transactions and payments</li>
                             <li>• Provide customer support</li>
                           </ul>
                         </div>
@@ -560,29 +527,6 @@ export default function PrivacyPolicy() {
                           ))}
                         </div>
                       </div>
-
-                      <div className="bg-gradient-to-r from-blue-50 to-cyan-50 p-6 rounded-xl mb-8">
-                        <h3 className="text-xl font-bold text-gray-900 mb-4">Exercising Your Rights</h3>
-                        <div className="space-y-4">
-                          <div>
-                            <h4 className="font-bold text-gray-900 mb-2">Contact Information</h4>
-                            <p className="text-gray-600">
-                              To exercise any of these rights, please contact our Data Protection Officer at:
-                            </p>
-                            <div className="mt-2 p-3 bg-white rounded-lg">
-                              <div className="font-medium text-gray-900">Email: privacy@retech.com</div>
-                              <div className="text-sm text-gray-600">We respond to all requests within 30 days</div>
-                            </div>
-                          </div>
-                          
-                          <div>
-                            <h4 className="font-bold text-gray-900 mb-2">Verification Process</h4>
-                            <p className="text-gray-600 text-sm">
-                              For security purposes, we may need to verify your identity before processing certain requests. This helps protect your personal information from unauthorized access.
-                            </p>
-                          </div>
-                        </div>
-                      </div>
                     </div>
                   </div>
                 )}
@@ -636,17 +580,7 @@ export default function PrivacyPolicy() {
                   <div className="bg-green-50 px-4 py-2 rounded-lg">
                     <span className="text-green-700 font-medium">Platform announcement</span>
                   </div>
-                  <div className="bg-green-50 px-4 py-2 rounded-lg">
-                    <span className="text-green-700 font-medium">Updated "Last Updated" date</span>
-                  </div>
                 </div>
-              </div>
-
-              <div className="border-t border-gray-200 pt-6">
-                <h3 className="text-xl font-bold text-gray-900 mb-4">International Data Transfers</h3>
-                <p className="text-gray-700">
-                  As a platform connecting refurbishment partners globally, your information may be transferred to and processed in countries other than your own. We ensure appropriate safeguards are in place for such transfers in accordance with applicable data protection laws.
-                </p>
               </div>
             </div>
           </div>

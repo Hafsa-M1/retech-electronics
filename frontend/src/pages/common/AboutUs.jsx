@@ -8,44 +8,36 @@ export default function AboutUs() {
   const [visibleSections, setVisibleSections] = useState({});
   const observerRefs = useRef({});
 
-  const projectDetails = {
-    studentName: "Hafsa Mushtaq",
-    university: "University of Moratuwa",
-    course: "B.Sc. (Hons) in Information Technology and Management",
-    projectLevel: "Level 3 Individual Project",
-    academicYear: "2025-2026"
-  };
-
   const features = [
     {
       icon: "🎯",
-      title: "Project Mission",
-      description: "To develop a full-stack e-commerce platform for refurbished electronics that promotes sustainability and accessibility."
-    },
-    {
-      icon: "🎓",
-      title: "Academic Focus",
-      description: "Combining React frontend, Django backend, and PostgreSQL database to demonstrate comprehensive software development skills."
+      title: "Our Mission",
+      description: "To create a trusted marketplace for refurbished electronics that promotes sustainability and makes technology accessible to everyone."
     },
     {
       icon: "♻️",
-      title: "Sustainability Goal",
-      description: "Promoting circular economy by extending device lifespans and reducing electronic waste."
+      title: "Sustainability",
+      description: "Extending device lifespans and reducing electronic waste through quality refurbishment and responsible recycling."
     },
     {
-      icon: "💻",
-      title: "Technical Stack",
-      description: "Modern web technologies including React, Tailwind CSS, Django REST Framework, and PostgreSQL."
+      icon: "🔒",
+      title: "Quality Assurance",
+      description: "Every device undergoes rigorous testing, certification, and comes with a warranty for customer peace of mind."
+    },
+    {
+      icon: "💰",
+      title: "Affordable Tech",
+      description: "Making high-quality electronics accessible with prices up to 70% lower than new devices."
     }
   ];
 
-  const projectObjectives = [
-    "Develop a responsive e-commerce platform with user authentication",
-    "Implement product catalog with filtering and search functionality",
-    "Create admin dashboard for inventory management",
-    "Build secure payment gateway integration",
-    "Design intuitive user interface with modern UX principles",
-    "Implement order tracking and customer management system"
+  const keyFeatures = [
+    "Advanced product catalog with search & filters",
+    "Secure user authentication & profiles",
+    "Order tracking & management",
+    "Customer support system",
+    "Device certification process",
+    "Warranty management"
   ];
 
   const technologies = [
@@ -54,9 +46,9 @@ export default function AboutUs() {
     { name: "Django", color: "bg-green-100 text-green-800" },
     { name: "Django REST", color: "bg-emerald-100 text-emerald-800" },
     { name: "PostgreSQL", color: "bg-indigo-100 text-indigo-800" },
-    { name: "Vite", color: "bg-purple-100 text-purple-800" },
     { name: "JWT Auth", color: "bg-yellow-100 text-yellow-800" },
-    { name: "Git", color: "bg-gray-100 text-gray-800" }
+    { name: "REST API", color: "bg-purple-100 text-purple-800" },
+    { name: "Responsive Design", color: "bg-pink-100 text-pink-800" }
   ];
 
   // Intersection Observer for scroll animations
@@ -75,7 +67,6 @@ export default function AboutUs() {
       { threshold: 0.1 }
     );
 
-    // Observe all sections
     const sections = document.querySelectorAll('[data-scroll-section]');
     sections.forEach((section) => {
       observer.observe(section);
@@ -165,6 +156,9 @@ export default function AboutUs() {
           50% {
             opacity: 1;
           }
+          70% {
+            transform: scale(1.1);
+          }
           100% {
             transform: scale(1);
           }
@@ -178,17 +172,6 @@ export default function AboutUs() {
           to {
             opacity: 1;
             transform: translateY(0);
-          }
-        }
-
-        @keyframes rotateIn {
-          from {
-            opacity: 0;
-            transform: rotate(-10deg) scale(0.9);
-          }
-          to {
-            opacity: 1;
-            transform: rotate(0) scale(1);
           }
         }
 
@@ -222,10 +205,6 @@ export default function AboutUs() {
 
         .animate-float-up {
           animation: floatUp 0.8s ease-out forwards;
-        }
-
-        .animate-rotate-in {
-          animation: rotateIn 0.6s ease-out forwards;
         }
 
         .delay-100 { animation-delay: 0.1s; }
@@ -280,9 +259,26 @@ export default function AboutUs() {
         .scroll-item-4 { transition-delay: 0.4s; }
         .scroll-item-5 { transition-delay: 0.5s; }
         .scroll-item-6 { transition-delay: 0.6s; }
+
+        /* Feature cards */
+        .feature-card {
+          opacity: 0;
+          transform: scale(0.8);
+          transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .feature-card-visible {
+          opacity: 1;
+          transform: scale(1);
+        }
+
+        .feature-card:nth-child(1) { transition-delay: 0.1s; }
+        .feature-card:nth-child(2) { transition-delay: 0.2s; }
+        .feature-card:nth-child(3) { transition-delay: 0.3s; }
+        .feature-card:nth-child(4) { transition-delay: 0.4s; }
       `}</style>
 
-      {/* Navbar - Same as Home */}
+      {/* Navbar */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-white shadow-md h-20 flex items-center justify-between px-6">
         <Link to="/" className="flex items-center h-full -ml-4" style={{ marginTop: '4mm' }}>
           <img
@@ -314,7 +310,7 @@ export default function AboutUs() {
         </button>
       </nav>
 
-      {/* Hero Section with Image Background */}
+      {/* Hero Section */}
       <header className="relative min-h-[60vh] pt-32 pb-20 flex items-center justify-center overflow-hidden">
         {/* Background Image */}
         <div 
@@ -322,7 +318,7 @@ export default function AboutUs() {
           style={{ backgroundImage: `url(${aboutHeroImage})` }}
         />
         
-        {/* Dark Overlay for better text readability */}
+        {/* Dark Overlay */}
         <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-black/30"></div>
         
         {/* Floating Elements */}
@@ -336,43 +332,47 @@ export default function AboutUs() {
           </h1>
           <div className="inline-block bg-white/20 backdrop-blur-md px-6 py-3 rounded-full mb-8 border border-white/30 animate-fade-in-up delay-200">
             <p className="text-lg text-white font-medium">
-              {projectDetails.projectLevel} • {projectDetails.university}
+              Sustainable Electronics Marketplace
             </p>
           </div>
           <p className="text-xl md:text-2xl text-white/95 max-w-3xl mx-auto leading-relaxed drop-shadow-lg animate-fade-in-up delay-400">
-            A Sustainable E-Commerce Platform for Refurbished Electronics
+            Transforming the way people buy and sell refurbished electronics
           </p>
         </div>
       </header>
 
-      {/* Project Introduction */}
+      {/* Platform Introduction */}
       <section className="py-20 px-4" data-scroll-section id="intro">
         <div className="container mx-auto max-w-6xl">
           <div className={`bg-gradient-to-r from-green-50 to-emerald-50 rounded-3xl p-8 md:p-12 shadow-xl hover-lift scroll-hidden ${visibleSections['intro'] ? 'scroll-visible' : ''}`}>
             <div className="flex flex-col md:flex-row items-center gap-8">
               <div className={`md:w-2/3 ${visibleSections['intro'] ? 'animate-fade-in-left delay-200' : ''}`}>
                 <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
-                  Project Overview
+                  The ReTech Platform
                 </h2>
                 <p className="text-lg text-gray-700 mb-6 leading-relaxed">
-                  ReTech is a comprehensive full-stack e-commerce platform developed as part of my Level 3 Individual Project at the University of Moratuwa. This project demonstrates the application of modern web development technologies to create a sustainable marketplace for refurbished electronics.
+                  ReTech is a comprehensive e-commerce platform dedicated to refurbished electronics. We connect buyers with certified, high-quality refurbished devices while promoting sustainability and reducing electronic waste.
                 </p>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className={`bg-white p-4 rounded-xl shadow-sm hover-lift scroll-item-hidden scroll-item-1 ${visibleSections['intro'] ? 'scroll-item-visible' : ''}`}>
-                    <div className="font-bold text-gray-900">Student</div>
-                    <div className="text-green-600 font-medium">{projectDetails.studentName}</div>
+                    <div className="font-bold text-gray-900">10,000+</div>
+                    <div className="text-green-600 font-medium">Devices Sold</div>
                   </div>
                   <div className={`bg-white p-4 rounded-xl shadow-sm hover-lift scroll-item-hidden scroll-item-2 ${visibleSections['intro'] ? 'scroll-item-visible' : ''}`}>
-                    <div className="font-bold text-gray-900">Course</div>
-                    <div className="text-green-600 font-medium">{projectDetails.course}</div>
+                    <div className="font-bold text-gray-900">98%</div>
+                    <div className="text-green-600 font-medium">Satisfaction Rate</div>
+                  </div>
+                  <div className={`bg-white p-4 rounded-xl shadow-sm hover-lift scroll-item-hidden scroll-item-3 ${visibleSections['intro'] ? 'scroll-item-visible' : ''}`}>
+                    <div className="font-bold text-gray-900">70%</div>
+                    <div className="text-green-600 font-medium">Average Savings</div>
                   </div>
                 </div>
               </div>
               <div className={`md:w-1/3 ${visibleSections['intro'] ? 'animate-fade-in-right delay-200' : ''}`}>
                 <div className="bg-gradient-to-br from-green-600 to-emerald-600 text-white p-8 rounded-2xl text-center shadow-lg hover-lift animate-bounce-in delay-300">
-                  <div className="text-4xl mb-4">🎓</div>
-                  <h3 className="text-xl font-bold mb-2">Academic Project</h3>
-                  <p className="text-green-100">Demonstrating Full-Stack Development Skills</p>
+                  <div className="text-4xl mb-4">♻️</div>
+                  <h3 className="text-xl font-bold mb-2">Sustainable Choice</h3>
+                  <p className="text-green-100">Every purchase helps reduce e-waste</p>
                 </div>
               </div>
             </div>
@@ -380,7 +380,7 @@ export default function AboutUs() {
         </div>
       </section>
 
-      {/* Tabs Section - Mission & Technical Details */}
+      {/* Tabs Section */}
       <section className="py-20 px-4" data-scroll-section id="tabs">
         <div className="container mx-auto max-w-6xl">
           <div className="flex flex-col md:flex-row gap-8">
@@ -388,9 +388,9 @@ export default function AboutUs() {
             <div className={`md:w-2/5 scroll-hidden ${visibleSections['tabs'] ? 'scroll-visible' : ''}`}>
               <div className="bg-white rounded-2xl shadow-xl p-2 sticky top-32">
                 {[
-                  { id: 'mission', label: 'Project Mission', icon: '🎯' },
-                  { id: 'tech', label: 'Technical Stack', icon: '💻' },
-                  { id: 'features', label: 'Key Features', icon: '📋' }
+                  { id: 'mission', label: 'Our Mission', icon: '🎯' },
+                  { id: 'tech', label: 'Technology', icon: '💻' },
+                  { id: 'features', label: 'Platform Features', icon: '📋' }
                 ].map((tab, index) => (
                   <button
                     key={tab.id}
@@ -404,9 +404,9 @@ export default function AboutUs() {
                       <div>
                         <h3 className="text-xl font-bold text-gray-900">{tab.label}</h3>
                         <p className="text-gray-600 text-sm mt-1">
-                          {tab.id === 'mission' && 'Goals and objectives'}
-                          {tab.id === 'tech' && 'Technologies used'}
-                          {tab.id === 'features' && 'Project deliverables'}
+                          {tab.id === 'mission' && 'Values and goals'}
+                          {tab.id === 'tech' && 'Built with modern tech'}
+                          {tab.id === 'features' && 'What makes us unique'}
                         </p>
                       </div>
                     </div>
@@ -420,30 +420,32 @@ export default function AboutUs() {
               <div className="bg-white rounded-2xl shadow-xl p-8 hover-lift">
                 {activeTab === 'mission' && (
                   <div className="tab-content">
-                    <h2 className="text-3xl font-bold text-gray-900 mb-6 animate-fade-in-down">Project Mission & Objectives</h2>
+                    <h2 className="text-3xl font-bold text-gray-900 mb-6 animate-fade-in-down">Our Mission & Values</h2>
                     <div className="space-y-6">
                       <p className="text-lg text-gray-700 leading-relaxed animate-fade-in-up delay-100">
-                        The primary mission of ReTech is to create an innovative e-commerce solution that addresses both technological requirements and environmental concerns in the electronics industry.
+                        At ReTech, we're driven by a dual mission: to make quality electronics accessible to everyone while promoting environmental sustainability through responsible consumption.
                       </p>
                       
-                      <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-6 rounded-xl hover-lift animate-fade-in-up delay-200">
-                        <h3 className="text-xl font-bold text-gray-900 mb-4">Key Objectives:</h3>
-                        <ul className="space-y-3">
-                          {projectObjectives.map((objective, index) => (
-                            <li key={index} className="flex items-start animate-fade-in-left scroll-item-hidden" style={{ animationDelay: `${0.3 + index * 0.1}s` }}>
-                              <svg className="w-5 h-5 text-green-600 mt-1 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                              </svg>
-                              <span className="text-gray-700">{objective}</span>
-                            </li>
-                          ))}
-                        </ul>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {features.map((feature, index) => (
+                          <div 
+                            key={index} 
+                            className={`feature-card bg-white border border-gray-200 rounded-xl p-6 hover-lift ${visibleSections['tabs'] ? 'feature-card-visible' : ''}`}
+                            style={{ animationDelay: `${0.2 + index * 0.1}s` }}
+                          >
+                            <div className="text-3xl mb-4">
+                              {feature.icon}
+                            </div>
+                            <h3 className="text-xl font-bold text-gray-900 mb-3">{feature.title}</h3>
+                            <p className="text-gray-600">{feature.description}</p>
+                          </div>
+                        ))}
                       </div>
                       
-                      <div className="bg-gradient-to-r from-blue-50 to-cyan-50 p-6 rounded-xl hover-lift animate-fade-in-up delay-500">
-                        <h3 className="text-xl font-bold text-gray-900 mb-3">Learning Outcomes:</h3>
+                      <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-6 rounded-xl hover-lift animate-fade-in-up delay-500">
+                        <h3 className="text-xl font-bold text-gray-900 mb-3">Quality Promise:</h3>
                         <p className="text-gray-700">
-                          This project demonstrates proficiency in full-stack development, database design, API integration, user experience design, and project management—skills essential for modern web development careers.
+                          Every device sold on ReTech undergoes 50+ point diagnostic tests, professional refurbishment, and comes with a minimum 90-day warranty. We stand behind every product we sell.
                         </p>
                       </div>
                     </div>
@@ -452,17 +454,21 @@ export default function AboutUs() {
 
                 {activeTab === 'tech' && (
                   <div className="tab-content">
-                    <h2 className="text-3xl font-bold text-gray-900 mb-6 animate-fade-in-down">Technical Architecture</h2>
+                    <h2 className="text-3xl font-bold text-gray-900 mb-6 animate-fade-in-down">Built With Modern Technology</h2>
                     <div className="space-y-6">
                       <p className="text-lg text-gray-700 leading-relaxed animate-fade-in-up delay-100">
-                        ReTech is built using a modern MERN-like stack with Django as the backend, providing a robust and scalable architecture for e-commerce applications.
+                        ReTech is built on a robust, scalable technology stack designed to provide a seamless shopping experience while ensuring security and reliability.
                       </p>
                       
                       <div className="mb-8 animate-fade-in-up delay-200">
                         <h3 className="text-xl font-bold text-gray-900 mb-4">Technology Stack:</h3>
                         <div className="flex flex-wrap gap-3">
                           {technologies.map((tech, index) => (
-                            <span key={index} className={`px-4 py-2 rounded-full text-sm font-medium ${tech.color} hover-lift animate-scale-in scroll-item-hidden`} style={{ animationDelay: `${0.2 + index * 0.08}s` }}>
+                            <span 
+                              key={index} 
+                              className={`px-4 py-2 rounded-full text-sm font-medium ${tech.color} hover-lift ${visibleSections['tabs'] ? 'animate-scale-in' : ''}`} 
+                              style={{ animationDelay: `${0.2 + index * 0.08}s` }}
+                            >
                               {tech.name}
                             </span>
                           ))}
@@ -471,23 +477,23 @@ export default function AboutUs() {
                       
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="bg-gradient-to-br from-green-500 to-emerald-600 p-6 rounded-xl text-white hover-lift animate-fade-in-left delay-400 scroll-item-hidden">
-                          <div className="text-3xl mb-2">⚛️</div>
-                          <h4 className="font-bold text-lg">Frontend</h4>
+                          <div className="text-3xl mb-2">⚡</div>
+                          <h4 className="font-bold text-lg">Fast & Secure</h4>
                           <ul className="mt-3 space-y-2 text-sm">
-                            <li>• React with Hooks & Context API</li>
-                            <li>• Tailwind CSS for styling</li>
-                            <li>• React Router for navigation</li>
-                            <li>• Responsive design</li>
+                            <li>• Optimized for performance</li>
+                            <li>• Bank-level security</li>
+                            <li>• 24/7 monitoring</li>
+                            <li>• Regular updates</li>
                           </ul>
                         </div>
                         <div className="bg-gradient-to-br from-blue-500 to-cyan-600 p-6 rounded-xl text-white hover-lift animate-fade-in-right delay-400 scroll-item-hidden">
-                          <div className="text-3xl mb-2">🐍</div>
-                          <h4 className="font-bold text-lg">Backend</h4>
+                          <div className="text-3xl mb-2">📱</div>
+                          <h4 className="font-bold text-lg">Accessible</h4>
                           <ul className="mt-3 space-y-2 text-sm">
-                            <li>• Django REST Framework</li>
-                            <li>• JWT Authentication</li>
-                            <li>• PostgreSQL Database</li>
-                            <li>• RESTful API Design</li>
+                            <li>• Mobile-first design</li>
+                            <li>• Cross-browser compatible</li>
+                            <li>• Fast loading times</li>
+                            <li>• Intuitive interface</li>
                           </ul>
                         </div>
                       </div>
@@ -497,41 +503,46 @@ export default function AboutUs() {
 
                 {activeTab === 'features' && (
                   <div className="tab-content">
-                    <h2 className="text-3xl font-bold text-gray-900 mb-6 animate-fade-in-down">System Features</h2>
+                    <h2 className="text-3xl font-bold text-gray-900 mb-6 animate-fade-in-down">Platform Features</h2>
                     <div className="space-y-6">
                       <p className="text-lg text-gray-700 leading-relaxed animate-fade-in-up delay-100">
-                        The ReTech platform includes comprehensive features for both customers and administrators, creating a complete e-commerce ecosystem.
+                        ReTech offers a comprehensive set of features designed to make buying and selling refurbished electronics safe, easy, and enjoyable.
                       </p>
                       
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        {features.map((feature, index) => (
-                          <div key={index} className="bg-white border border-gray-200 rounded-xl p-6 hover-lift animate-bounce-in scroll-item-hidden" style={{ animationDelay: `${0.2 + index * 0.1}s` }}>
-                            <div className="text-3xl mb-4 animate-bounce">
-                              {feature.icon}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                        {keyFeatures.map((feature, index) => (
+                          <div 
+                            key={index} 
+                            className={`bg-white border border-gray-200 rounded-xl p-4 hover-lift flex items-start space-x-3 ${visibleSections['tabs'] ? 'animate-fade-in-left' : ''}`}
+                            style={{ animationDelay: `${0.2 + index * 0.05}s` }}
+                          >
+                            <div className="w-6 h-6 bg-green-100 text-green-600 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                              ✓
                             </div>
-                            <h3 className="text-xl font-bold text-gray-900 mb-3">{feature.title}</h3>
-                            <p className="text-gray-600">{feature.description}</p>
+                            <span className="text-gray-700">{feature}</span>
                           </div>
                         ))}
                       </div>
                       
                       <div className="bg-gradient-to-r from-purple-50 to-violet-50 p-6 rounded-xl hover-lift animate-fade-in-up delay-600">
-                        <h3 className="text-xl font-bold text-gray-900 mb-3">Additional Features:</h3>
-                        <ul className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                          {[
-                            "User Authentication & Authorization",
-                            "Product Catalog with Filters",
-                            "Shopping Cart & Checkout",
-                            "Order Management System"
-                          ].map((feature, index) => (
-                            <li key={index} className="flex items-center animate-fade-in-left scroll-item-hidden" style={{ animationDelay: `${0.5 + index * 0.1}s` }}>
-                              <svg className="w-4 h-4 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                              </svg>
-                              {feature}
-                            </li>
-                          ))}
-                        </ul>
+                        <h3 className="text-xl font-bold text-gray-900 mb-3">Customer Experience:</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                          <div className="text-center p-4">
+                            <div className="text-2xl mb-2">🛡️</div>
+                            <h4 className="font-bold text-gray-900">Warranty</h4>
+                            <p className="text-sm text-gray-600">90-day minimum on all devices</p>
+                          </div>
+                          <div className="text-center p-4">
+                            <div className="text-2xl mb-2">📦</div>
+                            <h4 className="font-bold text-gray-900">Easy Returns</h4>
+                            <p className="text-sm text-gray-600">30-day return policy</p>
+                          </div>
+                          <div className="text-center p-4">
+                            <div className="text-2xl mb-2">💬</div>
+                            <h4 className="font-bold text-gray-900">Support</h4>
+                            <p className="text-sm text-gray-600">24/7 customer service</p>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -542,62 +553,64 @@ export default function AboutUs() {
         </div>
       </section>
 
-      {/* Why This Project Section */}
+      {/* Why Choose ReTech */}
       <section className="py-20 bg-gradient-to-b from-emerald-50 to-white" data-scroll-section id="why">
         <div className="container mx-auto px-4">
           <div className={`text-center mb-16 scroll-hidden ${visibleSections['why'] ? 'scroll-visible' : ''}`}>
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-              Why <span className="text-green-600">ReTech</span>?
+              Why Choose <span className="text-green-600">ReTech</span>?
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Addressing Real-World Problems Through Academic Excellence
+              The smart choice for refurbished electronics
             </p>
           </div>
 
-          <div className={`max-w-4xl mx-auto bg-white rounded-3xl shadow-xl p-8 md:p-12 hover-lift scroll-hidden ${visibleSections['why'] ? 'scroll-visible' : ''}`}>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div className={`${visibleSections['why'] ? 'animate-fade-in-left delay-300' : ''}`}>
-                <h3 className="text-2xl font-bold text-gray-900 mb-4">Problem Statement</h3>
-                <ul className="space-y-3">
-                  {[
-                    "Growing electronic waste with 53.6 million metric tons generated globally in 2019",
-                    "High cost of new electronics limiting accessibility",
-                    "Lack of trusted platforms for refurbished electronics"
-                  ].map((problem, index) => (
-                    <li key={index} className={`flex items-start scroll-item-hidden scroll-item-${index + 1} ${visibleSections['why'] ? 'scroll-item-visible' : ''}`}>
-                      <div className="w-6 h-6 bg-red-100 text-red-600 rounded-full flex items-center justify-center mr-3 mt-1 flex-shrink-0">
-                        ⚠️
-                      </div>
-                      <span className="text-gray-700">{problem}</span>
-                    </li>
-                  ))}
-                </ul>
+          <div className={`max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 scroll-hidden ${visibleSections['why'] ? 'scroll-visible' : ''}`}>
+            <div className={`bg-white rounded-2xl p-8 shadow-xl hover-lift animate-fade-in-up ${visibleSections['why'] ? 'animate-fade-in-up delay-100' : ''}`}>
+              <div className="w-16 h-16 bg-green-100 text-green-600 rounded-xl flex items-center justify-center text-2xl mb-6">
+                💰
               </div>
-              <div className={`${visibleSections['why'] ? 'animate-fade-in-right delay-300' : ''}`}>
-                <h3 className="text-2xl font-bold text-gray-900 mb-4">Our Solution</h3>
-                <ul className="space-y-3">
-                  {[
-                    "Promoting circular economy through device refurbishment",
-                    "Making technology accessible with affordable pricing",
-                    "Building trust through quality assurance and warranties"
-                  ].map((solution, index) => (
-                    <li key={index} className={`flex items-start scroll-item-hidden scroll-item-${index + 1} ${visibleSections['why'] ? 'scroll-item-visible' : ''}`}>
-                      <div className="w-6 h-6 bg-green-100 text-green-600 rounded-full flex items-center justify-center mr-3 mt-1 flex-shrink-0">
-                        ✅
-                      </div>
-                      <span className="text-gray-700">{solution}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-4">Save Money</h3>
+              <p className="text-gray-600">
+                Get premium devices at up to 70% off retail prices without compromising on quality or performance.
+              </p>
             </div>
+
+            <div className={`bg-white rounded-2xl p-8 shadow-xl hover-lift animate-fade-in-up ${visibleSections['why'] ? 'animate-fade-in-up delay-300' : ''}`}>
+              <div className="w-16 h-16 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center text-2xl mb-6">
+                ♻️
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-4">Help The Planet</h3>
+              <p className="text-gray-600">
+                Every purchase reduces electronic waste and supports the circular economy. Choose sustainability without sacrifice.
+              </p>
+            </div>
+
+            <div className={`bg-white rounded-2xl p-8 shadow-xl hover-lift animate-fade-in-up ${visibleSections['why'] ? 'animate-fade-in-up delay-500' : ''}`}>
+              <div className="w-16 h-16 bg-purple-100 text-purple-600 rounded-xl flex items-center justify-center text-2xl mb-6">
+                🛡️
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-4">Shop With Confidence</h3>
+              <p className="text-gray-600">
+                All devices are certified, tested, and backed by warranties. Your satisfaction is our priority.
+              </p>
+            </div>
+          </div>
+
+          {/* CTA */}
+          <div className={`text-center mt-16 animate-fade-in-up delay-700 ${visibleSections['why'] ? 'animate-fade-in-up' : ''}`}>
+            <Link
+              to="/customer-signup"
+              className="inline-block bg-gradient-to-r from-green-600 to-emerald-600 text-white px-8 py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transition-all hover:scale-105"
+            >
+              Join ReTech Today
+            </Link>
+            <p className="text-gray-600 mt-4">
+              Start shopping sustainable electronics or become a seller
+            </p>
           </div>
         </div>
       </section>
-
-      
-
-      
     </div>
   );
 }

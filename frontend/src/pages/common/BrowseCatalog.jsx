@@ -198,7 +198,7 @@ export default function Catalog() {
         <div className="hidden md:flex items-center space-x-8">
           <Link to="/" className="text-gray-700 hover:text-green-600 font-medium">Home</Link>
           <Link to="/about-us" className="text-gray-700 hover:text-green-600 font-medium">About Us</Link>
-          <Link to="/contact-us" className="text-gray-700 hover:text-green-600 font-medium">Contact Us</Link>
+          <Link to="/contact-us" className="text-gray-700 hover:text-green-600 font-medium">Partner With Us</Link>
           <Link to="/privacy-policy" className="text-gray-700 hover:text-green-600 font-medium">Privacy Policy</Link>
           <Link to="/catalog" className="text-green-600 font-medium border-b-2 border-green-600 pb-1">Browse Catalog</Link>
           <Link to="/customer-login" className="text-gray-700 hover:text-green-600 font-medium">Login</Link>
@@ -493,7 +493,7 @@ export default function Catalog() {
                       </div>
                       
                       <button className="px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-medium rounded-xl transition-all duration-300 transform hover:scale-105">
-                        Add to Cart
+                        Reserve
                       </button>
                     </div>
                   </div>
