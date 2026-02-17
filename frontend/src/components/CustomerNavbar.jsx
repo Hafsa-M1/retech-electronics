@@ -1,6 +1,6 @@
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import logo from "../assets/retech-logo.png"; // Adjust the path based on your folder structure
+import { NavLink, useNavigate } from 'react-router-dom';  // ← Changed to NavLink
+import logo from "../assets/retech-logo.png";
 
 const CustomerNavbar = () => {
   const navigate = useNavigate();
@@ -9,56 +9,59 @@ const CustomerNavbar = () => {
   const isLoggedIn = localStorage.getItem('customerToken');
   
   const handleLogout = () => {
-    // Clear customer authentication data
     localStorage.removeItem('customerToken');
     localStorage.removeItem('customerEmail');
     navigate('/customer-login');
   };
 
+  // Common active link styles
+  const activeLinkStyle = "text-emerald-600 font-semibold border-b-2 border-emerald-600 pb-1";
+  const inactiveLinkStyle = "text-gray-700 hover:text-emerald-600 font-medium transition-colors duration-200";
+
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md shadow-sm border-b border-gray-200">
       <div className="container mx-auto px-6 flex items-center justify-between h-20">
         {/* Logo */}
-        <Link to="/customer-dashboard" className="flex items-center">
+        <NavLink to="/customer-dashboard" className="flex items-center">
           <img
             src={logo}
             alt="ReTech Logo"
             className="h-32 w-auto transition-transform hover:scale-105"
           />
-        </Link>
+        </NavLink>
 
         {/* Desktop Menu */}
         <div className="hidden md:flex items-center space-x-8">
-          <Link 
+          <NavLink 
             to="/customer-dashboard" 
-            className="text-gray-700 hover:text-emerald-600 font-medium transition-colors duration-200"
+            className={({ isActive }) => isActive ? activeLinkStyle : inactiveLinkStyle}
           >
             Dashboard
-          </Link>
-          <Link 
+          </NavLink>
+          <NavLink 
             to="/customer-submit-device" 
-            className="text-gray-700 hover:text-emerald-600 font-medium transition-colors duration-200"
+            className={({ isActive }) => isActive ? activeLinkStyle : inactiveLinkStyle}
           >
             Submit Device
-          </Link>
-          <Link 
+          </NavLink>
+          <NavLink 
             to="/customer-my-devices" 
-            className="text-gray-700 hover:text-emerald-600 font-medium transition-colors duration-200"
+            className={({ isActive }) => isActive ? activeLinkStyle : inactiveLinkStyle}
           >
             My Devices
-          </Link>
-          <Link 
+          </NavLink>
+          <NavLink 
             to="/catalog" 
-            className="text-gray-700 hover:text-emerald-600 font-medium transition-colors duration-200"
+            className={({ isActive }) => isActive ? activeLinkStyle : inactiveLinkStyle}
           >
             Browse Catalog
-          </Link>
-          <Link 
+          </NavLink>
+          <NavLink 
             to="/customer-feedback" 
-            className="text-gray-700 hover:text-emerald-600 font-medium transition-colors duration-200"
+            className={({ isActive }) => isActive ? activeLinkStyle : inactiveLinkStyle}
           >
             Feedback
-          </Link>
+          </NavLink>
           
           {/* User Profile & Logout */}
           {isLoggedIn ? (
@@ -82,18 +85,18 @@ const CustomerNavbar = () => {
             </div>
           ) : (
             <div className="flex items-center space-x-4">
-              <Link
+              <NavLink
                 to="/customer-login"
-                className="text-gray-700 hover:text-emerald-600 font-medium transition-colors duration-200"
+                className={({ isActive }) => isActive ? activeLinkStyle : inactiveLinkStyle}
               >
                 Login
-              </Link>
-              <Link
+              </NavLink>
+              <NavLink
                 to="/customer-signup"
                 className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white px-6 py-2.5 rounded-lg font-medium shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5"
               >
                 Sign Up
-              </Link>
+              </NavLink>
             </div>
           )}
         </div>
@@ -117,40 +120,40 @@ const CustomerNavbar = () => {
         </div>
       </div>
 
-      {/* Mobile Menu */}
+      {/* Mobile Menu - also using NavLink for active style */}
       {isLoggedIn && (
         <div className="md:hidden bg-white border-t border-gray-200 py-4 px-6">
           <div className="flex flex-col space-y-4">
-            <Link 
+            <NavLink 
               to="/customer-dashboard" 
-              className="text-gray-700 hover:text-emerald-600 font-medium transition-colors duration-200 py-2"
+              className={({ isActive }) => isActive ? "text-emerald-600 font-semibold py-2" : "text-gray-700 hover:text-emerald-600 font-medium transition-colors duration-200 py-2"}
             >
               Dashboard
-            </Link>
-            <Link 
+            </NavLink>
+            <NavLink 
               to="/customer-submit-device" 
-              className="text-gray-700 hover:text-emerald-600 font-medium transition-colors duration-200 py-2"
+              className={({ isActive }) => isActive ? "text-emerald-600 font-semibold py-2" : "text-gray-700 hover:text-emerald-600 font-medium transition-colors duration-200 py-2"}
             >
               Submit Device
-            </Link>
-            <Link 
+            </NavLink>
+            <NavLink 
               to="/customer-my-devices" 
-              className="text-gray-700 hover:text-emerald-600 font-medium transition-colors duration-200 py-2"
+              className={({ isActive }) => isActive ? "text-emerald-600 font-semibold py-2" : "text-gray-700 hover:text-emerald-600 font-medium transition-colors duration-200 py-2"}
             >
               My Devices
-            </Link>
-            <Link 
+            </NavLink>
+            <NavLink 
               to="/catalog" 
-              className="text-gray-700 hover:text-emerald-600 font-medium transition-colors duration-200 py-2"
+              className={({ isActive }) => isActive ? "text-emerald-600 font-semibold py-2" : "text-gray-700 hover:text-emerald-600 font-medium transition-colors duration-200 py-2"}
             >
               Browse Catalog
-            </Link>
-            <Link 
+            </NavLink>
+            <NavLink 
               to="/customer-feedback" 
-              className="text-gray-700 hover:text-emerald-600 font-medium transition-colors duration-200 py-2"
+              className={({ isActive }) => isActive ? "text-emerald-600 font-semibold py-2" : "text-gray-700 hover:text-emerald-600 font-medium transition-colors duration-200 py-2"}
             >
               Feedback
-            </Link>
+            </NavLink>
             <button
               onClick={handleLogout}
               className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white px-4 py-2 rounded-lg font-medium shadow-md hover:shadow-lg transition-all duration-300 text-left mt-2"

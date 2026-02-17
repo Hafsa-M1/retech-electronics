@@ -5,14 +5,15 @@ import Home from './pages/common/Home';
 import AboutUs from './pages/common/AboutUs'; 
 import ContactUs from './pages/common/ContactUs';
 import PrivacyPolicy from './pages/common/PrivacyPolicy';
-import BrowseCatalog from './pages/common/BrowseCatalog'; // Keep this import
+import BrowseCatalog from './pages/common/BrowseCatalog';
 
-//Customer Pages
+// Customer Pages
 import CustomerLogin from './pages/customer/CustomerLogin';
 import CustomerSignup from './pages/customer/CustomerSignup';
 import CustomerDashboard from './pages/customer/CustomerDashboard';
+import SubmitDevice from './pages/customer/SubmitDevice';   // ← NEW IMPORT
 
-//Staff Pages
+// Staff Pages
 import StaffLogin from './pages/staff/StaffLogin';
 
 // Footer
@@ -29,11 +30,17 @@ function App() {
             <Route path="/about-us" element={<AboutUs />} /> 
             <Route path="/contact-us" element={<ContactUs />} />
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-            <Route path="/catalog" element={<BrowseCatalog />} /> {/* Changed from /browse-catalog to /catalog */}
+            <Route path="/catalog" element={<BrowseCatalog />} />
+
+            {/* Customer routes */}
             <Route path="/customer-login" element={<CustomerLogin />} />
             <Route path="/customer-signup" element={<CustomerSignup />} />
             <Route path="/customer-dashboard" element={<CustomerDashboard />} />
+            <Route path="/customer-submit-device" element={<SubmitDevice />} />  {/* ← NEW ROUTE */}
+
+            {/* Staff routes */}
             <Route path="/staff-login" element={<StaffLogin />} />
+
             {/* Add more routes here later */}
           </Routes>
         </div>
