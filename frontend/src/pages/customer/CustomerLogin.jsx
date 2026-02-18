@@ -1,5 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
+import axios from 'axios';
 import { FaEnvelope, FaLock, FaEye, FaEyeSlash, FaArrowRight, FaLock as FaLockIcon, FaCheck, FaTimes } from 'react-icons/fa';
 import logo from "../../assets/retech-logo.png";
 
@@ -57,26 +58,36 @@ export default function CustomerLogin() {
     setIsSubmitting(true);
     setLoginError('');
 
-    // Simulate API call
-    setTimeout(() => {
-      setIsSubmitting(false);
+    try {
+      const response = await axios.post(
+        'http://localhost:8000/api/token/',  // your real JWT token endpoint
+        {
+          email: formData.email,
+          password: formData.password,
+        }
+      );
 
-      // Demo login validation
-      if (formData.email === 'demo@error.com') {
-        setLoginError('Invalid email or password. Please try again.');
-        showNotification('error', 'Invalid email or password. Please try again.');
-      } else {
-        // ✅ CRITICAL FIX: Save authentication data
-        localStorage.setItem('customerToken', 'mock-token-' + Date.now());
-        localStorage.setItem('customerEmail', formData.email);
-        
-        // Show success notification before redirecting
-        showNotification('success', 'Login successful! Redirecting to dashboard...');
-        setTimeout(() => {
-          navigate('/customer-dashboard');
-        }, 1500);
-      }
-    }, 1500);
+      const { access } = response.data;  // extract the access token (SimpleJWT default)
+
+      localStorage.setItem('customerToken', access);
+      localStorage.setItem('customerEmail', formData.email);
+
+      showNotification('success', 'Login successful! Redirecting to dashboard...');
+      setTimeout(() => {
+        navigate('/customer-dashboard');
+      }, 1500);
+    } catch (err) {
+      const errorMsg =
+        err.response?.data?.detail ||
+        err.response?.data?.non_field_errors?.[0] ||
+        err.response?.data?.email?.[0] ||
+        err.response?.data?.password?.[0] ||
+        'Invalid email or password. Please try again.';
+      setLoginError(errorMsg);
+      showNotification('error', errorMsg);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleForgotPassword = (e) => {
@@ -88,7 +99,7 @@ export default function CustomerLogin() {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // Simulate password reset
+    // Simulate password reset (replace with real API call later if needed)
     setTimeout(() => {
       setIsSubmitting(false);
       setForgotPassword(false);

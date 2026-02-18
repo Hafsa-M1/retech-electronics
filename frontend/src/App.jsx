@@ -11,7 +11,8 @@ import BrowseCatalog from './pages/common/BrowseCatalog';
 import CustomerLogin from './pages/customer/CustomerLogin';
 import CustomerSignup from './pages/customer/CustomerSignup';
 import CustomerDashboard from './pages/customer/CustomerDashboard';
-import SubmitDevice from './pages/customer/SubmitDevice';   // ← NEW IMPORT
+import SubmitDevice from './pages/customer/SubmitDevice';   
+import MyDevices from './pages/customer/MyDevices';   
 
 // Staff Pages
 import StaffLogin from './pages/staff/StaffLogin';
@@ -36,7 +37,8 @@ function App() {
             <Route path="/customer-login" element={<CustomerLogin />} />
             <Route path="/customer-signup" element={<CustomerSignup />} />
             <Route path="/customer-dashboard" element={<CustomerDashboard />} />
-            <Route path="/customer-submit-device" element={<SubmitDevice />} />  {/* ← NEW ROUTE */}
+            <Route path="/customer-submit-device" element={<SubmitDevice />} />  
+            <Route path="/customer-my-devices" element={<MyDevices />} />
 
             {/* Staff routes */}
             <Route path="/staff-login" element={<StaffLogin />} />

@@ -10,55 +10,138 @@ const SubmitDevice = () => {
     model: '',
     condition_description: '',
     serial_number: '',
-    photos: [], // will handle files separately
+    photos: [],
+    video: null,
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [fieldErrors, setFieldErrors] = useState({});
   const [success, setSuccess] = useState('');
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    setFieldErrors((prev) => ({ ...prev, [name]: '' }));
   };
 
-  const handleFileChange = (e) => {
-    setFormData((prev) => ({ ...prev, photos: Array.from(e.target.files) }));
+  const handlePhotosChange = (e) => {
+    const files = Array.from(e.target.files);
+    if (files.length > 4) {
+      setError('Maximum 4 photos allowed');
+      return;
+    }
+    setFormData((prev) => ({ ...prev, photos: files }));
+  };
+
+  const handleVideoChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (file.size > 50 * 1024 * 1024) {
+        setError('Video file is too large (max 50MB allowed)');
+        e.target.value = '';
+        return;
+      }
+      setFormData((prev) => ({ ...prev, video: file }));
+      setError('');
+    } else {
+      // If user clears the file input
+      setFormData((prev) => ({ ...prev, video: null }));
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError('');
+    setFieldErrors({});
     setSuccess('');
 
-    // Basic client-side validation
-    if (!formData.brand || !formData.model || !formData.condition_description) {
+    // Client-side required fields
+    const required = ['brand', 'model', 'condition_description'];
+    const missing = required.filter((f) => !formData[f]?.trim());
+    if (missing.length > 0) {
       setError('Please fill in all required fields');
       setLoading(false);
       return;
     }
 
     try {
-      // Placeholder API call – backend endpoint doesn't exist yet
+      const data = new FormData();
+      data.append('brand', formData.brand);
+      data.append('model', formData.model);
+      data.append('condition_description', formData.condition_description || 'No additional description');
+
+      if (formData.serial_number?.trim()) {
+        data.append('serial_number', formData.serial_number);
+      }
+
+      // Photos (multiple)
+      formData.photos.forEach((photo) => {
+        data.append('photo_files', photo);
+      });
+
+      // Video – ONLY append if a real file is selected
+      if (formData.video instanceof File && formData.video.size > 0) {
+        data.append('video', formData.video);
+      }
+
+      // Debug: log FormData contents
+      console.log('Submitting FormData:');
+      for (let [key, value] of data.entries()) {
+        console.log(`${key}:`, value instanceof File ? `${value.name} (${value.size} bytes)` : value);
+      }
+
       const response = await axios.post(
-        'http://localhost:8000/api/submissions/', // ← Update port if Django runs on different port
-        formData,
+        'http://localhost:8000/api/submissions/',
+        data,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('customerToken')}`,
-            'Content-Type': 'multipart/form-data',
           },
         }
       );
 
       setSuccess('Device submitted successfully! Redirecting...');
       setTimeout(() => navigate('/customer-my-devices'), 2000);
+
+      // Clear form
+      setFormData({
+        brand: '',
+        model: '',
+        condition_description: '',
+        serial_number: '',
+        photos: [],
+        video: null,
+      });
     } catch (err) {
-      setError(
-        err.response?.data?.detail ||
-        err.response?.data?.non_field_errors?.[0] ||
-        'Failed to submit device. Please try again.'
-      );
+      console.error('Submission error:', err);
+
+      let msg = 'Failed to submit device. Please try again.';
+      const newFieldErrors = {};
+
+      if (err.response?.status === 400 && err.response.data) {
+        const data = err.response.data;
+        Object.keys(data).forEach((key) => {
+          if (Array.isArray(data[key])) {
+            newFieldErrors[key] = data[key][0];
+          }
+        });
+
+        if (Object.keys(newFieldErrors).length > 0) {
+          setFieldErrors(newFieldErrors);
+          msg = 'Please correct the highlighted fields.';
+        } else if (data.detail) {
+          msg = data.detail;
+        } else if (data.non_field_errors) {
+          msg = data.non_field_errors[0];
+        }
+      } else if (err.response) {
+        msg = err.response.data?.detail || `Server error (${err.response.status})`;
+      } else if (err.request) {
+        msg = 'No response from server – check if backend is running.';
+      }
+
+      setError(msg);
     } finally {
       setLoading(false);
     }
@@ -66,10 +149,8 @@ const SubmitDevice = () => {
 
   return (
     <>
-      {/* Navbar – same as dashboard */}
       <CustomerNavbar />
 
-      {/* Main content – push down to avoid overlap with fixed navbar */}
       <div className="min-h-screen bg-gray-50 pt-28 pb-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-3xl mx-auto bg-white shadow-xl rounded-2xl overflow-hidden border border-gray-100">
           <div className="px-8 py-10">
@@ -79,7 +160,6 @@ const SubmitDevice = () => {
               All submissions are reviewed by our team.
             </p>
 
-            {/* Error / Success Messages */}
             {error && (
               <div className="mb-8 p-4 bg-red-50 border-l-4 border-red-500 text-red-700 rounded-r-lg">
                 {error}
@@ -93,7 +173,6 @@ const SubmitDevice = () => {
             )}
 
             <form onSubmit={handleSubmit} className="space-y-7">
-              {/* Brand */}
               <div>
                 <label htmlFor="brand" className="block text-sm font-medium text-gray-700 mb-1">
                   Brand <span className="text-red-600">*</span>
@@ -104,13 +183,13 @@ const SubmitDevice = () => {
                   name="brand"
                   value={formData.brand}
                   onChange={handleChange}
-                  className="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm py-2.5 px-4 border transition-colors"
+                  className={`mt-1 block w-full rounded-lg border ${fieldErrors.brand ? 'border-red-500' : 'border-gray-300'} shadow-sm focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm py-2.5 px-4 transition-colors`}
                   placeholder="e.g. Apple, Samsung, Huawei"
                   required
                 />
+                {fieldErrors.brand && <p className="mt-1 text-sm text-red-600">{fieldErrors.brand}</p>}
               </div>
 
-              {/* Model */}
               <div>
                 <label htmlFor="model" className="block text-sm font-medium text-gray-700 mb-1">
                   Model <span className="text-red-600">*</span>
@@ -121,13 +200,13 @@ const SubmitDevice = () => {
                   name="model"
                   value={formData.model}
                   onChange={handleChange}
-                  className="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm py-2.5 px-4 border transition-colors"
-                  placeholder="e.g. iPhone 13, Galaxy S22, Mate 50 Pro"
+                  className={`mt-1 block w-full rounded-lg border ${fieldErrors.model ? 'border-red-500' : 'border-gray-300'} shadow-sm focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm py-2.5 px-4 transition-colors`}
+                  placeholder="e.g. iPhone 13, Galaxy S22"
                   required
                 />
+                {fieldErrors.model && <p className="mt-1 text-sm text-red-600">{fieldErrors.model}</p>}
               </div>
 
-              {/* Condition Description */}
               <div>
                 <label htmlFor="condition_description" className="block text-sm font-medium text-gray-700 mb-1">
                   Describe the current condition <span className="text-red-600">*</span>
@@ -138,13 +217,15 @@ const SubmitDevice = () => {
                   rows={5}
                   value={formData.condition_description}
                   onChange={handleChange}
-                  className="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm py-3 px-4 border transition-colors"
-                  placeholder="e.g. Minor scratches on back, screen perfect, battery health 85%, fully functional except charging port is loose..."
+                  className={`mt-1 block w-full rounded-lg border ${fieldErrors.condition_description ? 'border-red-500' : 'border-gray-300'} shadow-sm focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm py-3 px-4 transition-colors`}
+                  placeholder="e.g. Minor scratches on back, screen perfect, battery health 85%..."
                   required
                 />
+                {fieldErrors.condition_description && (
+                  <p className="mt-1 text-sm text-red-600">{fieldErrors.condition_description}</p>
+                )}
               </div>
 
-              {/* Serial Number / IMEI (optional) */}
               <div>
                 <label htmlFor="serial_number" className="block text-sm font-medium text-gray-700 mb-1">
                   Serial Number / IMEI (optional)
@@ -155,12 +236,11 @@ const SubmitDevice = () => {
                   name="serial_number"
                   value={formData.serial_number}
                   onChange={handleChange}
-                  className="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm py-2.5 px-4 border transition-colors"
+                  className="mt-1 block w-full rounded-lg border border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm py-2.5 px-4 transition-colors"
                   placeholder="e.g. F17KX123456789"
                 />
               </div>
 
-              {/* Photos */}
               <div>
                 <label htmlFor="photos" className="block text-sm font-medium text-gray-700 mb-1">
                   Upload photos (up to 4)
@@ -168,44 +248,41 @@ const SubmitDevice = () => {
                 <input
                   type="file"
                   id="photos"
-                  name="photos"
                   accept="image/*"
                   multiple
-                  onChange={handleFileChange}
-                  className="mt-1 block w-full text-sm text-gray-500
-                    file:mr-4 file:py-2.5 file:px-5
-                    file:rounded-lg file:border-0
-                    file:text-sm file:font-medium
-                    file:bg-emerald-50 file:text-emerald-700
-                    hover:file:bg-emerald-100
-                    file:transition-colors"
+                  onChange={handlePhotosChange}
+                  className="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2.5 file:px-5 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100 file:transition-colors"
                 />
-                <p className="mt-2 text-xs text-gray-500">
-                  Max 4 photos • Each under 5MB • Good lighting, multiple angles recommended
-                </p>
+                <p className="mt-2 text-xs text-gray-500">Max 4 photos • Each under 5MB</p>
+                {fieldErrors.photo_files && <p className="mt-1 text-sm text-red-600">{fieldErrors.photo_files}</p>}
               </div>
 
-              {/* Submit Button */}
+              <div>
+                <label htmlFor="video" className="block text-sm font-medium text-gray-700 mb-1">
+                  Optional: Record a short video showing the device powering on, screen working, and basic functions
+                </label>
+                <input
+                  type="file"
+                  id="video"
+                  accept="video/*"
+                  onChange={handleVideoChange}
+                  className="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2.5 file:px-5 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100 file:transition-colors"
+                />
+                <p className="mt-2 text-xs text-gray-500">Recommended: 10–60s • Max 50MB</p>
+                {fieldErrors.video && <p className="mt-1 text-sm text-red-600">{fieldErrors.video}</p>}
+              </div>
+
               <div className="pt-6">
                 <button
                   type="submit"
                   disabled={loading}
-                  className={`w-full flex justify-center py-3.5 px-6 border border-transparent rounded-xl shadow-md text-white font-semibold text-base transition-all duration-300
-                    ${loading
+                  className={`w-full py-3.5 px-6 rounded-xl text-white font-semibold transition-all duration-300 ${
+                    loading
                       ? 'bg-gray-400 cursor-not-allowed'
-                      : 'bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 hover:shadow-xl hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500'}`}
+                      : 'bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 hover:shadow-xl hover:-translate-y-0.5'
+                  }`}
                 >
-                  {loading ? (
-                    <span className="flex items-center">
-                      <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                      </svg>
-                      Submitting...
-                    </span>
-                  ) : (
-                    'Submit Device for Evaluation'
-                  )}
+                  {loading ? 'Submitting...' : 'Submit Device for Evaluation'}
                 </button>
               </div>
             </form>
