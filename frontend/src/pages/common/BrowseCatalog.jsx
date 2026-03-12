@@ -1,7 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
 import { FaFilter, FaSortAmountDown, FaSearch, FaShoppingCart, FaHeart, FaStar, FaMobileAlt, FaLaptop, FaTabletAlt, FaHeadphones } from 'react-icons/fa';
-import logo from "../../assets/retech-logo.png";
 import browseHero from "../../assets/images/browse-hero.png";
 
 export default function Catalog() {
@@ -185,41 +184,9 @@ export default function Catalog() {
 
   return (
     <div className="min-h-screen font-sans bg-gradient-to-b from-gray-50 to-white">
-      {/* Navbar */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-white shadow-md h-20 flex items-center justify-between px-6">
-        <Link to="/" className="flex items-center h-full -ml-4" style={{ marginTop: '4mm' }}>
-          <img
-            src={logo}
-            alt="ReTech Logo"
-            className="h-32 w-auto object-contain"
-          />
-        </Link>
-
-        <div className="hidden md:flex items-center space-x-8">
-          <Link to="/" className="text-gray-700 hover:text-green-600 font-medium">Home</Link>
-          <Link to="/about-us" className="text-gray-700 hover:text-green-600 font-medium">About Us</Link>
-          <Link to="/contact-us" className="text-gray-700 hover:text-green-600 font-medium">Partner With Us</Link>
-          <Link to="/privacy-policy" className="text-gray-700 hover:text-green-600 font-medium">Privacy Policy</Link>
-          <Link to="/catalog" className="text-green-600 font-medium border-b-2 border-green-600 pb-1">Browse Catalog</Link>
-          <Link to="/customer-login" className="text-gray-700 hover:text-green-600 font-medium">Login</Link>
-          <Link
-            to="/customer-signup"
-            className="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-lg font-medium shadow-sm"
-          >
-            Sign Up
-          </Link>
-        </div>
-
-        <button className="md:hidden text-gray-700">
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
-          </svg>
-        </button>
-      </nav>
-
-      {/* Hero Section */}
+      {/* Hero Section - Adjusted padding since navbar is now in layout */}
       <header 
-        className="relative pt-32 pb-20 bg-cover bg-center bg-no-repeat"
+        className="relative pt-24 pb-20 bg-cover bg-center bg-no-repeat"
         style={{
           backgroundImage: `url(${browseHero})`
         }}
