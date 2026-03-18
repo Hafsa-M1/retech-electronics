@@ -475,28 +475,7 @@ export default function AboutUs() {
                         </div>
                       </div>
                       
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div className="bg-gradient-to-br from-green-500 to-emerald-600 p-6 rounded-xl text-white hover-lift animate-fade-in-left delay-400 scroll-item-hidden">
-                          <div className="text-3xl mb-2">⚡</div>
-                          <h4 className="font-bold text-lg">Fast & Secure</h4>
-                          <ul className="mt-3 space-y-2 text-sm">
-                            <li>• Optimized for performance</li>
-                            <li>• Bank-level security</li>
-                            <li>• 24/7 monitoring</li>
-                            <li>• Regular updates</li>
-                          </ul>
-                        </div>
-                        <div className="bg-gradient-to-br from-blue-500 to-cyan-600 p-6 rounded-xl text-white hover-lift animate-fade-in-right delay-400 scroll-item-hidden">
-                          <div className="text-3xl mb-2">📱</div>
-                          <h4 className="font-bold text-lg">Accessible</h4>
-                          <ul className="mt-3 space-y-2 text-sm">
-                            <li>• Mobile-first design</li>
-                            <li>• Cross-browser compatible</li>
-                            <li>• Fast loading times</li>
-                            <li>• Intuitive interface</li>
-                          </ul>
-                        </div>
-                      </div>
+                      
                     </div>
                   </div>
                 )}

@@ -45,6 +45,9 @@ const PublicNavbar = () => {
           <Link to="/catalog" className="text-gray-700 hover:text-green-600 font-medium transition-colors duration-200">
             Browse Catalog
           </Link>
+          <Link to="/privacy-policy" className="text-gray-700 hover:text-green-600 font-medium transition-colors duration-200">
+            Privacy Policy
+          </Link>
           <Link to="/customer-login" className="text-gray-700 hover:text-green-600 font-medium transition-colors duration-200">
             Login
           </Link>

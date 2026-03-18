@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import CustomerNavbar from "../../components/CustomerNavbar";
 
 const CustomerDashboard = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [customerData, setCustomerData] = useState(null);
+  const [devices, setDevices] = useState([]);
   const [stats, setStats] = useState({
     totalDevices: 0,
     submitted: 0,
@@ -14,7 +16,7 @@ const CustomerDashboard = () => {
     sold: 0
   });
 
-  // Mock data - Replace with actual API calls
+  // Fetch real customer data from API
   useEffect(() => {
     // Check authentication
     const token = localStorage.getItem('customerToken') || sessionStorage.getItem('customerToken');
@@ -23,71 +25,68 @@ const CustomerDashboard = () => {
       return;
     }
 
-    // Fetch customer data (replace with actual API call)
+    // Fetch customer data from API
     const fetchCustomerData = async () => {
       try {
-        // Simulate API delay
-        await new Promise(resolve => setTimeout(resolve, 500));
+        setLoading(true);
         
-        // Mock customer data
-        const mockCustomerData = {
-          name: 'Emma Gregory',
-          email: localStorage.getItem('customerEmail') || 'emma@gmail.com',
-          memberSince: '2026-01-26',
-          totalSubmissions: 1,
-          lastSubmission: '2026-01-26'
-        };
-        
-        // Mock devices data based on SRS Section 4.1-4.3
-        const mockDevices = [
+        // Fetch user profile
+        const userResponse = await axios.get(
+          'http://localhost:8000/api/users/me/',
           {
-            id: 'DEV001',
-            brand: 'Samsung',
-            model: 'Galaxy S21',
-            submissionDate: '2024-02-10',
-            status: 'Under Diagnostics',
-            condition: 'Good',
-            certificateId: null,
-            estimatedValue: 'Rs. 45,000'
-          },
-          {
-            id: 'DEV002',
-            brand: 'Apple',
-            model: 'iPhone 12',
-            submissionDate: '2024-01-25',
-            status: 'Certified',
-            condition: 'Excellent',
-            certificateId: 'CERT-2024-0012',
-            certifiedDate: '2024-01-28',
-            certifiedValue: 'Rs. 60,000'
-          },
-          {
-            id: 'DEV003',
-            brand: 'Dell',
-            model: 'XPS 13',
-            submissionDate: '2024-01-15',
-            status: 'Sold',
-            condition: 'Good',
-            certificateId: 'CERT-2024-0008',
-            soldDate: '2024-01-20',
-            soldPrice: 'Rs. 85,000'
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
           }
-        ];
-
-        // Calculate statistics
+        );
+        
+        // Fetch user's devices/submissions
+        const devicesResponse = await axios.get(
+          'http://localhost:8000/api/submissions/my/',
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        
+        const userData = userResponse.data;
+        const devicesData = devicesResponse.data;
+        
+        // Calculate statistics from real devices
         const statsData = {
-          totalDevices: mockDevices.length,
-          submitted: mockDevices.filter(d => d.status === 'Submitted').length,
-          underDiagnostics: mockDevices.filter(d => d.status === 'Under Diagnostics').length,
-          certified: mockDevices.filter(d => d.status === 'Certified').length,
-          sold: mockDevices.filter(d => d.status === 'Sold').length
+          totalDevices: devicesData.length,
+          submitted: devicesData.filter(d => d.status === 'PENDING' || d.status === 'Submitted' || d.status === 'pending').length,
+          underDiagnostics: devicesData.filter(d => d.status === 'UNDER_DIAGNOSTICS' || d.status === 'Under Diagnostics' || d.status === 'under_diagnostics').length,
+          certified: devicesData.filter(d => d.status === 'CERTIFIED' || d.status === 'Certified' || d.status === 'APPROVED' || d.status === 'approved').length,
+          sold: devicesData.filter(d => d.status === 'SOLD' || d.status === 'Sold' || d.status === 'sold').length
         };
 
-        setCustomerData(mockCustomerData);
+        setCustomerData({
+          name: userData.full_name || `${userData.first_name} ${userData.last_name}`.trim() || userData.email.split('@')[0],
+          email: userData.email,
+          memberSince: new Date(userData.date_joined).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+          }),
+          totalSubmissions: devicesData.length,
+          lastSubmission: devicesData.length > 0 ? new Date(devicesData[0].submission_date).toLocaleDateString() : 'N/A'
+        });
+        
+        setDevices(devicesData);
         setStats(statsData);
         setLoading(false);
       } catch (error) {
         console.error('Error fetching customer data:', error);
+        
+        // If token is invalid, redirect to login
+        if (error.response && (error.response.status === 401 || error.response.status === 403)) {
+          localStorage.removeItem('customerToken');
+          localStorage.removeItem('customerEmail');
+          navigate('/customer-login');
+        }
+        
         setLoading(false);
       }
     };
@@ -127,14 +126,31 @@ const CustomerDashboard = () => {
     }
   ];
 
+  // Get status badge color
+  const getStatusColor = (status) => {
+    const statusLower = (status || '').toLowerCase();
+    if (statusLower.includes('pending') || statusLower.includes('submitted')) {
+      return 'bg-yellow-100 text-yellow-800';
+    } else if (statusLower.includes('diagnostic') || statusLower.includes('under')) {
+      return 'bg-blue-100 text-blue-800';
+    } else if (statusLower.includes('certified') || statusLower.includes('approved')) {
+      return 'bg-green-100 text-green-800';
+    } else if (statusLower.includes('sold')) {
+      return 'bg-purple-100 text-purple-800';
+    } else {
+      return 'bg-gray-100 text-gray-800';
+    }
+  };
+
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 pt-20"> {/* Added pt-20 for navbar height */}
+      <div className="min-h-screen bg-gray-50 pt-20">
         <CustomerNavbar />
         <div className="container mx-auto px-4 py-8">
           <div className="flex justify-center items-center h-64">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600"></div>
           </div>
+          <p className="text-center text-gray-600 mt-4">Loading your dashboard...</p>
         </div>
       </div>
     );
@@ -144,8 +160,8 @@ const CustomerDashboard = () => {
     <div className="min-h-screen bg-gray-50">
       <CustomerNavbar />
       
-      {/* Main Content - Added pt-20 for navbar height */}
-      <div className="container mx-auto px-4 py-8 pt-24"> {/* Changed from pt-8 to pt-24 */}
+      {/* Main Content */}
+      <div className="container mx-auto px-4 py-8 pt-24">
         
         {/* Welcome Section */}
         <div className="mb-8">
@@ -153,7 +169,7 @@ const CustomerDashboard = () => {
             Welcome back, {customerData?.name || 'Customer'}!
           </h1>
           <p className="text-gray-600 text-lg">
-            Manage your device submissions, track certifications, and explore refurbished electronics.
+            Member since {customerData?.memberSince || 'N/A'} • {customerData?.totalSubmissions || 0} device(s) submitted
           </p>
         </div>
 
@@ -164,7 +180,11 @@ const CustomerDashboard = () => {
             <div className="text-gray-700 font-medium">Total Devices</div>
           </div>
           <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100 hover:shadow-xl transition-shadow duration-300">
-            <div className="text-3xl font-bold text-yellow-600">{stats.underDiagnostics}</div>
+            <div className="text-3xl font-bold text-yellow-600">{stats.submitted}</div>
+            <div className="text-gray-700 font-medium">Submitted</div>
+          </div>
+          <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100 hover:shadow-xl transition-shadow duration-300">
+            <div className="text-3xl font-bold text-blue-600">{stats.underDiagnostics}</div>
             <div className="text-gray-700 font-medium">Under Diagnostics</div>
           </div>
           <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100 hover:shadow-xl transition-shadow duration-300">
@@ -174,10 +194,6 @@ const CustomerDashboard = () => {
           <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100 hover:shadow-xl transition-shadow duration-300">
             <div className="text-3xl font-bold text-purple-600">{stats.sold}</div>
             <div className="text-gray-700 font-medium">Sold</div>
-          </div>
-          <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100 hover:shadow-xl transition-shadow duration-300">
-            <div className="text-3xl font-bold text-gray-600">{stats.submitted}</div>
-            <div className="text-gray-700 font-medium">Submitted</div>
           </div>
         </div>
 
@@ -207,58 +223,55 @@ const CustomerDashboard = () => {
           </div>
           
           <div className="p-6">
-            <div className="space-y-4">
-              <div className="flex items-center p-4 bg-blue-50 rounded-lg border border-blue-100">
-                <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-4">
-                  <span className="text-blue-600">📱</span>
-                </div>
-                <div className="flex-1">
-                  <p className="font-medium text-gray-900">Device submitted for diagnostics</p>
-                  <p className="text-sm text-gray-600">Samsung Galaxy S21 - Submitted on 2024-02-10</p>
-                </div>
-                <span className="px-3 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full">
-                  Under Review
-                </span>
+            {devices.length > 0 ? (
+              <div className="space-y-4">
+                {devices.slice(0, 3).map((device, index) => (
+                  <div key={index} className="flex items-center p-4 bg-blue-50 rounded-lg border border-blue-100">
+                    <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-4">
+                      <span className="text-blue-600">📱</span>
+                    </div>
+                    <div className="flex-1">
+                      <p className="font-medium text-gray-900">{device.brand} {device.model}</p>
+                      <p className="text-sm text-gray-600">
+                        {device.condition || 'Standard'} • Submitted on {new Date(device.submission_date).toLocaleDateString()}
+                      </p>
+                    </div>
+                    <span className={`px-3 py-1 ${getStatusColor(device.status)} text-xs font-medium rounded-full`}>
+                      {device.status}
+                    </span>
+                  </div>
+                ))}
               </div>
-              
-              <div className="flex items-center p-4 bg-emerald-50 rounded-lg border border-emerald-100">
-                <div className="w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center mr-4">
-                  <span className="text-emerald-600">✅</span>
-                </div>
-                <div className="flex-1">
-                  <p className="font-medium text-gray-900">Device certified for resale</p>
-                  <p className="text-sm text-gray-600">Apple iPhone 12 - Certified on 2024-01-28</p>
-                </div>
-                <span className="px-3 py-1 bg-emerald-100 text-emerald-800 text-xs font-medium rounded-full">
-                  Certified
-                </span>
+            ) : (
+              <div className="text-center py-8">
+                <div className="text-6xl mb-4">✨</div>
+                <h3 className="text-xl font-bold text-gray-900 mb-2">No devices yet</h3>
+                <p className="text-gray-600 mb-6">Start by submitting your first device for refurbishment</p>
+                <Link
+                  to="/customer-submit-device"
+                  className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-medium rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+                >
+                  Submit Your First Device
+                  <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                  </svg>
+                </Link>
               </div>
-              
-              <div className="flex items-center p-4 bg-purple-50 rounded-lg border border-purple-100">
-                <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center mr-4">
-                  <span className="text-purple-600">💰</span>
-                </div>
-                <div className="flex-1">
-                  <p className="font-medium text-gray-900">Device sold successfully</p>
-                  <p className="text-sm text-gray-600">Dell XPS 13 - Sold on 2024-01-20 for Rs. 85,000</p>
-                </div>
-                <span className="px-3 py-1 bg-purple-100 text-purple-800 text-xs font-medium rounded-full">
-                  Sold
-                </span>
-              </div>
-            </div>
+            )}
             
-            <div className="mt-6 pt-6 border-t border-gray-200">
-              <Link
-                to="/customer-my-devices"
-                className="text-emerald-600 hover:text-emerald-700 font-medium flex items-center"
-              >
-                View All Activities
-                <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                </svg>
-              </Link>
-            </div>
+            {devices.length > 0 && (
+              <div className="mt-6 pt-6 border-t border-gray-200">
+                <Link
+                  to="/customer-my-devices"
+                  className="text-emerald-600 hover:text-emerald-700 font-medium flex items-center"
+                >
+                  View All Activities
+                  <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                  </svg>
+                </Link>
+              </div>
+            )}
           </div>
         </div>
 
@@ -268,7 +281,7 @@ const CustomerDashboard = () => {
           <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
             <h3 className="text-xl font-bold text-gray-800 mb-4">Certification Process</h3>
             <p className="text-gray-600 mb-4">
-              Based on SRS Section 4.3, all devices undergo standardized diagnostic testing before certification.
+              All devices undergo standardized diagnostic testing before certification.
             </p>
             <ul className="space-y-3">
               <li className="flex items-center">
@@ -298,36 +311,50 @@ const CustomerDashboard = () => {
             </ul>
           </div>
 
-          {/* Recent Notifications */}
+          {/* Why Choose ReTech */}
           <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
-            <h3 className="text-xl font-bold text-gray-800 mb-4">Recent Notifications</h3>
+            <h3 className="text-xl font-bold text-gray-800 mb-4">Why Choose ReTech?</h3>
             <div className="space-y-4">
-              <div className="flex items-start p-4 bg-blue-50 rounded-lg border border-blue-100">
-                <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3 flex-shrink-0">
-                  <span className="text-blue-600">📱</span>
+              <div className="flex items-start">
+                <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-3 flex-shrink-0">
+                  <span className="text-green-600 text-xl">✓</span>
                 </div>
                 <div>
-                  <p className="font-medium text-gray-900">Device diagnostics completed</p>
-                  <p className="text-sm text-gray-600 mt-1">Your Samsung Galaxy S21 has completed diagnostic testing</p>
-                  <span className="inline-block mt-2 text-xs text-blue-600">2 hours ago</span>
+                  <p className="font-medium text-gray-900">Certified Quality</p>
+                  <p className="text-sm text-gray-600">50+ point diagnostic testing on every device</p>
                 </div>
               </div>
-              <div className="flex items-start p-4 bg-emerald-50 rounded-lg border border-emerald-100">
-                <div className="w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center mr-3 flex-shrink-0">
-                  <span className="text-emerald-600">✅</span>
+              <div className="flex items-start">
+                <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3 flex-shrink-0">
+                  <span className="text-blue-600 text-xl">✓</span>
                 </div>
                 <div>
-                  <p className="font-medium text-gray-900">Certificate issued</p>
-                  <p className="text-sm text-gray-600 mt-1">Your iPhone 12 has been certified for resale</p>
-                  <span className="inline-block mt-2 text-xs text-emerald-600">1 day ago</span>
+                  <p className="font-medium text-gray-900">90-Day Warranty</p>
+                  <p className="text-sm text-gray-600">Peace of mind with every purchase</p>
+                </div>
+              </div>
+              <div className="flex items-start">
+                <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center mr-3 flex-shrink-0">
+                  <span className="text-purple-600 text-xl">✓</span>
+                </div>
+                <div>
+                  <p className="font-medium text-gray-900">Sustainable Choice</p>
+                  <p className="text-sm text-gray-600">Reduce e-waste and carbon footprint</p>
+                </div>
+              </div>
+              <div className="flex items-start">
+                <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center mr-3 flex-shrink-0">
+                  <span className="text-orange-600 text-xl">✓</span>
+                </div>
+                <div>
+                  <p className="font-medium text-gray-900">Best Prices</p>
+                  <p className="text-sm text-gray-600">Up to 70% off retail prices</p>
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-
-      
     </div>
   );
 };

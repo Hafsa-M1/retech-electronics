@@ -300,6 +300,9 @@ export default function Home() {
             <Link to="/catalog" className="text-gray-700 hover:text-green-600 font-medium transition-colors duration-200">
               Browse Catalog
             </Link>
+            <Link to="/privacy-policy" className="text-gray-700 hover:text-green-600 font-medium transition-colors duration-200">
+              Privacy Policy
+            </Link>
             <Link to="/customer-login" className="text-gray-700 hover:text-green-600 font-medium transition-colors duration-200">
               Login
             </Link>
@@ -448,14 +451,6 @@ export default function Home() {
                 <p className="text-gray-600 leading-relaxed">
                   {feature.description}
                 </p>
-                <div className="mt-6 pt-6 border-t border-gray-200/50">
-                  <div className="flex items-center text-sm text-gray-500">
-                    <svg className="w-4 h-4 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                    </svg>
-                    Certified & Tested
-                  </div>
-                </div>
               </div>
             ))}
           </div>
