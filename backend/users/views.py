@@ -1,9 +1,10 @@
 # users/views.py
 from rest_framework import status
 from rest_framework.generics import CreateAPIView
+from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.permissions import AllowAny
-from .serializers import CustomerSignupSerializer
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from .serializers import CustomerSignupSerializer, UserProfileSerializer
 from rest_framework.authtoken.models import Token
 # If you're using JWT instead → from rest_framework_simplejwt.tokens import RefreshToken
 
@@ -39,6 +40,7 @@ class CustomerSignupView(CreateAPIView):
                 'email': user.email,
                 'first_name': user.first_name,
                 'last_name': user.last_name,
+                'full_name': f"{user.first_name} {user.last_name}".strip(),
                 'phone': user.phone,
                 'business_name': user.business_name or '',
                 'role': user.role,
@@ -48,13 +50,12 @@ class CustomerSignupView(CreateAPIView):
         }, status=status.HTTP_201_CREATED)
 
 
-# ────────────────────────────────────────────────
-# Alternative: minimal version without token (if frontend handles login separately)
-# ────────────────────────────────────────────────
-
-# class CustomerSignupView(CreateAPIView):
-#     serializer_class = CustomerSignupSerializer
-#     permission_classes = [AllowAny]
-
-#     def perform_create(self, serializer):
-#         serializer.save()  # just create, no extra response fields
+class CurrentUserView(APIView):
+    """
+    API endpoint to get the currently authenticated user's profile.
+    """
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request):
+        serializer = UserProfileSerializer(request.user)
+        return Response(serializer.data)

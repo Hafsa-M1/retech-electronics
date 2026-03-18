@@ -81,8 +81,7 @@ class CustomerSignupSerializer(serializers.ModelSerializer):
 
 
 # ────────────────────────────────────────────────
-# Optional: if you later need a serializer just for reading customer profile
-# (without password, for profile view / my account page)
+# Serializer for reading customer profile
 # ────────────────────────────────────────────────
 
 class CustomerProfileSerializer(serializers.ModelSerializer):
@@ -109,3 +108,14 @@ class CustomerProfileSerializer(serializers.ModelSerializer):
 
     def get_full_name(self, obj):
         return f"{obj.first_name} {obj.last_name}".strip()
+
+
+# ────────────────────────────────────────────────
+# User Profile Serializer (alias for CustomerProfileSerializer)
+# ────────────────────────────────────────────────
+
+class UserProfileSerializer(CustomerProfileSerializer):
+    """
+    Alias for CustomerProfileSerializer - used for getting current user profile.
+    """
+    pass
