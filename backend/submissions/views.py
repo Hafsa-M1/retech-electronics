@@ -1,50 +1,103 @@
+# submissions/views.py
+
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.generics import ListAPIView
-from .models import DeviceSubmission, SubmissionPhoto
-from .serializers import DeviceSubmissionSerializer
-from django.core.files.storage import default_storage
+from django.contrib.auth import get_user_model
 
+from .models import DeviceSubmission
+from .serializers import DeviceSubmissionSerializer, AdminDeviceSubmissionSerializer
+
+
+# -------------------- Customer --------------------
 
 class DeviceSubmissionCreateView(APIView):
-    """
-    API endpoint for customers to submit a device.
-    - Requires authentication (customer token)
-    - Accepts multipart/form-data (text fields + photos + optional video)
-    - Status defaults to 'PENDING'
-    """
+    """POST /api/submissions/ — customer submits a device"""
     permission_classes = [IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
-        # Use the serializer to validate and process data
         serializer = DeviceSubmissionSerializer(data=request.data)
-
         if serializer.is_valid():
-            # Associate the submission with the logged-in customer
             submission = serializer.save(customer=request.user)
-
             return Response(
                 {
                     "message": "Device submitted successfully",
                     "submission_id": submission.id,
-                    "status": submission.status
+                    "status": submission.status,
                 },
-                status=status.HTTP_201_CREATED
+                status=status.HTTP_201_CREATED,
             )
-
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class MyDeviceSubmissionsListView(ListAPIView):
-    """
-    GET /api/submissions/my/
-    Returns list of submissions belonging to the currently authenticated customer.
-    """
+    """GET /api/submissions/my/ — customer's own submissions"""
     serializer_class = DeviceSubmissionSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        # Only return submissions for the logged-in user, newest first
-        return DeviceSubmission.objects.filter(customer=self.request.user).order_by('-submission_date')
+        return DeviceSubmission.objects.filter(
+            customer=self.request.user
+        ).order_by('-submission_date')
+
+
+# -------------------- Admin --------------------
+
+class AdminSubmissionsListView(ListAPIView):
+    """GET /api/submissions/admin/all/ — admin sees all submissions"""
+    serializer_class = AdminDeviceSubmissionSerializer
+    permission_classes = [IsAdminUser]
+
+    def get_queryset(self):
+        qs = DeviceSubmission.objects.select_related('customer').prefetch_related('photos').order_by('-submission_date')
+        
+        status_filter = self.request.query_params.get('status')
+        if status_filter:
+            qs = qs.filter(status=status_filter.upper())
+
+        return qs
+
+
+class AdminSubmissionUpdateView(APIView):
+    """PATCH /api/submissions/admin/<id>/update/ — admin updates submission status"""
+    permission_classes = [IsAdminUser]
+
+    def patch(self, request, pk):
+        try:
+            submission = DeviceSubmission.objects.get(pk=pk)
+        except DeviceSubmission.DoesNotExist:
+            return Response({'error': 'Submission not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        new_status = request.data.get('status')
+        valid_statuses = ['PENDING', 'APPROVED', 'REJECTED', 'UNDER_REVIEW']
+
+        if new_status not in valid_statuses:
+            return Response(
+                {'error': f'Invalid status. Choose from: {", ".join(valid_statuses)}'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        submission.status = new_status
+        submission.save()
+
+        return Response({'message': 'Status updated', 'status': submission.status})
+
+
+class AdminSubmissionStatsView(APIView):
+    """GET /api/submissions/admin/stats/ — admin dashboard stats"""
+    permission_classes = [IsAdminUser]
+
+    def get(self, request):
+        User = get_user_model()
+        qs = DeviceSubmission.objects.all()
+
+        return Response({
+            "total_submissions": qs.count(),
+            "pending": qs.filter(status='PENDING').count(),
+            "under_review": qs.filter(status='UNDER_REVIEW').count(),
+            "approved": qs.filter(status='APPROVED').count(),
+            "rejected": qs.filter(status='REJECTED').count(),
+            "staff_count": User.objects.filter(is_staff=True).count(),
+        })
