@@ -1,5 +1,6 @@
-import { FaFacebookF, FaInstagram } from "react-icons/fa"; // Facebook & Instagram
-import { SiX } from "react-icons/si"; // X logo
+import { FaFacebookF, FaInstagram } from "react-icons/fa";
+import { SiX } from "react-icons/si";
+import { Link } from "react-router-dom";
 
 export default function Footer() {
   return (
@@ -20,28 +21,13 @@ export default function Footer() {
         <div className="md:col-span-1 text-center">
           <h4 className="text-lg font-semibold text-white mb-4">Follow Us</h4>
           <div className="flex justify-center space-x-6 text-gray-400 text-xl">
-            <a
-              href="https://www.facebook.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-blue-500 transition"
-            >
+            <a href="https://www.facebook.com" target="_blank" rel="noopener noreferrer" className="hover:text-blue-500 transition">
               <FaFacebookF size={24} />
             </a>
-            <a
-              href="https://www.instagram.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-pink-500 transition"
-            >
+            <a href="https://www.instagram.com" target="_blank" rel="noopener noreferrer" className="hover:text-pink-500 transition">
               <FaInstagram size={24} />
             </a>
-            <a
-              href="https://www.x.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-blue-400 transition"
-            >
+            <a href="https://www.x.com" target="_blank" rel="noopener noreferrer" className="hover:text-blue-400 transition">
               <SiX size={24} />
             </a>
           </div>
@@ -59,6 +45,10 @@ export default function Footer() {
       {/* Bottom bar */}
       <div className="border-t border-gray-700 py-4 text-center text-sm text-gray-500">
         © {new Date().getFullYear()} ReTech. All rights reserved.
+        <span className="mx-2">·</span>
+        <Link to="/admin/login" className="hover:text-gray-400 transition">
+          Admin
+        </Link>
       </div>
     </footer>
   );
