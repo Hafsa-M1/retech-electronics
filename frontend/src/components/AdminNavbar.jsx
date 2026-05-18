@@ -1,26 +1,28 @@
-import React from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import React from "react";
+import { NavLink, useNavigate } from "react-router-dom";
 import logo from "../assets/retech-logo.png";
 
 const AdminNavbar = () => {
   const navigate = useNavigate();
-  
+
   // Check if admin is logged in
-  const isLoggedIn = localStorage.getItem('adminToken');
-  
+  const isLoggedIn = localStorage.getItem("adminToken");
+
   const handleLogout = () => {
-    localStorage.removeItem('adminToken');
-    localStorage.removeItem('adminInfo');
-    navigate('/admin-login');
+    localStorage.removeItem("adminToken");
+    localStorage.removeItem("adminInfo");
+    navigate("/admin-login");
   };
 
   // Common active link styles
-  const activeLinkStyle = "text-emerald-600 font-semibold border-b-2 border-emerald-600 pb-1";
-  const inactiveLinkStyle = "text-gray-700 hover:text-emerald-600 font-medium transition-colors duration-200";
+  const activeLinkStyle =
+    "text-emerald-600 font-semibold border-b-2 border-emerald-600 pb-1";
+  const inactiveLinkStyle =
+    "text-gray-700 hover:text-emerald-600 font-medium transition-colors duration-200";
 
   // Get admin name from localStorage
-  const adminInfo = localStorage.getItem('adminInfo');
-  const adminName = adminInfo ? JSON.parse(adminInfo).name || 'Admin' : 'Admin';
+  const adminInfo = localStorage.getItem("adminInfo");
+  const adminName = adminInfo ? JSON.parse(adminInfo).name || "Admin" : "Admin";
   const adminInitial = adminName.charAt(0).toUpperCase();
 
   return (
@@ -37,37 +39,47 @@ const AdminNavbar = () => {
 
         {/* Desktop Menu */}
         <div className="hidden md:flex items-center space-x-8">
-          <NavLink 
-            to="/admin/dashboard" 
-            className={({ isActive }) => isActive ? activeLinkStyle : inactiveLinkStyle}
+          <NavLink
+            to="/admin/dashboard"
+            className={({ isActive }) =>
+              isActive ? activeLinkStyle : inactiveLinkStyle
+            }
           >
             Dashboard
           </NavLink>
-          <NavLink 
-            to="/admin/submissions" 
-            className={({ isActive }) => isActive ? activeLinkStyle : inactiveLinkStyle}
+          <NavLink
+            to="/admin/submissions"
+            className={({ isActive }) =>
+              isActive ? activeLinkStyle : inactiveLinkStyle
+            }
           >
             Submissions
           </NavLink>
-          <NavLink 
-            to="/admin/staff" 
-            className={({ isActive }) => isActive ? activeLinkStyle : inactiveLinkStyle}
+          <NavLink
+            to="/admin/staff"
+            className={({ isActive }) =>
+              isActive ? activeLinkStyle : inactiveLinkStyle
+            }
           >
             Staff
           </NavLink>
-          <NavLink 
-            to="/admin/users" 
-            className={({ isActive }) => isActive ? activeLinkStyle : inactiveLinkStyle}
+          <NavLink
+            to="/admin/users"
+            className={({ isActive }) =>
+              isActive ? activeLinkStyle : inactiveLinkStyle
+            }
           >
             Customers
           </NavLink>
-          <NavLink 
-            to="/admin/devices" 
-            className={({ isActive }) => isActive ? activeLinkStyle : inactiveLinkStyle}
+          <NavLink
+            to="/admin/devices"
+            className={({ isActive }) =>
+              isActive ? activeLinkStyle : inactiveLinkStyle
+            }
           >
             Inventory
           </NavLink>
-          
+
           {/* Admin Profile & Logout */}
           {isLoggedIn ? (
             <div className="flex items-center space-x-4">
@@ -77,9 +89,7 @@ const AdminNavbar = () => {
                     {adminInitial}
                   </span>
                 </div>
-                <span className="text-sm text-gray-700">
-                  {adminName}
-                </span>
+                <span className="text-sm text-gray-700">{adminName}</span>
               </div>
               <button
                 onClick={handleLogout}
@@ -92,7 +102,9 @@ const AdminNavbar = () => {
             <div className="flex items-center space-x-4">
               <NavLink
                 to="/admin-login"
-                className={({ isActive }) => isActive ? activeLinkStyle : inactiveLinkStyle}
+                className={({ isActive }) =>
+                  isActive ? activeLinkStyle : inactiveLinkStyle
+                }
               >
                 Login
               </NavLink>
@@ -112,8 +124,18 @@ const AdminNavbar = () => {
             </div>
           )}
           <button className="text-gray-700">
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
+            <svg
+              className="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M4 6h16M4 12h16M4 18h16"
+              />
             </svg>
           </button>
         </div>
@@ -123,33 +145,53 @@ const AdminNavbar = () => {
       {isLoggedIn && (
         <div className="md:hidden bg-white border-t border-gray-200 py-4 px-6">
           <div className="flex flex-col space-y-4">
-            <NavLink 
-              to="/admin/dashboard" 
-              className={({ isActive }) => isActive ? "text-emerald-600 font-semibold py-2" : "text-gray-700 hover:text-emerald-600 font-medium transition-colors duration-200 py-2"}
+            <NavLink
+              to="/admin/dashboard"
+              className={({ isActive }) =>
+                isActive
+                  ? "text-emerald-600 font-semibold py-2"
+                  : "text-gray-700 hover:text-emerald-600 font-medium transition-colors duration-200 py-2"
+              }
             >
               Dashboard
             </NavLink>
-            <NavLink 
-              to="/admin/submissions" 
-              className={({ isActive }) => isActive ? "text-emerald-600 font-semibold py-2" : "text-gray-700 hover:text-emerald-600 font-medium transition-colors duration-200 py-2"}
+            <NavLink
+              to="/admin/submissions"
+              className={({ isActive }) =>
+                isActive
+                  ? "text-emerald-600 font-semibold py-2"
+                  : "text-gray-700 hover:text-emerald-600 font-medium transition-colors duration-200 py-2"
+              }
             >
               Submissions
             </NavLink>
-            <NavLink 
-              to="/admin/staff" 
-              className={({ isActive }) => isActive ? "text-emerald-600 font-semibold py-2" : "text-gray-700 hover:text-emerald-600 font-medium transition-colors duration-200 py-2"}
+            <NavLink
+              to="/admin/staff"
+              className={({ isActive }) =>
+                isActive
+                  ? "text-emerald-600 font-semibold py-2"
+                  : "text-gray-700 hover:text-emerald-600 font-medium transition-colors duration-200 py-2"
+              }
             >
               Staff
             </NavLink>
-            <NavLink 
-              to="/admin/users" 
-              className={({ isActive }) => isActive ? "text-emerald-600 font-semibold py-2" : "text-gray-700 hover:text-emerald-600 font-medium transition-colors duration-200 py-2"}
+            <NavLink
+              to="/admin/users"
+              className={({ isActive }) =>
+                isActive
+                  ? "text-emerald-600 font-semibold py-2"
+                  : "text-gray-700 hover:text-emerald-600 font-medium transition-colors duration-200 py-2"
+              }
             >
               Customers
             </NavLink>
-            <NavLink 
-              to="/admin/devices" 
-              className={({ isActive }) => isActive ? "text-emerald-600 font-semibold py-2" : "text-gray-700 hover:text-emerald-600 font-medium transition-colors duration-200 py-2"}
+            <NavLink
+              to="/admin/devices"
+              className={({ isActive }) =>
+                isActive
+                  ? "text-emerald-600 font-semibold py-2"
+                  : "text-gray-700 hover:text-emerald-600 font-medium transition-colors duration-200 py-2"
+              }
             >
               Inventory
             </NavLink>

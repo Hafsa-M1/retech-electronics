@@ -1,31 +1,36 @@
 // src/App.jsx
 import { BrowserRouter as Router, Routes, Route, Outlet } from 'react-router-dom';
 
-// Pages
+// Common pages
 import Home            from './pages/common/Home';
 import AboutUs         from './pages/common/AboutUs';
 import ContactUs       from './pages/common/ContactUs';
 import PrivacyPolicy   from './pages/common/PrivacyPolicy';
-import BrowseCatalog    from './pages/common/BrowseCatalog';
+import BrowseCatalog   from './pages/common/BrowseCatalog';
 
+// Customer pages
 import CustomerLogin     from './pages/customer/CustomerLogin';
 import CustomerSignup    from './pages/customer/CustomerSignup';
 import CustomerDashboard from './pages/customer/CustomerDashboard';
 import SubmitDevice      from './pages/customer/SubmitDevice';
 import MyDevices         from './pages/customer/MyDevices';
 
+// Staff
 import StaffLogin from './pages/staff/StaffLogin';
 
-import AdminLogin     from './pages/admin/AdminLogin';
-import AdminDashboard from './pages/admin/AdminDashboard';
+// Admin
+import AdminLogin       from './pages/admin/AdminLogin';
+import AdminDashboard   from './pages/admin/AdminDashboard';
+import AdminSubmissions from './pages/admin/AdminSubmissions';
+import AdminStaff       from './pages/admin/AdminStaff';
 
 // Components
-import Footer from './components/Footer';
+import Footer         from './components/Footer';
 import CustomerNavbar from './components/CustomerNavbar';
-import PublicNavbar from './components/PublicNavbar';
-import AdminRoute from './components/AdminRoute';
+import PublicNavbar   from './components/PublicNavbar';
+import AdminRoute     from './components/AdminRoute';
 
-// Layouts
+// ── Layouts ───────────────────────────────────────────────────────────────────
 function MainLayout() {
   const isLoggedIn = localStorage.getItem('customerToken');
   return (
@@ -55,12 +60,13 @@ function CustomerLayout() {
   );
 }
 
+// ── App ───────────────────────────────────────────────────────────────────────
 function App() {
   return (
     <Router>
       <Routes>
 
-        {/* Common pages */}
+        {/* Public pages */}
         <Route element={<MainLayout />}>
           <Route path="/"               element={<Home />} />
           <Route path="/about-us"       element={<AboutUs />} />
@@ -76,20 +82,36 @@ function App() {
           <Route path="/customer-my-devices"    element={<MyDevices />} />
         </Route>
 
-        {/* Auth pages – no navbar */}
+        {/* Auth — no navbar */}
         <Route path="/customer-login"  element={<CustomerLogin />} />
         <Route path="/customer-signup" element={<CustomerSignup />} />
 
         {/* Staff */}
         <Route path="/staff-login" element={<StaffLogin />} />
+        <Route path="/staff/dashboard" element={
+          // Placeholder until you build the staff dashboard
+          <div className="min-h-screen flex items-center justify-center bg-gray-50">
+            <div className="text-center">
+              <div className="text-6xl mb-4">🛠️</div>
+              <h1 className="text-2xl font-bold text-gray-800">Staff Dashboard</h1>
+              <p className="mt-2 text-gray-500">Coming soon — logged in successfully!</p>
+            </div>
+          </div>
+        } />
 
-        {/* Admin – no navbar, protected */}
+        {/* Admin — AdminNavbar rendered inside each page */}
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/admin/dashboard" element={
           <AdminRoute><AdminDashboard /></AdminRoute>
         } />
+        <Route path="/admin/submissions" element={
+          <AdminRoute><AdminSubmissions /></AdminRoute>
+        } />
+        <Route path="/admin/staff" element={
+          <AdminRoute><AdminStaff /></AdminRoute>
+        } />
 
-        {/* Catch-all 404 */}
+        {/* 404 */}
         <Route path="*" element={
           <div className="min-h-screen flex items-center justify-center bg-gray-50">
             <div className="text-center">
