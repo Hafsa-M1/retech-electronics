@@ -6,12 +6,19 @@ from .views import (
     AdminLoginView,
     AdminStaffListView,
     AdminStaffCreateView,
+    AdminStaffToggleActiveView,
 )
 
 urlpatterns = [
+    # ── Customer ──────────────────────────────────────────────────────────────
     path('signup/', CustomerSignupView.as_view(), name='customer-signup'),
-    path('me/', CurrentUserView.as_view(), name='current-user'),
+    path('me/',     CurrentUserView.as_view(),    name='current-user'),
+
+    # ── Admin auth ────────────────────────────────────────────────────────────
     path('admin/login/', AdminLoginView.as_view(), name='admin-login'),
-    path('admin/staff/', AdminStaffListView.as_view(), name='admin-staff-list'),
-    path('admin/staff/create/', AdminStaffCreateView.as_view(), name='admin-staff-create'),
+
+    # ── Staff management ──────────────────────────────────────────────────────
+    path('admin/staff/',                 AdminStaffListView.as_view(),         name='admin-staff-list'),
+    path('admin/staff/create/',          AdminStaffCreateView.as_view(),       name='admin-staff-create'),
+    path('admin/staff/<int:pk>/toggle/', AdminStaffToggleActiveView.as_view(), name='admin-staff-toggle'),
 ]

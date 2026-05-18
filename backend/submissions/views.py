@@ -1,9 +1,8 @@
 # submissions/views.py
-
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from rest_framework.permissions import IsAuthenticated, BasePermission
 from rest_framework.generics import ListAPIView
 from django.contrib.auth import get_user_model
 
@@ -11,21 +10,35 @@ from .models import DeviceSubmission
 from .serializers import DeviceSubmissionSerializer, AdminDeviceSubmissionSerializer
 
 
-# -------------------- Customer --------------------
+# ─── Custom permission ─────────────────────────────────────────────────────────
+class IsStaffOrAdmin(BasePermission):
+    """Allow any authenticated user with is_staff=True (superusers included)."""
+    def has_permission(self, request, view):
+        return bool(
+            request.user
+            and request.user.is_authenticated
+            and request.user.is_staff
+        )
+
+
+# ─── Customer views ────────────────────────────────────────────────────────────
 
 class DeviceSubmissionCreateView(APIView):
-    """POST /api/submissions/ — customer submits a device"""
+    """POST /api/submissions/"""
     permission_classes = [IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
-        serializer = DeviceSubmissionSerializer(data=request.data)
+        serializer = DeviceSubmissionSerializer(
+            data=request.data,
+            context={'request': request},
+        )
         if serializer.is_valid():
             submission = serializer.save(customer=request.user)
             return Response(
                 {
-                    "message": "Device submitted successfully",
-                    "submission_id": submission.id,
-                    "status": submission.status,
+                    'message':       'Device submitted successfully',
+                    'submission_id': submission.id,
+                    'status':        submission.status,
                 },
                 status=status.HTTP_201_CREATED,
             )
@@ -33,8 +46,8 @@ class DeviceSubmissionCreateView(APIView):
 
 
 class MyDeviceSubmissionsListView(ListAPIView):
-    """GET /api/submissions/my/ — customer's own submissions"""
-    serializer_class = DeviceSubmissionSerializer
+    """GET /api/submissions/my/"""
+    serializer_class   = DeviceSubmissionSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
@@ -42,35 +55,56 @@ class MyDeviceSubmissionsListView(ListAPIView):
             customer=self.request.user
         ).order_by('-submission_date')
 
+    def get_serializer_context(self):
+        ctx = super().get_serializer_context()
+        ctx['request'] = self.request
+        return ctx
 
-# -------------------- Admin --------------------
+
+# ─── Admin / Staff views ───────────────────────────────────────────────────────
 
 class AdminSubmissionsListView(ListAPIView):
-    """GET /api/submissions/admin/all/ — admin sees all submissions"""
-    serializer_class = AdminDeviceSubmissionSerializer
-    permission_classes = [IsAdminUser]
+    """GET /api/submissions/admin/all/"""
+    serializer_class   = AdminDeviceSubmissionSerializer
+    permission_classes = [IsStaffOrAdmin]
 
     def get_queryset(self):
-        qs = DeviceSubmission.objects.select_related('customer').prefetch_related('photos').order_by('-submission_date')
-        
+        qs = (
+            DeviceSubmission.objects
+            .select_related('customer')
+            .prefetch_related('photos')
+            .order_by('-submission_date')
+        )
         status_filter = self.request.query_params.get('status')
         if status_filter:
             qs = qs.filter(status=status_filter.upper())
-
         return qs
+
+    def get_serializer_context(self):
+        ctx = super().get_serializer_context()
+        ctx['request'] = self.request
+        return ctx
 
 
 class AdminSubmissionUpdateView(APIView):
-    """PATCH /api/submissions/admin/<id>/update/ — admin updates submission status"""
-    permission_classes = [IsAdminUser]
+    """PATCH /api/submissions/admin/<id>/update/"""
+    permission_classes = [IsStaffOrAdmin]
 
     def patch(self, request, pk):
         try:
-            submission = DeviceSubmission.objects.get(pk=pk)
+            submission = (
+                DeviceSubmission.objects
+                .select_related('customer')
+                .prefetch_related('photos')
+                .get(pk=pk)
+            )
         except DeviceSubmission.DoesNotExist:
-            return Response({'error': 'Submission not found'}, status=status.HTTP_404_NOT_FOUND)
+            return Response(
+                {'error': 'Submission not found'},
+                status=status.HTTP_404_NOT_FOUND,
+            )
 
-        new_status = request.data.get('status')
+        new_status     = request.data.get('status')
         valid_statuses = ['PENDING', 'APPROVED', 'REJECTED', 'UNDER_REVIEW']
 
         if new_status not in valid_statuses:
@@ -82,22 +116,27 @@ class AdminSubmissionUpdateView(APIView):
         submission.status = new_status
         submission.save()
 
-        return Response({'message': 'Status updated', 'status': submission.status})
+        serializer = AdminDeviceSubmissionSerializer(
+            submission, context={'request': request}
+        )
+        return Response({
+            'message':    'Status updated successfully.',
+            'submission': serializer.data,
+        })
 
 
 class AdminSubmissionStatsView(APIView):
-    """GET /api/submissions/admin/stats/ — admin dashboard stats"""
-    permission_classes = [IsAdminUser]
+    """GET /api/submissions/admin/stats/"""
+    permission_classes = [IsStaffOrAdmin]
 
     def get(self, request):
         User = get_user_model()
-        qs = DeviceSubmission.objects.all()
-
+        qs   = DeviceSubmission.objects.all()
         return Response({
-            "total_submissions": qs.count(),
-            "pending": qs.filter(status='PENDING').count(),
-            "under_review": qs.filter(status='UNDER_REVIEW').count(),
-            "approved": qs.filter(status='APPROVED').count(),
-            "rejected": qs.filter(status='REJECTED').count(),
-            "staff_count": User.objects.filter(is_staff=True).count(),
+            'total_submissions': qs.count(),
+            'pending':           qs.filter(status='PENDING').count(),
+            'under_review':      qs.filter(status='UNDER_REVIEW').count(),
+            'approved':          qs.filter(status='APPROVED').count(),
+            'rejected':          qs.filter(status='REJECTED').count(),
+            'staff_count':       User.objects.filter(is_staff=True).count(),
         })
