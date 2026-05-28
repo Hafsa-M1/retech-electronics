@@ -1,3 +1,4 @@
+// src/pages/customer/MyDevices.jsx
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
@@ -20,14 +21,9 @@ export default function MyDevices() {
 
         const response = await axios.get(
           'http://localhost:8000/api/submissions/my/',
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
+          { headers: { Authorization: `Bearer ${token}` } }
         );
 
-        console.log('API Response:', response.data);
         setSubmissions(response.data);
       } catch (err) {
         setError('Failed to load your devices. Please try again.');
@@ -40,29 +36,12 @@ export default function MyDevices() {
     fetchSubmissions();
   }, []);
 
-  // Helper function to get the correct image URL
   const getImageUrl = (imagePath) => {
     if (!imagePath) return null;
-    
-    // Log the original path for debugging
-    console.log('Original image path:', imagePath);
-    
-    // If it's already a full URL (starts with http), use it as is
-    if (imagePath.startsWith('http')) {
-      return imagePath;
-    }
-    // If the path starts with /media/, add base URL
-    else if (imagePath.startsWith('/media/')) {
-      return `http://localhost:8000${imagePath}`;
-    }
-    // If the path starts with media/ (without leading slash), add slash and base URL
-    else if (imagePath.startsWith('media/')) {
-      return `http://localhost:8000/${imagePath}`;
-    }
-    // If it's just the filename, construct the full path
-    else {
-      return `http://localhost:8000/media/${imagePath}`;
-    }
+    if (imagePath.startsWith('http')) return imagePath;
+    if (imagePath.startsWith('/media/')) return `http://localhost:8000${imagePath}`;
+    if (imagePath.startsWith('media/')) return `http://localhost:8000/${imagePath}`;
+    return `http://localhost:8000/media/${imagePath}`;
   };
 
   return (
@@ -117,24 +96,15 @@ export default function MyDevices() {
                             alt={`${device.brand} ${device.model}`}
                             className="w-full h-full object-contain bg-gray-50"
                             loading="lazy"
-                            onLoad={() => console.log('✅ Photo loaded successfully for device:', device.id)}
                             onError={(e) => {
-                              console.error('❌ Photo failed to load for device:', device.id);
-                              console.error('Attempted URL:', e.target.src);
-                              // Show a nicer placeholder
-                              e.target.onerror = null; // Prevent infinite loop
-                              e.target.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300"><rect width="400" height="300" fill="%23f3f4f6"/><text x="50" y="150" font-family="Arial" font-size="16" fill="%239ca3af">Image failed to load</text></svg>';
+                              e.target.onerror = null;
+                              e.target.src = 'https://placehold.co/400x300?text=Photo+Failed';
                             }}
                           />
                         </div>
                       ) : (
                         <div className="w-full h-48 bg-gray-100 flex items-center justify-center text-gray-500 font-medium border-b border-gray-200">
-                          <div className="text-center">
-                            <svg className="w-12 h-12 mx-auto text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                            </svg>
-                            <p>No photo uploaded</p>
-                          </div>
+                          No photo uploaded
                         </div>
                       )}
 
@@ -142,33 +112,72 @@ export default function MyDevices() {
                         <h3 className="text-xl font-bold text-gray-900 mb-2">
                           {device.brand} {device.model}
                         </h3>
-                        <p className="text-sm text-gray-600 mb-2">
+                        <p className="text-sm text-gray-600 mb-3">
                           Submitted: {new Date(device.submission_date).toLocaleDateString()}
                         </p>
-                        {device.condition && (
-                          <p className="text-sm text-gray-600 mb-4">
-                            Condition: {device.condition}
-                          </p>
-                        )}
-                        <div className="flex justify-between items-center">
+
+                        {/* Status Badge */}
+                        <div className="mb-4">
                           <span className={`px-3 py-1 rounded-full text-sm font-medium ${
                             device.status === 'PENDING' ? 'bg-yellow-100 text-yellow-800' :
-                            device.status === 'APPROVED' ? 'bg-green-100 text-green-800' :
+                            device.status === 'APPROVED' ? 'bg-blue-100 text-blue-800' :
+                            device.status === 'CERTIFIED' ? 'bg-emerald-100 text-emerald-800' :
+                            device.status === 'REFURBISH' ? 'bg-amber-100 text-amber-800' :
                             device.status === 'REJECTED' ? 'bg-red-100 text-red-800' :
                             'bg-gray-100 text-gray-800'
                           }`}>
-                            {device.status}
+                            {device.status === 'REFURBISH' ? 'REFURBISHMENT' : device.status}
                           </span>
-                          <Link
-                            to={`/customer-device/${device.id}`}
-                            className="text-emerald-600 hover:text-emerald-800 font-medium inline-flex items-center"
-                          >
-                            View Details
-                            <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
-                            </svg>
-                          </Link>
                         </div>
+
+                        {/* APPROVED */}
+                        {device.status === 'APPROVED' && (
+                          <div className="mb-5 p-4 bg-blue-50 border border-blue-200 rounded-xl">
+                            <p className="text-blue-700 font-semibold">✅ Device Accepted</p>
+                            <p className="text-blue-600 text-sm mt-1">
+                              Please bring your device to the shop for physical inspection.
+                            </p>
+                          </div>
+                        )}
+
+                        {/* CERTIFIED */}
+                        {device.status === 'CERTIFIED' && (
+                          <div className="mb-5 p-4 bg-emerald-50 border border-emerald-200 rounded-xl">
+                            <p className="text-emerald-700 font-semibold flex items-center gap-2">
+                              🎉 Device is now Certified!
+                            </p>
+                            <p className="text-emerald-600 text-sm mt-1">
+                              Your device has passed all quality checks and is ready for sale.
+                            </p>
+                          </div>
+                        )}
+
+                        {/* REFURBISHMENT */}
+                        {device.status === 'REFURBISH' && (
+                          <div className="mb-5 p-4 bg-amber-50 border border-amber-200 rounded-xl">
+                            <p className="text-amber-700 font-semibold">🔧 Under Refurbishment</p>
+                            <p className="text-amber-600 text-sm mt-1">
+                              Minor issues found. Our team is repairing this device.
+                            </p>
+                          </div>
+                        )}
+
+                        {/* REJECTED */}
+                        {device.status === 'REJECTED' && (
+                          <div className="mb-5 p-4 bg-red-50 border border-red-200 rounded-xl">
+                            <p className="text-red-700 font-semibold">❌ Device Rejected</p>
+                            <p className="text-red-600 text-sm mt-1">
+                              This device did not meet our quality standards.
+                            </p>
+                          </div>
+                        )}
+
+                        <Link
+                          to={`/customer-device/${device.id}`}
+                          className="block w-full text-center py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-xl transition-colors"
+                        >
+                          View Details →
+                        </Link>
                       </div>
                     </div>
                   ))}

@@ -45,9 +45,15 @@ export default function Footer() {
       {/* Bottom bar */}
       <div className="border-t border-gray-700 py-4 text-center text-sm text-gray-500">
         © {new Date().getFullYear()} ReTech. All rights reserved.
+        
         <span className="mx-2">·</span>
         <Link to="/admin/login" className="hover:text-gray-400 transition">
           Admin
+        </Link>
+
+        <span className="mx-2">·</span>
+        <Link to="/staff/login" className="hover:text-gray-400 transition">
+          Staff
         </Link>
       </div>
     </footer>

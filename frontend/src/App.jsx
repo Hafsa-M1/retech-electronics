@@ -16,7 +16,10 @@ import SubmitDevice      from './pages/customer/SubmitDevice';
 import MyDevices         from './pages/customer/MyDevices';
 
 // Staff
-import StaffLogin from './pages/staff/StaffLogin';
+import StaffLogin        from './pages/staff/StaffLogin';
+import StaffDashboard    from './pages/staff/StaffDashboard';
+import StaffRegistration from './pages/staff/StaffRegistration';
+import StaffDiagnostics  from './pages/staff/StaffDiagnostics';   // ← New Import
 
 // Admin
 import AdminLogin       from './pages/admin/AdminLogin';
@@ -30,7 +33,23 @@ import CustomerNavbar from './components/CustomerNavbar';
 import PublicNavbar   from './components/PublicNavbar';
 import AdminRoute     from './components/AdminRoute';
 
-// ── Layouts ───────────────────────────────────────────────────────────────────
+// ── Staff Route Guard ─────────────────────────────────────────────────────
+const StaffRoute = ({ children }) => {
+  const token = localStorage.getItem('staffToken');
+  if (!token) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <p className="text-gray-600 mb-4">Please log in to access the staff portal.</p>
+          <a href="/staff/login" className="text-blue-600 underline">Go to Staff Login</a>
+        </div>
+      </div>
+    );
+  }
+  return children;
+};
+
+// ── Layouts ───────────────────────────────────────────────────────────────
 function MainLayout() {
   const isLoggedIn = localStorage.getItem('customerToken');
   return (
@@ -60,13 +79,13 @@ function CustomerLayout() {
   );
 }
 
-// ── App ───────────────────────────────────────────────────────────────────────
+// ── App ─────────────────────────────────────────────────────────────────────
 function App() {
   return (
     <Router>
       <Routes>
 
-        {/* Public pages */}
+        {/* Public pages with MainLayout (includes Footer) */}
         <Route element={<MainLayout />}>
           <Route path="/"               element={<Home />} />
           <Route path="/about-us"       element={<AboutUs />} />
@@ -82,24 +101,23 @@ function App() {
           <Route path="/customer-my-devices"    element={<MyDevices />} />
         </Route>
 
-        {/* Auth — no navbar */}
+        {/* Auth Pages - No Navbar/Footer */}
         <Route path="/customer-login"  element={<CustomerLogin />} />
         <Route path="/customer-signup" element={<CustomerSignup />} />
 
-        {/* Staff */}
-        <Route path="/staff-login" element={<StaffLogin />} />
-        <Route path="/staff/dashboard" element={
-          // Placeholder until you build the staff dashboard
-          <div className="min-h-screen flex items-center justify-center bg-gray-50">
-            <div className="text-center">
-              <div className="text-6xl mb-4">🛠️</div>
-              <h1 className="text-2xl font-bold text-gray-800">Staff Dashboard</h1>
-              <p className="mt-2 text-gray-500">Coming soon — logged in successfully!</p>
-            </div>
-          </div>
+        {/* Staff Routes */}
+        <Route path="/staff/login"        element={<StaffLogin />} />
+        <Route path="/staff/dashboard"    element={
+          <StaffRoute><StaffDashboard /></StaffRoute>
+        } />
+        <Route path="/staff/registration" element={
+          <StaffRoute><StaffRegistration /></StaffRoute>
+        } />
+        <Route path="/staff/diagnostics" element={
+          <StaffRoute><StaffDiagnostics /></StaffRoute>
         } />
 
-        {/* Admin — AdminNavbar rendered inside each page */}
+        {/* Admin Routes */}
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/admin/dashboard" element={
           <AdminRoute><AdminDashboard /></AdminRoute>
