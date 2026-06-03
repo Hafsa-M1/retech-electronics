@@ -1,18 +1,21 @@
-# submissions/views.py
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, BasePermission
 from rest_framework.generics import ListAPIView
 from django.contrib.auth import get_user_model
+import uuid
 
-from .models import DeviceSubmission
-from .serializers import DeviceSubmissionSerializer, AdminDeviceSubmissionSerializer
+from .models import DeviceSubmission, DeviceReservation
+from .serializers import DeviceSubmissionSerializer, AdminDeviceSubmissionSerializer, DeviceReservationSerializer
 
 
-# ─── Custom permission ─────────────────────────────────────────────────────────
+# ─────────────────────────────────────────────
+# Permission
+# ─────────────────────────────────────────────
+
 class IsStaffOrAdmin(BasePermission):
-    """Allow any authenticated user with is_staff=True (superusers included)."""
+    """Allow any authenticated staff/admin user."""
     def has_permission(self, request, view):
         return bool(
             request.user
@@ -21,10 +24,11 @@ class IsStaffOrAdmin(BasePermission):
         )
 
 
-# ─── Customer views ────────────────────────────────────────────────────────────
+# ─────────────────────────────────────────────
+# Customer Views
+# ─────────────────────────────────────────────
 
 class DeviceSubmissionCreateView(APIView):
-    """POST /api/submissions/"""
     permission_classes = [IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
@@ -36,9 +40,9 @@ class DeviceSubmissionCreateView(APIView):
             submission = serializer.save(customer=request.user)
             return Response(
                 {
-                    'message':       'Device submitted successfully',
+                    'message': 'Device submitted successfully',
                     'submission_id': submission.id,
-                    'status':        submission.status,
+                    'status': submission.status,
                 },
                 status=status.HTTP_201_CREATED,
             )
@@ -46,8 +50,7 @@ class DeviceSubmissionCreateView(APIView):
 
 
 class MyDeviceSubmissionsListView(ListAPIView):
-    """GET /api/submissions/my/"""
-    serializer_class   = DeviceSubmissionSerializer
+    serializer_class = DeviceSubmissionSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
@@ -61,23 +64,115 @@ class MyDeviceSubmissionsListView(ListAPIView):
         return ctx
 
 
-# ─── Admin / Staff views ───────────────────────────────────────────────────────
+# ─────────────────────────────────────────────
+# Reservation Views
 
-class AdminSubmissionsListView(ListAPIView):
-    """GET /api/submissions/admin/all/"""
-    serializer_class   = AdminDeviceSubmissionSerializer
+class DeviceReservationCreateView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, pk):
+        try:
+            submission = DeviceSubmission.objects.select_related('customer').get(
+                pk=pk,
+                status='PUBLISHED',
+            )
+        except DeviceSubmission.DoesNotExist:
+            return Response(
+                {'error': 'Device not available for reservation.'},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        if hasattr(submission, 'reservation'):
+            return Response(
+                {'error': 'This device has already been reserved.'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        reservation = DeviceReservation.objects.create(
+            device_submission=submission,
+            customer=request.user,
+        )
+
+        serializer = DeviceReservationSerializer(
+            reservation,
+            context={'request': request},
+        )
+
+        return Response({
+            'message': 'Device reserved successfully.',
+            'reservation': serializer.data,
+        }, status=status.HTTP_201_CREATED)
+
+
+class StaffReservationsListView(ListAPIView):
+    serializer_class = DeviceReservationSerializer
     permission_classes = [IsStaffOrAdmin]
 
     def get_queryset(self):
-        qs = (
-            DeviceSubmission.objects
-            .select_related('customer')
-            .prefetch_related('photos')
-            .order_by('-submission_date')
+        return DeviceReservation.objects.select_related(
+            'customer',
+            'device_submission',
+            'device_submission__customer',
+        ).prefetch_related('device_submission__photos').order_by('-reserved_at')
+
+    def get_serializer_context(self):
+        ctx = super().get_serializer_context()
+        ctx['request'] = self.request
+        return ctx
+
+
+class ReservationUpdateStatusView(APIView):
+    permission_classes = [IsStaffOrAdmin]
+
+    def patch(self, request, pk):
+        try:
+            reservation = DeviceReservation.objects.get(pk=pk)
+        except DeviceReservation.DoesNotExist:
+            return Response(
+                {'error': 'Reservation not found'},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        new_status = request.data.get('status')
+        valid_statuses = ['ACTIVE', 'COMPLETED']
+
+        if new_status not in valid_statuses:
+            return Response(
+                {'error': f'Invalid status. Choose from: {", ".join(valid_statuses)}'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        reservation.status = new_status
+        reservation.save()
+
+        serializer = DeviceReservationSerializer(
+            reservation,
+            context={'request': request}
         )
+
+        return Response({
+            'message': f'Reservation marked as {new_status.lower()}.',
+            'reservation': serializer.data,
+        }, status=status.HTTP_200_OK)
+
+
+# ─────────────────────────────────────────────
+# Admin Views
+# ─────────────────────────────────────────────
+
+class AdminSubmissionsListView(ListAPIView):
+    serializer_class = AdminDeviceSubmissionSerializer
+    permission_classes = [IsStaffOrAdmin]
+
+    def get_queryset(self):
+        qs = DeviceSubmission.objects.select_related(
+            'customer'
+        ).prefetch_related('photos').order_by('-submission_date')
+
         status_filter = self.request.query_params.get('status')
         if status_filter:
             qs = qs.filter(status=status_filter.upper())
+
         return qs
 
     def get_serializer_context(self):
@@ -87,24 +182,20 @@ class AdminSubmissionsListView(ListAPIView):
 
 
 class AdminSubmissionUpdateView(APIView):
-    """PATCH /api/submissions/admin/<id>/update/"""
     permission_classes = [IsStaffOrAdmin]
 
     def patch(self, request, pk):
         try:
-            submission = (
-                DeviceSubmission.objects
-                .select_related('customer')
-                .prefetch_related('photos')
-                .get(pk=pk)
-            )
+            submission = DeviceSubmission.objects.select_related(
+                'customer'
+            ).prefetch_related('photos').get(pk=pk)
         except DeviceSubmission.DoesNotExist:
             return Response(
                 {'error': 'Submission not found'},
                 status=status.HTTP_404_NOT_FOUND,
             )
 
-        new_status     = request.data.get('status')
+        new_status = request.data.get('status')
         valid_statuses = ['PENDING', 'APPROVED', 'REJECTED', 'UNDER_REVIEW']
 
         if new_status not in valid_statuses:
@@ -119,24 +210,214 @@ class AdminSubmissionUpdateView(APIView):
         serializer = AdminDeviceSubmissionSerializer(
             submission, context={'request': request}
         )
+
         return Response({
-            'message':    'Status updated successfully.',
+            'message': 'Status updated successfully.',
             'submission': serializer.data,
         })
 
 
+# ─────────────────────────────────────────────
+# 🔥 FIXED: Diagnostics View (IMPORTANT)
+# ─────────────────────────────────────────────
+
+class DeviceDiagnosticsView(APIView):
+    permission_classes = [IsStaffOrAdmin]
+
+    def post(self, request, pk):
+        try:
+            submission = DeviceSubmission.objects.get(pk=pk)
+        except DeviceSubmission.DoesNotExist:
+            return Response(
+                {'error': 'Submission not found'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        action = request.data.get('action')
+        notes = request.data.get('notes', '')
+        results = request.data.get('results', {})
+
+        # 🔍 DEBUG LOGS
+        print("=" * 50)
+        print("DIAGNOSTICS REQUEST RECEIVED")
+        print("ACTION:", action)
+        print("RESULTS:", results)
+        print("NOTES:", notes)
+        print("FULL REQUEST DATA:", request.data)
+        print("=" * 50)
+
+        valid_actions = ['CERTIFIED', 'REFURBISH', 'REJECTED']
+
+        if action not in valid_actions:
+            return Response(
+                {'error': f'Invalid action. Use one of: {valid_actions}'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Save diagnostics
+        submission.diagnostic_results = results
+        submission.diagnostic_notes = notes
+        submission.status = action
+
+        if action == 'CERTIFIED':
+            submission.certificate_id = f"CERT-{uuid.uuid4().hex[:8].upper()}"
+
+        submission.save()
+
+        # 🔍 VERIFY WHAT WAS SAVED
+        submission.refresh_from_db()
+
+        print("SAVED diagnostic_results:", submission.diagnostic_results)
+        print("SAVED diagnostic_notes:", submission.diagnostic_notes)
+        print("SAVED status:", submission.status)
+        print("=" * 50)
+
+        serializer = AdminDeviceSubmissionSerializer(
+            submission,
+            context={'request': request}
+        )
+
+        return Response({
+            'message': f'Device successfully processed as {action}',
+            'submission': serializer.data,
+            'certificate_id': submission.certificate_id if action == 'CERTIFIED' else None,
+        }, status=status.HTTP_200_OK)
+
+# ─────────────────────────────────────────────
+# Certification View
+# ─────────────────────────────────────────────
+
+class DeviceCertificationView(APIView):
+    permission_classes = [IsStaffOrAdmin]
+
+    def post(self, request, pk):
+        try:
+            submission = DeviceSubmission.objects.get(pk=pk)
+        except DeviceSubmission.DoesNotExist:
+            return Response(
+                {'error': 'Submission not found'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        if submission.status != 'CERTIFIED':
+            return Response({
+                'error': 'Only CERTIFIED devices can be processed in certification stage.'
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        if not submission.diagnostic_results:
+            return Response({
+                'error': 'Device diagnostics must be recorded before publishing to the catalog.'
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        submission.category = request.data.get('category')
+        submission.estimated_price = request.data.get('estimated_price')
+        submission.final_notes = request.data.get('final_notes', '')
+        submission.status = 'PUBLISHED'
+        submission.save()
+
+        serializer = AdminDeviceSubmissionSerializer(
+            submission,
+            context={'request': request}
+        )
+
+        return Response({
+            'message': 'Device successfully published to the catalog.',
+            'submission': serializer.data,
+            'certificate_id': submission.certificate_id,
+        })
+
+
+# ─────────────────────────────────────────────
+# Stats
+# ─────────────────────────────────────────────
+
 class AdminSubmissionStatsView(APIView):
-    """GET /api/submissions/admin/stats/"""
     permission_classes = [IsStaffOrAdmin]
 
     def get(self, request):
         User = get_user_model()
-        qs   = DeviceSubmission.objects.all()
+        qs = DeviceSubmission.objects.all()
+
         return Response({
+            # User Statistics
+            'total_customers': User.objects.filter(role='customer').count(),
+            'total_staff': User.objects.filter(role='staff').count(),
+            
+            # Submission Statistics
             'total_submissions': qs.count(),
-            'pending':           qs.filter(status='PENDING').count(),
-            'under_review':      qs.filter(status='UNDER_REVIEW').count(),
-            'approved':          qs.filter(status='APPROVED').count(),
-            'rejected':          qs.filter(status='REJECTED').count(),
-            'staff_count':       User.objects.filter(is_staff=True).count(),
+            'pending': qs.filter(status='PENDING').count(),
+            'under_review': qs.filter(status='UNDER_REVIEW').count(),
+            'approved': qs.filter(status='APPROVED').count(),
+            
+            # Device Status Statistics
+            'diagnostics_completed': qs.filter(status__in=['CERTIFIED', 'REFURBISH', 'REJECTED']).count(),
+            'certified': qs.filter(status='CERTIFIED').count(),
+            'refurbishment': qs.filter(status='REFURBISH').count(),
+            'rejected': qs.filter(status='REJECTED').count(),
+            'published_for_sale': qs.filter(status='PUBLISHED').count(),
         })
+
+
+# ─────────────────────────────────────────────
+# Public Catalog
+# ─────────────────────────────────────────────
+
+class PublicPublishedDeviceDetailView(APIView):
+    permission_classes = []
+
+    def get(self, request, pk):
+        try:
+            submission = DeviceSubmission.objects.select_related('customer').prefetch_related('photos').get(
+                pk=pk,
+                status='PUBLISHED',
+                reservation__isnull=True,
+            )
+        except DeviceSubmission.DoesNotExist:
+            return Response(
+                {'error': 'Device not found'},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        serializer = AdminDeviceSubmissionSerializer(
+            submission,
+            context={'request': request}
+        )
+        return Response(serializer.data)
+
+
+class PublicPublishedDevicesView(ListAPIView):
+    serializer_class = AdminDeviceSubmissionSerializer
+    permission_classes = []
+
+    def get_queryset(self):
+        return DeviceSubmission.objects.filter(
+            status='PUBLISHED',
+            reservation__isnull=True,
+        ).select_related('customer').prefetch_related('photos').order_by('-submission_date')
+
+
+class ReservationCompleteView(APIView):
+    """POST /api/submissions/admin/reservations/<int:pk>/complete/"""
+    permission_classes = [IsStaffOrAdmin]
+
+    def post(self, request, pk):
+        try:
+            reservation = DeviceReservation.objects.get(pk=pk)
+        except DeviceReservation.DoesNotExist:
+            return Response({'error': 'Reservation not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        # Mark reservation as completed
+        reservation.status = 'COMPLETED'
+        reservation.save()
+
+        # Optionally mark the device as sold
+        device = reservation.device_submission
+        device.status = 'SOLD'
+        device.save()
+
+        return Response({
+            'message': 'Reservation marked as sold successfully.',
+            'reservation_id': reservation.id,
+            'device_id': device.id,
+            'status': 'COMPLETED'
+        }, status=status.HTTP_200_OK)

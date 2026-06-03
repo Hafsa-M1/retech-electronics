@@ -7,10 +7,17 @@ from .views import (
     AdminSubmissionsListView,
     AdminSubmissionUpdateView,
     AdminSubmissionStatsView,
+    DeviceDiagnosticsView,
+    DeviceCertificationView,
+    DeviceReservationCreateView,
+    StaffReservationsListView,
+    ReservationCompleteView,               # ← New
+    PublicPublishedDeviceDetailView,
+    PublicPublishedDevicesView,
 )
 
 urlpatterns = [
-    # -------------------- Customer --------------------
+    # -------------------- Customer Routes --------------------
     path(
         '',
         DeviceSubmissionCreateView.as_view(),
@@ -22,7 +29,7 @@ urlpatterns = [
         name='my-submissions-list'
     ),
 
-    # -------------------- Admin --------------------
+    # -------------------- Admin / Staff Routes --------------------
     path(
         'admin/all/',
         AdminSubmissionsListView.as_view(),
@@ -38,4 +45,25 @@ urlpatterns = [
         AdminSubmissionUpdateView.as_view(),
         name='admin-submission-update'
     ),
+
+    # -------------------- Diagnostics & Certification Routes --------------------
+    path(
+        '<int:pk>/diagnostics/',
+        DeviceDiagnosticsView.as_view(),
+        name='device-diagnostics'
+    ),
+    path(
+        '<int:pk>/certify/',
+        DeviceCertificationView.as_view(),
+        name='device-certification'
+    ),
+
+    # -------------------- Reservations --------------------
+    path('public/catalog/<int:pk>/reserve/', DeviceReservationCreateView.as_view(), name='public-device-reserve'),
+    path('admin/reservations/', StaffReservationsListView.as_view(), name='admin-reservations-list'),
+    path('admin/reservations/<int:pk>/complete/', ReservationCompleteView.as_view(), name='reservation-complete'),
+
+    # -------------------- Public Catalog --------------------
+    path('public/catalog/<int:pk>/', PublicPublishedDeviceDetailView.as_view(), name='public-catalog-detail'),
+    path('public/catalog/', PublicPublishedDevicesView.as_view(), name='public-catalog'),
 ]
