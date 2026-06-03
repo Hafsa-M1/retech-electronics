@@ -151,28 +151,32 @@ const SubmitDevice = () => {
     <>
       <CustomerNavbar />
 
-      <div className="min-h-screen bg-gray-50 pt-28 pb-16 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-3xl mx-auto bg-white shadow-xl rounded-2xl overflow-hidden border border-gray-100">
-          <div className="px-8 py-10">
-            <h1 className="text-3xl font-bold text-gray-900 mb-3">Submit Your Device</h1>
-            <p className="text-gray-600 mb-10 leading-relaxed">
-              Please provide accurate details about the device you wish to submit for evaluation and potential refurbishment. 
-              All submissions are reviewed by our team.
-            </p>
-
-            {error && (
-              <div className="mb-8 p-4 bg-red-50 border-l-4 border-red-500 text-red-700 rounded-r-lg">
-                {error}
+      <div className="min-h-screen bg-gray-50 py-6 pb-16 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-5xl mx-auto bg-white shadow-xl rounded-2xl overflow-hidden border border-gray-100">
+          <div className="grid grid-cols-1 lg:grid-cols-3">
+            {/* Form Column */}
+            <div className="lg:col-span-2 px-8 py-10">
+              <div className="flex items-start justify-between">
+                <div>
+                  <h1 className="text-3xl font-extrabold text-gray-900 mb-2">Submit Your Device</h1>
+                  <p className="text-gray-600 mb-6">Provide accurate details to help us evaluate and certify your device quickly.</p>
+                </div>
+                <div className="text-4xl">📤</div>
               </div>
-            )}
 
-            {success && (
-              <div className="mb-8 p-4 bg-green-50 border-l-4 border-green-500 text-green-700 rounded-r-lg">
-                {success}
-              </div>
-            )}
+              {error && (
+                <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-500 text-red-700 rounded-r-lg">
+                  {error}
+                </div>
+              )}
 
-            <form onSubmit={handleSubmit} className="space-y-7">
+              {success && (
+                <div className="mb-6 p-4 bg-green-50 border-l-4 border-green-500 text-green-700 rounded-r-lg">
+                  {success}
+                </div>
+              )}
+
+              <form onSubmit={handleSubmit} className="space-y-6">
               <div>
                 <label htmlFor="brand" className="block text-sm font-medium text-gray-700 mb-1">
                   Brand <span className="text-red-600">*</span>
@@ -183,7 +187,7 @@ const SubmitDevice = () => {
                   name="brand"
                   value={formData.brand}
                   onChange={handleChange}
-                  className={`mt-1 block w-full rounded-lg border ${fieldErrors.brand ? 'border-red-500' : 'border-gray-300'} shadow-sm focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm py-2.5 px-4 transition-colors`}
+                  className={`mt-1 block w-full rounded-lg border ${fieldErrors.brand ? 'border-red-500' : 'border-gray-300'} shadow-sm focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm py-2.5 px-4 transition-colors bg-white`}
                   placeholder="e.g. Apple, Samsung, Huawei"
                   required
                 />
@@ -242,33 +246,21 @@ const SubmitDevice = () => {
               </div>
 
               <div>
-                <label htmlFor="photos" className="block text-sm font-medium text-gray-700 mb-1">
-                  Upload photos (up to 4)
-                </label>
-                <input
-                  type="file"
-                  id="photos"
-                  accept="image/*"
-                  multiple
-                  onChange={handlePhotosChange}
-                  className="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2.5 file:px-5 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100 file:transition-colors"
-                />
-                <p className="mt-2 text-xs text-gray-500">Max 4 photos • Each under 5MB</p>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Photos (up to 4)</label>
+                <div className="mt-1 border-2 border-dashed border-gray-200 rounded-xl p-4 text-center bg-gray-50">
+                  <p className="text-sm text-gray-600 mb-2">Drag & drop photos here, or click to browse</p>
+                  <input type="file" id="photos" accept="image/*" multiple onChange={handlePhotosChange} className="mx-auto" />
+                  <p className="mt-2 text-xs text-gray-500">Max 4 photos • Each under 5MB</p>
+                </div>
                 {fieldErrors.photo_files && <p className="mt-1 text-sm text-red-600">{fieldErrors.photo_files}</p>}
               </div>
 
               <div>
-                <label htmlFor="video" className="block text-sm font-medium text-gray-700 mb-1">
-                  Optional: Record a short video showing the device powering on, screen working, and basic functions
-                </label>
-                <input
-                  type="file"
-                  id="video"
-                  accept="video/*"
-                  onChange={handleVideoChange}
-                  className="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2.5 file:px-5 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100 file:transition-colors"
-                />
-                <p className="mt-2 text-xs text-gray-500">Recommended: 10–60s • Max 50MB</p>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Optional Video</label>
+                <div className="mt-1 border border-gray-200 rounded-lg p-3 bg-white">
+                  <input type="file" id="video" accept="video/*" onChange={handleVideoChange} />
+                  <p className="mt-2 text-xs text-gray-500">Recommended: 10–60s • Max 50MB</p>
+                </div>
                 {fieldErrors.video && <p className="mt-1 text-sm text-red-600">{fieldErrors.video}</p>}
               </div>
 
@@ -286,6 +278,31 @@ const SubmitDevice = () => {
                 </button>
               </div>
             </form>
+            </div>
+
+            {/* Sidebar Column */}
+            <aside className="hidden lg:block lg:col-span-1 bg-gradient-to-b from-emerald-50 to-white p-6 border-l border-gray-100">
+              <div className="mb-6">
+                <h3 className="text-lg font-semibold text-gray-900">Tips for a faster review</h3>
+                <ul className="mt-3 text-sm text-gray-600 space-y-2">
+                  <li>Include clear photos of front, back & ports.</li>
+                  <li>Record a short video showing device power on.</li>
+                  <li>Note any functional issues in the description.</li>
+                </ul>
+              </div>
+
+              <div className="mb-6">
+                <h4 className="text-sm font-medium text-gray-700 mb-2">What we look for</h4>
+                <div className="space-y-2 text-sm text-gray-600">
+                  <div>Battery health • Screen condition • Cameras</div>
+                  <div>Buttons & ports • Sensors • Storage</div>
+                </div>
+              </div>
+
+              <div className="mt-auto text-xs text-gray-500">
+                Submitting accurate info speeds up certification and increases offer accuracy.
+              </div>
+            </aside>
           </div>
         </div>
       </div>

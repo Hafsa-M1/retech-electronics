@@ -117,13 +117,6 @@ const CustomerDashboard = () => {
       link: '/catalog',
       color: 'bg-gradient-to-r from-purple-500 to-violet-600 hover:from-purple-600 hover:to-violet-700'
     },
-    {
-      title: 'Provide Feedback',
-      description: 'Share your experience with submitted or purchased devices',
-      icon: '💬',
-      link: '/customer-feedback',
-      color: 'bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600'
-    }
   ];
 
   // Get status badge color
@@ -161,59 +154,82 @@ const CustomerDashboard = () => {
       <CustomerNavbar />
       
       {/* Main Content */}
-      <div className="container mx-auto px-4 py-8 pt-24">
+      <div className="container mx-auto px-4 py-6">
         
-        {/* Welcome Section */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">
-            Welcome back, {customerData?.name || 'Customer'}!
-          </h1>
-          <p className="text-gray-600 text-lg">
-            Member since {customerData?.memberSince || 'N/A'} • {customerData?.totalSubmissions || 0} device(s) submitted
-          </p>
-        </div>
+        {/* Welcome Section (redesigned) */}
+        <div className="mb-8 bg-gradient-to-r from-emerald-50 via-white to-white p-6 rounded-xl flex items-center justify-between shadow-sm border border-gray-100">
+          <div>
+            <h1 className="text-4xl font-extrabold text-gray-900 mb-2">
+              Welcome back, {customerData?.name || 'Customer'}!
+            </h1>
+            <p className="text-gray-600 text-lg">
+              Member since {customerData?.memberSince || 'N/A'} • {customerData?.totalSubmissions || 0} device(s) submitted
+            </p>
 
-        {/* Stats Overview */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
-          <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100 hover:shadow-xl transition-shadow duration-300">
-            <div className="text-3xl font-bold text-blue-600">{stats.totalDevices}</div>
-            <div className="text-gray-700 font-medium">Total Devices</div>
-          </div>
-          <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100 hover:shadow-xl transition-shadow duration-300">
-            <div className="text-3xl font-bold text-yellow-600">{stats.submitted}</div>
-            <div className="text-gray-700 font-medium">Submitted</div>
-          </div>
-          <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100 hover:shadow-xl transition-shadow duration-300">
-            <div className="text-3xl font-bold text-blue-600">{stats.underDiagnostics}</div>
-            <div className="text-gray-700 font-medium">Under Diagnostics</div>
-          </div>
-          <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100 hover:shadow-xl transition-shadow duration-300">
-            <div className="text-3xl font-bold text-emerald-600">{stats.certified}</div>
-            <div className="text-gray-700 font-medium">Certified</div>
-          </div>
-          <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100 hover:shadow-xl transition-shadow duration-300">
-            <div className="text-3xl font-bold text-purple-600">{stats.sold}</div>
-            <div className="text-gray-700 font-medium">Sold</div>
-          </div>
-        </div>
-
-        {/* Quick Actions Section */}
-        <div className="mb-8">
-          <h2 className="text-2xl font-bold text-gray-800 mb-6">Quick Actions</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {quickActions.map((action, index) => (
-              <Link 
-                key={index} 
-                to={action.link}
-                className={`${action.color} text-white rounded-xl shadow-lg p-6 transform transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl`}
-              >
-                <div className="text-4xl mb-4">{action.icon}</div>
-                <h3 className="text-xl font-bold mb-2">{action.title}</h3>
-                <p className="text-white/90 text-sm">{action.description}</p>
+            <div className="mt-4 flex items-center gap-3">
+              <Link to="/customer-submit-device" className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg shadow">
+                Submit Device
               </Link>
-            ))}
+              <Link to="/customer-my-devices" className="px-4 py-2 border border-gray-200 rounded-lg text-gray-700 hover:shadow">
+                My Devices
+              </Link>
+              <Link to="/catalog" className="px-4 py-2 bg-white border border-emerald-100 text-emerald-700 rounded-lg hover:bg-emerald-50">
+                Browse Catalog
+              </Link>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-4">
+            <div className="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center text-2xl font-bold text-emerald-700">
+              {customerData?.name ? customerData.name.split(' ').map(n => n[0]).slice(0,2).join('') : 'CU'}
+            </div>
           </div>
         </div>
+
+        {/* Stats Overview (redesigned cards) */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
+          <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm flex items-center gap-4 border-l-4 border-blue-400 hover:shadow-md transition">
+            <div className="w-14 h-14 bg-gradient-to-br from-blue-100 to-blue-50 rounded-lg flex items-center justify-center text-blue-700 text-xl">📦</div>
+            <div>
+              <div className="text-2xl font-bold text-gray-900">{stats.totalDevices}</div>
+              <div className="text-sm text-gray-500">Total Devices</div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm flex items-center gap-4 border-l-4 border-yellow-400 hover:shadow-md transition">
+            <div className="w-14 h-14 bg-gradient-to-br from-yellow-100 to-yellow-50 rounded-lg flex items-center justify-center text-yellow-700 text-xl">📝</div>
+            <div>
+              <div className="text-2xl font-bold text-gray-900">{stats.submitted}</div>
+              <div className="text-sm text-gray-500">Submitted</div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm flex items-center gap-4 border-l-4 border-indigo-500 hover:shadow-md transition">
+            <div className="w-14 h-14 bg-gradient-to-br from-indigo-100 to-indigo-50 rounded-lg flex items-center justify-center text-indigo-700 text-xl">🔧</div>
+            <div>
+              <div className="text-2xl font-bold text-gray-900">{stats.underDiagnostics}</div>
+              <div className="text-sm text-gray-500">Under Diagnostics</div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm flex items-center gap-4 border-l-4 border-emerald-400 hover:shadow-md transition">
+            <div className="w-14 h-14 bg-gradient-to-br from-emerald-100 to-emerald-50 rounded-lg flex items-center justify-center text-emerald-700 text-xl">✅</div>
+            <div>
+              <div className="text-2xl font-bold text-gray-900">{stats.certified}</div>
+              <div className="text-sm text-gray-500">Certified</div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm flex items-center gap-4 border-l-4 border-purple-400 hover:shadow-md transition">
+            <div className="w-14 h-14 bg-gradient-to-br from-purple-100 to-purple-50 rounded-lg flex items-center justify-center text-purple-700 text-xl">💰</div>
+            <div>
+              <div className="text-2xl font-bold text-gray-900">{stats.sold}</div>
+              <div className="text-sm text-gray-500">Sold</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Quick Actions removed per request */}
 
         {/* Recent Activity Section */}
         <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100">
@@ -226,19 +242,22 @@ const CustomerDashboard = () => {
             {devices.length > 0 ? (
               <div className="space-y-4">
                 {devices.slice(0, 3).map((device, index) => (
-                  <div key={index} className="flex items-center p-4 bg-blue-50 rounded-lg border border-blue-100">
-                    <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-4">
-                      <span className="text-blue-600">📱</span>
+                  <div key={index} className="flex items-center p-4 bg-white rounded-lg border shadow-sm">
+                    <div className="w-14 h-14 bg-gray-100 rounded-lg flex items-center justify-center mr-4 overflow-hidden">
+                      {device.photos && device.photos.length > 0 ? (
+                        <img src={device.photos[0].image} alt="photo" className="w-full h-full object-cover" />
+                      ) : (
+                        <span className="text-2xl">📱</span>
+                      )}
                     </div>
                     <div className="flex-1">
                       <p className="font-medium text-gray-900">{device.brand} {device.model}</p>
-                      <p className="text-sm text-gray-600">
-                        {device.condition || 'Standard'} • Submitted on {new Date(device.submission_date).toLocaleDateString()}
-                      </p>
+                      <p className="text-sm text-gray-600">{device.condition || device.condition_description || 'Standard'} • {new Date(device.submission_date).toLocaleDateString()}</p>
                     </div>
-                    <span className={`px-3 py-1 ${getStatusColor(device.status)} text-xs font-medium rounded-full`}>
-                      {device.status}
-                    </span>
+                    <div className="flex flex-col items-end">
+                      <span className={`px-3 py-1 ${getStatusColor(device.status)} text-xs font-medium rounded-full`}>{device.status}</span>
+                      <Link to={`/customer-my-devices`} className="text-sm text-emerald-600 mt-2">Details →</Link>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -252,13 +271,10 @@ const CustomerDashboard = () => {
                   className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-medium rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
                 >
                   Submit Your First Device
-                  <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                  </svg>
                 </Link>
               </div>
             )}
-            
+
             {devices.length > 0 && (
               <div className="mt-6 pt-6 border-t border-gray-200">
                 <Link

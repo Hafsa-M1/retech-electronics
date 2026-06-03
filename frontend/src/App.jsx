@@ -7,6 +7,7 @@ import AboutUs         from './pages/common/AboutUs';
 import ContactUs       from './pages/common/ContactUs';
 import PrivacyPolicy   from './pages/common/PrivacyPolicy';
 import BrowseCatalog   from './pages/common/BrowseCatalog';
+import PublicDeviceDetail from './pages/common/PublicDeviceDetail';   // ← New Import
 
 // Customer pages
 import CustomerLogin     from './pages/customer/CustomerLogin';
@@ -19,18 +20,22 @@ import MyDevices         from './pages/customer/MyDevices';
 import StaffLogin        from './pages/staff/StaffLogin';
 import StaffDashboard    from './pages/staff/StaffDashboard';
 import StaffRegistration from './pages/staff/StaffRegistration';
-import StaffDiagnostics  from './pages/staff/StaffDiagnostics';   // ← New Import
+import StaffDiagnostics  from './pages/staff/StaffDiagnostics';
+import StaffCertification from './pages/staff/StaffCertification';
+import StaffReservations  from './pages/staff/StaffReservations';
 
 // Admin
 import AdminLogin       from './pages/admin/AdminLogin';
 import AdminDashboard   from './pages/admin/AdminDashboard';
 import AdminSubmissions from './pages/admin/AdminSubmissions';
+import AdminStatistics  from './pages/admin/AdminStatistics';
 import AdminStaff       from './pages/admin/AdminStaff';
 
 // Components
 import Footer         from './components/Footer';
 import CustomerNavbar from './components/CustomerNavbar';
 import PublicNavbar   from './components/PublicNavbar';
+import StaffNavbar    from './components/StaffNavbar';
 import AdminRoute     from './components/AdminRoute';
 
 // ── Staff Route Guard ─────────────────────────────────────────────────────
@@ -51,10 +56,14 @@ const StaffRoute = ({ children }) => {
 
 // ── Layouts ───────────────────────────────────────────────────────────────
 function MainLayout() {
-  const isLoggedIn = localStorage.getItem('customerToken');
+  const isStaffLoggedIn = localStorage.getItem('staffToken');
+  const isCustomerLoggedIn = localStorage.getItem('customerToken');
+
+  const Navbar = isStaffLoggedIn ? StaffNavbar : isCustomerLoggedIn ? CustomerNavbar : PublicNavbar;
+
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
-      {isLoggedIn ? <CustomerNavbar /> : <PublicNavbar />}
+      <Navbar />
       <main className="flex-grow pt-20">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-10">
           <Outlet />
@@ -79,19 +88,37 @@ function CustomerLayout() {
   );
 }
 
+function StaffLayout() {
+  return (
+    <div className="flex flex-col min-h-screen bg-gray-50">
+      <StaffNavbar />
+      <main className="flex-grow">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-10">
+          <Outlet />
+        </div>
+      </main>
+    </div>
+  );
+}
+
 // ── App ─────────────────────────────────────────────────────────────────────
 function App() {
   return (
     <Router>
       <Routes>
 
-        {/* Public pages with MainLayout (includes Footer) */}
+        {/* Public pages with MainLayout */}
         <Route element={<MainLayout />}>
           <Route path="/"               element={<Home />} />
           <Route path="/about-us"       element={<AboutUs />} />
           <Route path="/contact-us"     element={<ContactUs />} />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-          <Route path="/catalog"        element={<BrowseCatalog />} />
+
+          {/* Public Catalog */}
+          <Route path="/catalog" element={<BrowseCatalog />} />
+
+          {/* Public Device Detail Page */}
+          <Route path="/device/:id" element={<PublicDeviceDetail />} />
         </Route>
 
         {/* Customer protected pages */}
@@ -105,17 +132,16 @@ function App() {
         <Route path="/customer-login"  element={<CustomerLogin />} />
         <Route path="/customer-signup" element={<CustomerSignup />} />
 
-        {/* Staff Routes */}
-        <Route path="/staff/login"        element={<StaffLogin />} />
-        <Route path="/staff/dashboard"    element={
-          <StaffRoute><StaffDashboard /></StaffRoute>
-        } />
-        <Route path="/staff/registration" element={
-          <StaffRoute><StaffRegistration /></StaffRoute>
-        } />
-        <Route path="/staff/diagnostics" element={
-          <StaffRoute><StaffDiagnostics /></StaffRoute>
-        } />
+        {/* Staff Routes with StaffNavbar */}
+        <Route element={<StaffLayout />}>
+          <Route path="/staff/dashboard"    element={<StaffDashboard />} />
+          <Route path="/staff/registration" element={<StaffRegistration />} />
+          <Route path="/staff/diagnostics"  element={<StaffDiagnostics />} />
+          <Route path="/staff/certification" element={<StaffCertification />} />
+          <Route path="/staff/reservations" element={<StaffReservations />} />
+        </Route>
+
+        <Route path="/staff/login" element={<StaffLogin />} />
 
         {/* Admin Routes */}
         <Route path="/admin/login" element={<AdminLogin />} />
@@ -124,6 +150,9 @@ function App() {
         } />
         <Route path="/admin/submissions" element={
           <AdminRoute><AdminSubmissions /></AdminRoute>
+        } />
+        <Route path="/admin/statistics" element={
+          <AdminRoute><AdminStatistics /></AdminRoute>
         } />
         <Route path="/admin/staff" element={
           <AdminRoute><AdminStaff /></AdminRoute>

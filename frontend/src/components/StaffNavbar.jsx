@@ -65,14 +65,15 @@ const StaffNavbar = () => {
           </NavLink>
 
           <NavLink
-            to="/staff/sales"
+            to="/staff/reservations"
             className={({ isActive }) => (isActive ? activeLinkStyle : inactiveLinkStyle)}
           >
-            Sales
+            Reservations
           </NavLink>
 
+          {/* Catalog links to PUBLIC catalog */}
           <NavLink
-            to="/staff/catalog"
+            to="/catalog"
             className={({ isActive }) => (isActive ? activeLinkStyle : inactiveLinkStyle)}
           >
             Catalog
@@ -138,10 +139,12 @@ const StaffNavbar = () => {
             <NavLink to="/staff/certification" className={({ isActive }) => isActive ? "text-emerald-600 font-semibold py-2" : "text-gray-700 hover:text-emerald-600 py-2"}>
               Certification
             </NavLink>
-            <NavLink to="/staff/sales" className={({ isActive }) => isActive ? "text-emerald-600 font-semibold py-2" : "text-gray-700 hover:text-emerald-600 py-2"}>
-              Sales
+            <NavLink to="/staff/reservations" className={({ isActive }) => isActive ? "text-emerald-600 font-semibold py-2" : "text-gray-700 hover:text-emerald-600 py-2"}>
+              Reservations
             </NavLink>
-            <NavLink to="/staff/catalog" className={({ isActive }) => isActive ? "text-emerald-600 font-semibold py-2" : "text-gray-700 hover:text-emerald-600 py-2"}>
+            
+            {/* Public Catalog Link in Mobile Menu */}
+            <NavLink to="/catalog" className={({ isActive }) => isActive ? "text-emerald-600 font-semibold py-2" : "text-gray-700 hover:text-emerald-600 py-2"}>
               Catalog
             </NavLink>
 

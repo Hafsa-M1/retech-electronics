@@ -64,21 +64,14 @@ const AdminNavbar = () => {
             Staff
           </NavLink>
           <NavLink
-            to="/admin/users"
+            to="/admin/statistics"
             className={({ isActive }) =>
               isActive ? activeLinkStyle : inactiveLinkStyle
             }
           >
-            Customers
+            Statistics
           </NavLink>
-          <NavLink
-            to="/admin/devices"
-            className={({ isActive }) =>
-              isActive ? activeLinkStyle : inactiveLinkStyle
-            }
-          >
-            Inventory
-          </NavLink>
+          
 
           {/* Admin Profile & Logout */}
           {isLoggedIn ? (
@@ -176,25 +169,16 @@ const AdminNavbar = () => {
               Staff
             </NavLink>
             <NavLink
-              to="/admin/users"
+              to="/admin/statistics"
               className={({ isActive }) =>
                 isActive
                   ? "text-emerald-600 font-semibold py-2"
                   : "text-gray-700 hover:text-emerald-600 font-medium transition-colors duration-200 py-2"
               }
             >
-              Customers
+              Statistics
             </NavLink>
-            <NavLink
-              to="/admin/devices"
-              className={({ isActive }) =>
-                isActive
-                  ? "text-emerald-600 font-semibold py-2"
-                  : "text-gray-700 hover:text-emerald-600 font-medium transition-colors duration-200 py-2"
-              }
-            >
-              Inventory
-            </NavLink>
+            
             <button
               onClick={handleLogout}
               className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white px-4 py-2 rounded-lg font-medium shadow-md hover:shadow-lg transition-all duration-300 text-left mt-2"

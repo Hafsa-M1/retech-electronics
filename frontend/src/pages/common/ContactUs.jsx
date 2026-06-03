@@ -1,6 +1,5 @@
 import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import { FaPhone, FaEnvelope, FaMapMarkerAlt, FaUsers, FaTools, FaShippingFast } from 'react-icons/fa';
 import logo from "../../assets/retech-logo.png";
 import partnerHero from "../../assets/images/partner-hero.png";
 
@@ -26,23 +25,6 @@ export default function ContactUs() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
-
-  const contactInfo = [
-    
-    {
-      icon: <FaPhone className="w-6 h-6" />,
-      title: "Business Support",
-      details: "+1 (555) 123-4567",
-      description: "For shop owners and business partnerships"
-    },
-    {
-      icon: <FaUsers className="w-6 h-6" />,
-      title: "Customer Support",
-      details: "support@retech.com",
-      description: "For device pickup and customer service"
-    },
-    
-  ];
 
   const businessTypes = [
     { value: "", label: "Select inquiry type" },
@@ -186,27 +168,6 @@ export default function ContactUs() {
           </p>
         </div>
       </header>
-
-      {/* Contact Cards */}
-      <section className="py-16 px-4 -mt-10">
-        <div className="container mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl mx-auto">
-            {contactInfo.map((item, index) => (
-              <div 
-                key={index}
-                className="bg-white rounded-2xl p-6 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1"
-              >
-                <div className="inline-flex p-4 rounded-xl bg-gradient-to-r from-green-500 to-emerald-500 text-white mb-4">
-                  {item.icon}
-                </div>
-                <h3 className="text-lg font-bold text-gray-900 mb-2">{item.title}</h3>
-                <p className="text-gray-900 font-medium mb-1">{item.details}</p>
-                <p className="text-gray-600 text-sm">{item.description}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
 
       {/* Main Content */}
       <section className="py-16 px-4">

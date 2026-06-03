@@ -48,7 +48,7 @@ export default function MyDevices() {
     <>
       <CustomerNavbar />
 
-      <div className="min-h-screen bg-gray-50 pt-28 pb-16 px-6">
+      <div className="min-h-screen bg-gray-50 py-6 pb-16 px-6">
         <div className="max-w-7xl mx-auto">
           <h1 className="text-4xl font-bold text-gray-900 mb-8">My Devices</h1>
 
@@ -124,45 +124,50 @@ export default function MyDevices() {
                             device.status === 'CERTIFIED' ? 'bg-emerald-100 text-emerald-800' :
                             device.status === 'REFURBISH' ? 'bg-amber-100 text-amber-800' :
                             device.status === 'REJECTED' ? 'bg-red-100 text-red-800' :
+                            device.status === 'PUBLISHED' ? 'bg-purple-100 text-purple-800' :
                             'bg-gray-100 text-gray-800'
                           }`}>
-                            {device.status === 'REFURBISH' ? 'REFURBISHMENT' : device.status}
+                            {device.status === 'REFURBISH' ? 'REFURBISHMENT' : 
+                             device.status === 'PUBLISHED' ? 'PUBLISHED' : device.status}
                           </span>
                         </div>
 
-                        {/* APPROVED */}
+                        {/* Certificate ID */}
+                        {device.status === 'CERTIFIED' && device.certificate_id && (
+                          <div className="mb-4 p-3 bg-emerald-50 border border-emerald-200 rounded-xl">
+                            <p className="text-emerald-700 text-sm font-medium">Certificate ID</p>
+                            <p className="font-mono text-emerald-800 font-semibold">{device.certificate_id}</p>
+                          </div>
+                        )}
+
+                        {/* Status Messages */}
                         {device.status === 'APPROVED' && (
                           <div className="mb-5 p-4 bg-blue-50 border border-blue-200 rounded-xl">
                             <p className="text-blue-700 font-semibold">✅ Device Accepted</p>
                             <p className="text-blue-600 text-sm mt-1">
-                              Please bring your device to the shop for physical inspection.
+                              Please bring your device to the shop for inspection.
                             </p>
                           </div>
                         )}
 
-                        {/* CERTIFIED */}
                         {device.status === 'CERTIFIED' && (
                           <div className="mb-5 p-4 bg-emerald-50 border border-emerald-200 rounded-xl">
-                            <p className="text-emerald-700 font-semibold flex items-center gap-2">
-                              🎉 Device is now Certified!
-                            </p>
+                            <p className="text-emerald-700 font-semibold">🎉 Device is now Certified!</p>
                             <p className="text-emerald-600 text-sm mt-1">
-                              Your device has passed all quality checks and is ready for sale.
+                              Your device has passed all quality checks.
                             </p>
                           </div>
                         )}
 
-                        {/* REFURBISHMENT */}
                         {device.status === 'REFURBISH' && (
                           <div className="mb-5 p-4 bg-amber-50 border border-amber-200 rounded-xl">
                             <p className="text-amber-700 font-semibold">🔧 Under Refurbishment</p>
                             <p className="text-amber-600 text-sm mt-1">
-                              Minor issues found. Our team is repairing this device.
+                              Our team is repairing this device.
                             </p>
                           </div>
                         )}
 
-                        {/* REJECTED */}
                         {device.status === 'REJECTED' && (
                           <div className="mb-5 p-4 bg-red-50 border border-red-200 rounded-xl">
                             <p className="text-red-700 font-semibold">❌ Device Rejected</p>
@@ -172,11 +177,20 @@ export default function MyDevices() {
                           </div>
                         )}
 
+                        {device.status === 'PUBLISHED' && (
+                          <div className="mb-5 p-4 bg-purple-50 border border-purple-200 rounded-xl">
+                            <p className="text-purple-700 font-semibold">📢 Published to Catalog</p>
+                            <p className="text-purple-600 text-sm mt-1">
+                              This device is now available for sale in our catalog.
+                            </p>
+                          </div>
+                        )}
+
                         <Link
                           to={`/customer-device/${device.id}`}
                           className="block w-full text-center py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-xl transition-colors"
                         >
-                          View Details →
+                          View Submitted Details →
                         </Link>
                       </div>
                     </div>

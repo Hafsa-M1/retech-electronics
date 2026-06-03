@@ -56,12 +56,7 @@ const CustomerNavbar = () => {
           >
             Browse Catalog
           </NavLink>
-          <NavLink 
-            to="/customer-feedback" 
-            className={({ isActive }) => isActive ? activeLinkStyle : inactiveLinkStyle}
-          >
-            Feedback
-          </NavLink>
+          
           
           {/* User Profile & Logout */}
           {isLoggedIn ? (
@@ -148,12 +143,7 @@ const CustomerNavbar = () => {
             >
               Browse Catalog
             </NavLink>
-            <NavLink 
-              to="/customer-feedback" 
-              className={({ isActive }) => isActive ? "text-emerald-600 font-semibold py-2" : "text-gray-700 hover:text-emerald-600 font-medium transition-colors duration-200 py-2"}
-            >
-              Feedback
-            </NavLink>
+            
             <button
               onClick={handleLogout}
               className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white px-4 py-2 rounded-lg font-medium shadow-md hover:shadow-lg transition-all duration-300 text-left mt-2"
