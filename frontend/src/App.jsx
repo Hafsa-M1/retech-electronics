@@ -7,7 +7,7 @@ import AboutUs         from './pages/common/AboutUs';
 import ContactUs       from './pages/common/ContactUs';
 import PrivacyPolicy   from './pages/common/PrivacyPolicy';
 import BrowseCatalog   from './pages/common/BrowseCatalog';
-import PublicDeviceDetail from './pages/common/PublicDeviceDetail';   // ← New Import
+import PublicDeviceDetail from './pages/common/PublicDeviceDetail';
 
 // Customer pages
 import CustomerLogin     from './pages/customer/CustomerLogin';
@@ -17,12 +17,14 @@ import SubmitDevice      from './pages/customer/SubmitDevice';
 import MyDevices         from './pages/customer/MyDevices';
 
 // Staff
-import StaffLogin        from './pages/staff/StaffLogin';
-import StaffDashboard    from './pages/staff/StaffDashboard';
-import StaffRegistration from './pages/staff/StaffRegistration';
-import StaffDiagnostics  from './pages/staff/StaffDiagnostics';
+import StaffLogin         from './pages/staff/StaffLogin';
+import StaffDashboard     from './pages/staff/StaffDashboard';
+import StaffRegistration  from './pages/staff/StaffRegistration';
+import StaffDiagnostics   from './pages/staff/StaffDiagnostics';
 import StaffCertification from './pages/staff/StaffCertification';
 import StaffReservations  from './pages/staff/StaffReservations';
+import ForgotPassword     from './pages/staff/ForgotPassword';   // ← New
+import ResetPassword      from './pages/staff/ResetPassword';    // ← New
 
 // Admin
 import AdminLogin       from './pages/admin/AdminLogin';
@@ -38,7 +40,7 @@ import PublicNavbar   from './components/PublicNavbar';
 import StaffNavbar    from './components/StaffNavbar';
 import AdminRoute     from './components/AdminRoute';
 
-// ── Staff Route Guard ─────────────────────────────────────────────────────
+// ── Staff Route Guard ──────────────────────────────────────────────────────────
 const StaffRoute = ({ children }) => {
   const token = localStorage.getItem('staffToken');
   if (!token) {
@@ -54,11 +56,10 @@ const StaffRoute = ({ children }) => {
   return children;
 };
 
-// ── Layouts ───────────────────────────────────────────────────────────────
+// ── Layouts ────────────────────────────────────────────────────────────────────
 function MainLayout() {
-  const isStaffLoggedIn = localStorage.getItem('staffToken');
+  const isStaffLoggedIn    = localStorage.getItem('staffToken');
   const isCustomerLoggedIn = localStorage.getItem('customerToken');
-
   const Navbar = isStaffLoggedIn ? StaffNavbar : isCustomerLoggedIn ? CustomerNavbar : PublicNavbar;
 
   return (
@@ -101,24 +102,20 @@ function StaffLayout() {
   );
 }
 
-// ── App ─────────────────────────────────────────────────────────────────────
+// ── App ────────────────────────────────────────────────────────────────────────
 function App() {
   return (
     <Router>
       <Routes>
 
-        {/* Public pages with MainLayout */}
+        {/* Public pages */}
         <Route element={<MainLayout />}>
           <Route path="/"               element={<Home />} />
           <Route path="/about-us"       element={<AboutUs />} />
           <Route path="/contact-us"     element={<ContactUs />} />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-
-          {/* Public Catalog */}
-          <Route path="/catalog" element={<BrowseCatalog />} />
-
-          {/* Public Device Detail Page */}
-          <Route path="/device/:id" element={<PublicDeviceDetail />} />
+          <Route path="/catalog"        element={<BrowseCatalog />} />
+          <Route path="/device/:id"     element={<PublicDeviceDetail />} />
         </Route>
 
         {/* Customer protected pages */}
@@ -128,22 +125,25 @@ function App() {
           <Route path="/customer-my-devices"    element={<MyDevices />} />
         </Route>
 
-        {/* Auth Pages - No Navbar/Footer */}
+        {/* Auth — no navbar */}
         <Route path="/customer-login"  element={<CustomerLogin />} />
         <Route path="/customer-signup" element={<CustomerSignup />} />
 
-        {/* Staff Routes with StaffNavbar */}
+        {/* Staff auth — no navbar */}
+        <Route path="/staff/login"                      element={<StaffLogin />} />
+        <Route path="/forgot-password"                  element={<ForgotPassword />} />
+        <Route path="/reset-password/:uid/:token"       element={<ResetPassword />} />
+
+        {/* Staff protected pages — with StaffNavbar */}
         <Route element={<StaffLayout />}>
-          <Route path="/staff/dashboard"    element={<StaffDashboard />} />
-          <Route path="/staff/registration" element={<StaffRegistration />} />
-          <Route path="/staff/diagnostics"  element={<StaffDiagnostics />} />
+          <Route path="/staff/dashboard"     element={<StaffDashboard />} />
+          <Route path="/staff/registration"  element={<StaffRegistration />} />
+          <Route path="/staff/diagnostics"   element={<StaffDiagnostics />} />
           <Route path="/staff/certification" element={<StaffCertification />} />
-          <Route path="/staff/reservations" element={<StaffReservations />} />
+          <Route path="/staff/reservations"  element={<StaffReservations />} />
         </Route>
 
-        <Route path="/staff/login" element={<StaffLogin />} />
-
-        {/* Admin Routes */}
+        {/* Admin */}
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/admin/dashboard" element={
           <AdminRoute><AdminDashboard /></AdminRoute>

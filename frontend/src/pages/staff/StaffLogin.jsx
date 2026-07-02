@@ -48,17 +48,17 @@ const StaffLogin = () => {
     <div style={{
       minHeight: "100vh",
       background: "linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #0f172a 100%)",
-      display: "flex", 
-      alignItems: "center", 
+      display: "flex",
+      alignItems: "center",
       justifyContent: "center",
-      fontFamily: "'Segoe UI', sans-serif", 
-      position: "relative", 
+      fontFamily: "'Segoe UI', sans-serif",
+      position: "relative",
       overflow: "hidden",
     }}>
       {/* Background grid */}
       <div style={{
-        position: "absolute", 
-        inset: 0, 
+        position: "absolute",
+        inset: 0,
         opacity: 0.06,
         backgroundImage: "linear-gradient(#60a5fa 1px, transparent 1px), linear-gradient(90deg, #60a5fa 1px, transparent 1px)",
         backgroundSize: "40px 40px",
@@ -66,45 +66,45 @@ const StaffLogin = () => {
 
       {/* Glow blobs */}
       <div style={{
-        position: "absolute", 
-        top: "-80px", 
-        right: "-80px", 
-        width: "350px", 
+        position: "absolute",
+        top: "-80px",
+        right: "-80px",
+        width: "350px",
         height: "350px",
-        borderRadius: "50%", 
+        borderRadius: "50%",
         pointerEvents: "none",
         background: "radial-gradient(circle, rgba(96,165,250,0.12) 0%, transparent 70%)",
       }} />
       <div style={{
-        position: "absolute", 
-        bottom: "-80px", 
-        left: "-80px", 
-        width: "300px", 
+        position: "absolute",
+        bottom: "-80px",
+        left: "-80px",
+        width: "300px",
         height: "300px",
-        borderRadius: "50%", 
+        borderRadius: "50%",
         pointerEvents: "none",
         background: "radial-gradient(circle, rgba(59,130,246,0.1) 0%, transparent 70%)",
       }} />
 
       {/* Card */}
       <div style={{
-        width: "100%", 
-        maxWidth: "420px", 
+        width: "100%",
+        maxWidth: "420px",
         margin: "0 24px",
         background: "rgba(255,255,255,0.04)",
         border: "1px solid rgba(96,165,250,0.2)",
-        borderRadius: "16px", 
+        borderRadius: "16px",
         backdropFilter: "blur(20px)",
-        padding: "48px 40px", 
-        position: "relative", 
+        padding: "48px 40px",
+        position: "relative",
         zIndex: 1,
         boxShadow: "0 24px 80px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.06)",
       }}>
 
         {/* Go to Home Link */}
         <div className="mb-6">
-          <Link 
-            to="/" 
+          <Link
+            to="/"
             className="inline-flex items-center gap-2 text-slate-400 hover:text-white transition-colors text-sm font-medium"
           >
             ← Back to Home
@@ -114,11 +114,11 @@ const StaffLogin = () => {
         {/* Logo */}
         <div style={{ textAlign: "center", marginBottom: "36px" }}>
           <div style={{
-            display: "inline-flex", 
-            alignItems: "center", 
+            display: "inline-flex",
+            alignItems: "center",
             justifyContent: "center",
-            width: "56px", 
-            height: "56px", 
+            width: "56px",
+            height: "56px",
             borderRadius: "14px",
             background: "linear-gradient(135deg, #2563eb, #60a5fa)",
             marginBottom: "16px",
@@ -138,7 +138,7 @@ const StaffLogin = () => {
 
         {/* Divider */}
         <div style={{
-          height: "1px", 
+          height: "1px",
           marginBottom: "32px",
           background: "linear-gradient(90deg, transparent, rgba(96,165,250,0.4), transparent)",
         }} />
@@ -146,13 +146,13 @@ const StaffLogin = () => {
         {/* Error */}
         {error && (
           <div style={{
-            padding: "12px 16px", 
-            borderRadius: "8px", 
+            padding: "12px 16px",
+            borderRadius: "8px",
             marginBottom: "20px",
-            background: "rgba(239,68,68,0.1)", 
+            background: "rgba(239,68,68,0.1)",
             border: "1px solid rgba(239,68,68,0.3)",
-            color: "#fca5a5", 
-            fontSize: "13px", 
+            color: "#fca5a5",
+            fontSize: "13px",
             lineHeight: "1.5",
           }}>
             {error}
@@ -164,32 +164,32 @@ const StaffLogin = () => {
           {/* Email */}
           <div style={{ marginBottom: "18px" }}>
             <label style={{
-              display: "block", 
-              fontSize: "11px", 
+              display: "block",
+              fontSize: "11px",
               fontWeight: "600",
-              color: "rgba(255,255,255,0.5)", 
+              color: "rgba(255,255,255,0.5)",
               letterSpacing: "0.1em",
-              textTransform: "uppercase", 
+              textTransform: "uppercase",
               marginBottom: "8px",
             }}>Email Address</label>
             <input
-              type="email" 
-              name="email" 
+              type="email"
+              name="email"
               value={form.email}
-              onChange={handleChange} 
-              required 
+              onChange={handleChange}
+              required
               placeholder="your@email.com"
               style={{
-                width: "100%", 
-                padding: "12px 16px", 
+                width: "100%",
+                padding: "12px 16px",
                 borderRadius: "8px",
-                background: "rgba(255,255,255,0.06)", 
+                background: "rgba(255,255,255,0.06)",
                 border: "1px solid rgba(255,255,255,0.1)",
-                color: "#f0f9ff", 
-                fontSize: "14px", 
+                color: "#f0f9ff",
+                fontSize: "14px",
                 outline: "none",
-                boxSizing: "border-box", 
-                transition: "border-color 0.2s", 
+                boxSizing: "border-box",
+                transition: "border-color 0.2s",
                 fontFamily: "inherit",
               }}
               onFocus={(e) => e.target.style.borderColor = "rgba(96,165,250,0.6)"}
@@ -198,51 +198,51 @@ const StaffLogin = () => {
           </div>
 
           {/* Password */}
-          <div style={{ marginBottom: "28px" }}>
+          <div style={{ marginBottom: "12px" }}>
             <label style={{
-              display: "block", 
-              fontSize: "11px", 
+              display: "block",
+              fontSize: "11px",
               fontWeight: "600",
-              color: "rgba(255,255,255,0.5)", 
+              color: "rgba(255,255,255,0.5)",
               letterSpacing: "0.1em",
-              textTransform: "uppercase", 
+              textTransform: "uppercase",
               marginBottom: "8px",
             }}>Password</label>
             <div style={{ position: "relative" }}>
               <input
                 type={showPassword ? "text" : "password"}
-                name="password" 
+                name="password"
                 value={form.password}
-                onChange={handleChange} 
-                required 
+                onChange={handleChange}
+                required
                 placeholder="••••••••••"
                 style={{
-                  width: "100%", 
-                  padding: "12px 44px 12px 16px", 
+                  width: "100%",
+                  padding: "12px 44px 12px 16px",
                   borderRadius: "8px",
-                  background: "rgba(255,255,255,0.06)", 
+                  background: "rgba(255,255,255,0.06)",
                   border: "1px solid rgba(255,255,255,0.1)",
-                  color: "#f0f9ff", 
-                  fontSize: "14px", 
+                  color: "#f0f9ff",
+                  fontSize: "14px",
                   outline: "none",
-                  boxSizing: "border-box", 
-                  transition: "border-color 0.2s", 
+                  boxSizing: "border-box",
+                  transition: "border-color 0.2s",
                   fontFamily: "inherit",
                 }}
                 onFocus={(e) => e.target.style.borderColor = "rgba(96,165,250,0.6)"}
                 onBlur={(e)  => e.target.style.borderColor = "rgba(255,255,255,0.1)"}
               />
-              <button 
-                type="button" 
-                onClick={() => setShowPassword((v) => !v)} 
+              <button
+                type="button"
+                onClick={() => setShowPassword((v) => !v)}
                 style={{
-                  position: "absolute", 
-                  right: "14px", 
+                  position: "absolute",
+                  right: "14px",
                   top: "50%",
-                  transform: "translateY(-50%)", 
+                  transform: "translateY(-50%)",
                   background: "none",
-                  border: "none", 
-                  cursor: "pointer", 
+                  border: "none",
+                  cursor: "pointer",
                   padding: 0,
                   color: "rgba(255,255,255,0.3)",
                 }}
@@ -263,34 +263,48 @@ const StaffLogin = () => {
             </div>
           </div>
 
+          {/* Forgot password link */}
+          <div style={{ textAlign: "right", marginBottom: "24px" }}>
+            <Link
+              to="/forgot-password"
+              style={{
+                fontSize: "12px",
+                color: "rgba(96,165,250,0.8)",
+                textDecoration: "none",
+              }}
+            >
+              Forgot password?
+            </Link>
+          </div>
+
           {/* Submit */}
-          <button 
-            type="submit" 
-            disabled={loading} 
+          <button
+            type="submit"
+            disabled={loading}
             style={{
-              width: "100%", 
-              padding: "13px", 
-              border: "none", 
+              width: "100%",
+              padding: "13px",
+              border: "none",
               borderRadius: "8px",
               background: loading ? "rgba(96,165,250,0.3)" : "linear-gradient(135deg, #2563eb, #60a5fa)",
               color: loading ? "rgba(255,255,255,0.5)" : "#fff",
-              fontSize: "14px", 
-              fontWeight: "700", 
+              fontSize: "14px",
+              fontWeight: "700",
               letterSpacing: "0.05em",
               cursor: loading ? "not-allowed" : "pointer",
               boxShadow: loading ? "none" : "0 4px 20px rgba(37,99,235,0.4)",
-              transition: "all 0.2s", 
+              transition: "all 0.2s",
               fontFamily: "inherit",
             }}
           >
             {loading ? (
               <span style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px" }}>
                 <span style={{
-                  display: "inline-block", 
-                  width: "14px", 
+                  display: "inline-block",
+                  width: "14px",
                   height: "14px",
                   border: "2px solid rgba(255,255,255,0.4)",
-                  borderTopColor: "white", 
+                  borderTopColor: "white",
                   borderRadius: "50%",
                   animation: "spin 0.7s linear infinite",
                 }} />
@@ -301,11 +315,11 @@ const StaffLogin = () => {
         </form>
 
         <p style={{
-          textAlign: "center", 
-          marginTop: "24px", 
+          textAlign: "center",
+          marginTop: "24px",
           marginBottom: 0,
-          fontSize: "11px", 
-          color: "rgba(255,255,255,0.25)", 
+          fontSize: "11px",
+          color: "rgba(255,255,255,0.25)",
           letterSpacing: "0.05em",
         }}>
           Restricted to authorised staff only

@@ -1,15 +1,19 @@
 // src/pages/common/BrowseCatalog.jsx
-import { Link } from 'react-router-dom';
-import { useState, useEffect, useCallback } from 'react';
-import axios from 'axios';
-import { FaSync } from 'react-icons/fa';
+import { Link, useSearchParams } from "react-router-dom";
+import { useState, useEffect, useCallback } from "react";
+import axios from "axios";
+import { FaSync } from "react-icons/fa";
 
 export default function Catalog() {
   const [devices, setDevices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [sortBy, setSortBy] = useState('newest');
+  const [searchQuery, setSearchQuery] = useState("");
+  const [sortBy, setSortBy] = useState("newest");
+
+  // Get category from URL query parameter
+  const [searchParams] = useSearchParams();
+  const selectedCategory = searchParams.get("category");
 
   // Fetch Published Devices
   const fetchPublishedDevices = useCallback(async (showLoading = true) => {
@@ -18,9 +22,13 @@ export default function Catalog() {
 
     try {
       const response = await axios.get(
-        'http://localhost:8000/api/submissions/public/catalog/'
+        "http://localhost:8000/api/submissions/public/catalog/"
       );
-      setDevices(Array.isArray(response.data) ? response.data : (response.data.results ?? []));
+      setDevices(
+        Array.isArray(response.data)
+          ? response.data
+          : (response.data.results ?? [])
+      );
     } catch (err) {
       console.error("Failed to fetch catalog devices", err);
     } finally {
@@ -36,17 +44,28 @@ export default function Catalog() {
 
   // Filter & Sort
   const filteredDevices = devices
-    .filter(device => {
+    .filter((device) => {
       const query = searchQuery.toLowerCase().trim();
-      if (!query) return true;
-      return (
-        (device.brand?.toLowerCase() || '').includes(query) ||
-        (device.model?.toLowerCase() || '').includes(query)
-      );
+
+      // Category Filter from URL (?category=Smartphone)
+      const matchesCategory =
+        !selectedCategory ||
+        (device.category &&
+          device.category.toLowerCase() === selectedCategory.toLowerCase());
+
+      // Search Filter
+      const matchesSearch =
+        !query ||
+        (device.brand?.toLowerCase() || "").includes(query) ||
+        (device.model?.toLowerCase() || "").includes(query);
+
+      return matchesCategory && matchesSearch;
     })
     .sort((a, b) => {
-      if (sortBy === 'price-low') return (a.estimated_price || 0) - (b.estimated_price || 0);
-      if (sortBy === 'price-high') return (b.estimated_price || 0) - (a.estimated_price || 0);
+      if (sortBy === "price-low")
+        return (a.estimated_price || 0) - (b.estimated_price || 0);
+      if (sortBy === "price-high")
+        return (b.estimated_price || 0) - (a.estimated_price || 0);
       return new Date(b.submission_date) - new Date(a.submission_date);
     });
 
@@ -67,7 +86,19 @@ export default function Catalog() {
       <div className="container mx-auto px-6 py-8">
         <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
           <h2 className="text-3xl font-bold text-gray-900">Available Devices</h2>
-          
+
+          {selectedCategory && (
+            <p className="text-emerald-600 font-medium">
+              Showing <span className="font-semibold">{selectedCategory}s</span> •{" "}
+              <button
+                onClick={() => window.history.back()}
+                className="text-gray-500 hover:text-gray-700 underline ml-2"
+              >
+                Clear Filter
+              </button>
+            </p>
+          )}
+
           <div className="flex items-center gap-4">
             <input
               type="text"
@@ -89,27 +120,33 @@ export default function Catalog() {
         </div>
 
         {loading ? (
-          <div className="text-center py-20 text-gray-600">Loading published devices...</div>
+          <div className="text-center py-20 text-gray-600">
+            Loading published devices...
+          </div>
         ) : filteredDevices.length === 0 ? (
           <div className="text-center py-20 text-gray-500">
-            No devices have been published to the catalog yet.<br />
+            No devices have been published to the catalog yet.
+            <br />
             Staff needs to certify and publish devices first.
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredDevices.map(device => (
-              <div key={device.id} className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all overflow-hidden border border-gray-100">
+            {filteredDevices.map((device) => (
+              <div
+                key={device.id}
+                className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all overflow-hidden border border-gray-100"
+              >
                 <div className="h-56 bg-gray-100 flex items-center justify-center overflow-hidden">
-                {device.photos && device.photos.length > 0 ? (
-                 <img
-                 src={device.photos[0].image}
-                 alt={device.brand}
-                 className="w-full h-full object-cover"
-                />
-                ) : (
-                <span className="text-6xl">📱</span>
-                )}
-          </div>
+                  {device.photos && device.photos.length > 0 ? (
+                    <img
+                      src={device.photos[0].image}
+                      alt={device.brand}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <span className="text-6xl">📱</span>
+                  )}
+                </div>
                 <div className="p-6">
                   <div className="flex justify-between items-start mb-3">
                     <h3 className="font-bold text-lg leading-tight">
@@ -121,18 +158,24 @@ export default function Catalog() {
                   </div>
 
                   {device.certificate_id && (
-                    <p className="text-xs text-gray-500 mb-3">Cert ID: {device.certificate_id}</p>
+                    <p className="text-xs text-gray-500 mb-3">
+                      Cert ID: {device.certificate_id}
+                    </p>
                   )}
 
                   {device.category && (
-                    <p className="text-sm text-gray-600 mb-4">{device.category}</p>
+                    <p className="text-sm text-gray-600 mb-4">
+                      {device.category}
+                    </p>
                   )}
 
                   <div className="text-3xl font-bold text-emerald-600 mb-5">
-                    ₹{device.estimated_price ? Number(device.estimated_price).toLocaleString() : '—'}
+                    ₹
+                    {device.estimated_price
+                      ? Number(device.estimated_price).toLocaleString()
+                      : "—"}
                   </div>
 
-                  {/* Public Device Detail Link */}
                   <Link
                     to={`/device/${device.id}`}
                     className="block w-full text-center py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-xl transition-colors"

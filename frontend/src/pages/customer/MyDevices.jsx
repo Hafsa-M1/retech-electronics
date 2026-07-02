@@ -185,13 +185,6 @@ export default function MyDevices() {
                             </p>
                           </div>
                         )}
-
-                        <Link
-                          to={`/customer-device/${device.id}`}
-                          className="block w-full text-center py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-xl transition-colors"
-                        >
-                          View Submitted Details →
-                        </Link>
                       </div>
                     </div>
                   ))}
