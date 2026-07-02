@@ -11,9 +11,10 @@ from .views import (
     DeviceCertificationView,
     DeviceReservationCreateView,
     StaffReservationsListView,
-    ReservationCompleteView,               # ← New
+    ReservationCompleteView,               
     PublicPublishedDeviceDetailView,
     PublicPublishedDevicesView,
+    PopularCategoriesView,
 )
 
 urlpatterns = [
@@ -66,4 +67,7 @@ urlpatterns = [
     # -------------------- Public Catalog --------------------
     path('public/catalog/<int:pk>/', PublicPublishedDeviceDetailView.as_view(), name='public-catalog-detail'),
     path('public/catalog/', PublicPublishedDevicesView.as_view(), name='public-catalog'),
+
+    # Popular Categories for Homepage
+    path('popular-categories/', PopularCategoriesView.as_view(), name='popular-categories'),
 ]

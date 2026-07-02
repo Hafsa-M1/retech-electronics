@@ -5,10 +5,11 @@ from rest_framework.permissions import IsAuthenticated, BasePermission
 from rest_framework.generics import ListAPIView
 from django.contrib.auth import get_user_model
 import uuid
+from django.db.models import Count
 
 from .models import DeviceSubmission, DeviceReservation
 from .serializers import DeviceSubmissionSerializer, AdminDeviceSubmissionSerializer, DeviceReservationSerializer
-
+from rest_framework.permissions import IsAuthenticated, BasePermission, AllowAny
 
 # ─────────────────────────────────────────────
 # Permission
@@ -218,7 +219,7 @@ class AdminSubmissionUpdateView(APIView):
 
 
 # ─────────────────────────────────────────────
-# 🔥 FIXED: Diagnostics View (IMPORTANT)
+# FIXED: Diagnostics View (IMPORTANT)
 # ─────────────────────────────────────────────
 
 class DeviceDiagnosticsView(APIView):
@@ -421,3 +422,59 @@ class ReservationCompleteView(APIView):
             'device_id': device.id,
             'status': 'COMPLETED'
         }, status=status.HTTP_200_OK)
+
+# ─────────────────────────────────────────────
+# Popular Categories for Homepage
+# ─────────────────────────────────────────────
+
+class PopularCategoriesView(APIView):
+    permission_classes = [AllowAny]   # Anyone can see this
+
+    def get(self, request):
+        # Get top categories from published devices
+        categories = DeviceSubmission.objects.filter(
+            status='PUBLISHED'
+        ).values('category').annotate(
+            count=Count('id')
+        ).order_by('-count')[:6]
+
+        data = []
+        category_icons = {
+            "Smartphone": "📱",
+            "Laptop": "💻",
+            "Tablet": "📟",
+            "Smartwatch": "⌚",
+            "Headphones": "🎧",
+            "Camera": "📷",
+            "Desktop": "🖥️",
+            "Other": "📦"
+        }
+
+        for cat in categories:
+            name = cat['category'] or "Other"
+            data.append({
+                "icon": category_icons.get(name, "📦"),
+                "name": name,
+                "count": f"{cat['count']}+",
+                "label": "devices available",
+                "color": self.get_category_color(name)
+            })
+
+        # If no data yet, return some default categories
+        if not data:
+            data = [
+                {"icon": "📱", "name": "Smartphone", "count": "250+", "label": "devices available", "color": "bg-gradient-to-r from-green-500 to-emerald-600"},
+                {"icon": "💻", "name": "Laptop", "count": "180+", "label": "devices available", "color": "bg-gradient-to-r from-blue-500 to-cyan-600"},
+                {"icon": "📟", "name": "Tablet", "count": "95+", "label": "devices available", "color": "bg-gradient-to-r from-purple-500 to-violet-600"},
+            ]
+
+        return Response(data)
+
+    def get_category_color(self, name):
+        colors = {
+            "Smartphone": "bg-gradient-to-r from-green-500 to-emerald-600",
+            "Laptop": "bg-gradient-to-r from-blue-500 to-cyan-600",
+            "Tablet": "bg-gradient-to-r from-purple-500 to-violet-600",
+            "Smartwatch": "bg-gradient-to-r from-amber-500 to-orange-600",
+        }
+        return colors.get(name, "bg-gradient-to-r from-gray-500 to-slate-600")

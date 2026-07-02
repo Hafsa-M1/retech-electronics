@@ -9,6 +9,9 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import get_user_model
+from django.contrib.auth.tokens import default_token_generator
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.encoding import force_bytes, force_str
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.conf import settings
@@ -36,10 +39,10 @@ class IsStaffOrAdmin(BasePermission):
         )
 
 
-# ─── Email Helper ──────────────────────────────────────────────────────────────
+# ─── Email Helpers ─────────────────────────────────────────────────────────────
 def send_staff_welcome_email(user, plain_password):
     try:
-        login_url = "http://localhost:5173/staff-login"   # ← matches App.jsx route
+        login_url = "http://localhost:5173/staff-login"
         year      = datetime.datetime.now().year
 
         context = {
@@ -75,6 +78,49 @@ def send_staff_welcome_email(user, plain_password):
 
     except Exception as e:
         logger.error(f"Failed to send welcome email to {user.email}: {e}")
+
+
+def send_password_reset_email(user):
+    """
+    Generates a secure uid+token pair (Django's default_token_generator,
+    same mechanism used by Django's built-in password reset) and emails
+    the staff member a link to reset their password.
+    """
+    try:
+        uid       = urlsafe_base64_encode(force_bytes(user.pk))
+        token     = default_token_generator.make_token(user)
+        reset_url = f"http://localhost:5173/reset-password/{uid}/{token}"
+        year      = datetime.datetime.now().year
+
+        context = {
+            'first_name': user.first_name,
+            'reset_url':  reset_url,
+            'year':       year,
+        }
+
+        html_body = render_to_string('emails/password_reset.html', context)
+        text_body = (
+            f"Hi {user.first_name},\n\n"
+            f"You requested a password reset for your ReTech account.\n\n"
+            f"Click the link below to reset your password:\n"
+            f"{reset_url}\n\n"
+            f"This link expires in 24 hours.\n\n"
+            f"If you did not request this, you can safely ignore this email.\n\n"
+            f"— ReTech Team"
+        )
+
+        email = EmailMultiAlternatives(
+            subject    = "ReTech — Reset Your Password",
+            body       = text_body,
+            from_email = settings.DEFAULT_FROM_EMAIL,
+            to         = [user.email],
+        )
+        email.attach_alternative(html_body, "text/html")
+        email.send(fail_silently=False)
+        logger.info(f"Password reset email sent to {user.email}")
+
+    except Exception as e:
+        logger.error(f"Failed to send password reset email to {user.email}: {e}")
 
 
 # ─── Customer Views ────────────────────────────────────────────────────────────
@@ -133,6 +179,78 @@ class AdminLoginView(TokenObtainPairView):
         except User.DoesNotExist:
             raise PermissionDenied("Invalid credentials.")
         return response
+
+
+# ─── Password Reset ────────────────────────────────────────────────────────────
+class PasswordResetRequestView(APIView):
+    """
+    POST /api/users/password-reset/
+    Body: { "email": "staff@example.com" }
+    Always returns the same success message regardless of whether the
+    email exists, to prevent user enumeration attacks.
+    """
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        email = request.data.get('email', '').lower().strip()
+        if not email:
+            return Response(
+                {'error': 'Email is required.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            user = User.objects.get(email=email)
+            if user.is_staff:
+                send_password_reset_email(user)
+        except User.DoesNotExist:
+            pass  # Silently ignore — don't reveal whether the email exists
+
+        return Response({'message': 'If this email exists, a reset link has been sent.'})
+
+
+class PasswordResetConfirmView(APIView):
+    """
+    POST /api/users/password-reset/confirm/
+    Body: { "uid": "...", "token": "...", "password": "new_password" }
+    """
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        uid      = request.data.get('uid', '')
+        token    = request.data.get('token', '')
+        password = request.data.get('password', '')
+
+        if not all([uid, token, password]):
+            return Response(
+                {'error': 'uid, token and password are required.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        if len(password) < 8:
+            return Response(
+                {'error': 'Password must be at least 8 characters.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            user_id = force_str(urlsafe_base64_decode(uid))
+            user    = User.objects.get(pk=user_id)
+        except (TypeError, ValueError, User.DoesNotExist):
+            return Response(
+                {'error': 'Invalid reset link.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        if not default_token_generator.check_token(user, token):
+            return Response(
+                {'error': 'This reset link has expired or already been used.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        user.set_password(password)
+        user.save()
+        return Response({'message': 'Password reset successfully. You can now log in.'})
 
 
 # ─── Staff Management ──────────────────────────────────────────────────────────
