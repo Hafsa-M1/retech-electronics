@@ -3,33 +3,16 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import {
-  FaMobileAlt, FaUsers, FaCheckCircle, FaClock,
-  FaTimesCircle, FaSearch, FaEye, FaEdit, FaTrash,
+  FaMobileAlt, FaUsers, FaCheckCircle, FaClock, FaEye,
 } from "react-icons/fa";
 import AdminNavbar from "../../components/AdminNavbar";
+import { Badge } from "../../components/shared/StatusBadge";
 
 const makeApi = (token) =>
   axios.create({
     baseURL: "http://localhost:8000",
     headers: { Authorization: `Bearer ${token}` },
   });
-
-const STATUS_CFG = {
-  PENDING:      { label: "Pending",      bg: "bg-yellow-100", text: "text-yellow-800", dot: "bg-yellow-400" },
-  UNDER_REVIEW: { label: "Under Review", bg: "bg-blue-100",   text: "text-blue-800",   dot: "bg-blue-400"   },
-  APPROVED:     { label: "Approved",     bg: "bg-green-100",  text: "text-green-800",  dot: "bg-green-500"  },
-  REJECTED:     { label: "Rejected",     bg: "bg-red-100",    text: "text-red-800",    dot: "bg-red-400"    },
-};
-
-const Badge = ({ status }) => {
-  const cfg = STATUS_CFG[status] || STATUS_CFG.PENDING;
-  return (
-    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${cfg.bg} ${cfg.text}`}>
-      <span className={`w-1.5 h-1.5 rounded-full ${cfg.dot}`} />
-      {cfg.label}
-    </span>
-  );
-};
 
 const AdminDashboard = () => {
   const token = localStorage.getItem("adminToken");
@@ -180,7 +163,7 @@ const AdminDashboard = () => {
           </div>
 
           {/* Quick action cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <Link
               to="/admin/submissions"
               className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-2xl p-6 text-white hover:shadow-xl transition-all transform hover:-translate-y-1"
@@ -199,16 +182,6 @@ const AdminDashboard = () => {
               <h3 className="text-xl font-bold mb-2">Manage Staff</h3>
               <p className="text-white/80 mb-4 text-sm">Create and manage staff accounts with different roles</p>
               <span className="text-sm font-semibold">Manage Staff →</span>
-            </Link>
-
-            <Link
-              to="/admin/devices"
-              className="bg-gradient-to-r from-emerald-500 to-teal-600 rounded-2xl p-6 text-white hover:shadow-xl transition-all transform hover:-translate-y-1"
-            >
-              <div className="text-3xl mb-3">🏷️</div>
-              <h3 className="text-xl font-bold mb-2">Catalog Management</h3>
-              <p className="text-white/80 mb-4 text-sm">Manage device listings and inventory in the public catalog</p>
-              <span className="text-sm font-semibold">Manage Catalog →</span>
             </Link>
           </div>
 

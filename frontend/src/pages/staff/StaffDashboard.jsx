@@ -5,10 +5,11 @@ import axios from "axios";
 import {
   FaMobileAlt, FaClock, FaCheckCircle, FaTimesCircle,
   FaHourglassHalf, FaEye, FaSearch, FaTimes, FaSync,
-  FaSignOutAlt, FaImage, FaVideo, FaFilter,
 } from "react-icons/fa";
 
 import StaffNavbar from "../../components/StaffNavbar";
+import { STATUS_CFG, Badge } from "../../components/shared/StatusBadge";
+import DetailModal from "../../components/shared/DetailModal";
 
 // ─── API helper ───────────────────────────────────────────────────────────────
 const makeApi = (token) =>
@@ -16,178 +17,6 @@ const makeApi = (token) =>
     baseURL: "http://localhost:8000",
     headers: { Authorization: `Bearer ${token}` },
   });
-
-// ─── Status config ────────────────────────────────────────────────────────────
-const STATUS_CFG = {
-  PENDING:      { label: "Pending",      bg: "bg-yellow-100", text: "text-yellow-800", dot: "bg-yellow-400" },
-  UNDER_REVIEW: { label: "Under Review", bg: "bg-blue-100",   text: "text-blue-800",   dot: "bg-blue-400"   },
-  APPROVED:     { label: "Approved",     bg: "bg-green-100",  text: "text-green-800",  dot: "bg-green-500"  },
-  REJECTED:     { label: "Rejected",     bg: "bg-red-100",    text: "text-red-800",    dot: "bg-red-400"    },
-};
-
-const Badge = ({ status }) => {
-  const cfg = STATUS_CFG[status] || STATUS_CFG.PENDING;
-  return (
-    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${cfg.bg} ${cfg.text}`}>
-      <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${cfg.dot}`} />
-      {cfg.label}
-    </span>
-  );
-};
-
-// ─── Stat card ────────────────────────────────────────────────────────────────
-const StatCard = ({ label, value, icon, color, bg, loading }) => (
-  <div className={`${bg} rounded-xl p-5 border border-white/60`}>
-    <div className="flex items-center justify-between">
-      <div>
-        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">{label}</p>
-        {loading
-          ? <div className="h-8 w-12 bg-white/60 rounded animate-pulse" />
-          : <p className="text-3xl font-bold text-gray-900">{value ?? 0}</p>}
-      </div>
-      <div className={`${color} w-11 h-11 rounded-xl flex items-center justify-center text-white text-lg flex-shrink-0`}>
-        {icon}
-      </div>
-    </div>
-  </div>
-);
-
-// ─── Detail Modal ─────────────────────────────────────────────────────────────
-const DetailModal = ({ submission, onClose, onStatusChange, token }) => {
-  const [updating, setUpdating] = useState(false);
-  const [currentStatus, setCurrentStatus] = useState(submission.status);
-
-  const updateStatus = async (newStatus) => {
-    setUpdating(true);
-    try {
-      await makeApi(token).patch(
-        `/api/submissions/admin/${submission.id}/update/`,
-        { status: newStatus }
-      );
-      setCurrentStatus(newStatus);
-      onStatusChange(submission.id, newStatus);
-    } catch {
-      alert("Failed to update status. Please try again.");
-    } finally {
-      setUpdating(false);
-    }
-  };
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" onClick={onClose}>
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
-        {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 sticky top-0 bg-white rounded-t-2xl z-10">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
-              <span className="text-blue-700 font-bold text-lg">{submission.brand?.charAt(0)}</span>
-            </div>
-            <div>
-              <h2 className="text-lg font-bold text-gray-900">{submission.brand} {submission.model}</h2>
-              <p className="text-sm text-gray-400">Submission #{submission.id}</p>
-            </div>
-          </div>
-          <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-400 hover:text-gray-600">
-            <FaTimes />
-          </button>
-        </div>
-
-        <div className="p-6 space-y-6">
-          {/* Device details */}
-          <div>
-            <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Device Details</h3>
-            <div className="grid grid-cols-2 gap-3">
-              {[
-                ["Brand",      submission.brand],
-                ["Model",      submission.model],
-                ["Serial No.", submission.serial_number || "Not provided"],
-                ["Submitted",  new Date(submission.submission_date).toLocaleString()],
-              ].map(([label, val]) => (
-                <div key={label} className="bg-gray-50 rounded-xl p-3">
-                  <p className="text-xs text-gray-400 font-semibold uppercase mb-1">{label}</p>
-                  <p className="text-sm text-gray-900 font-medium">{val}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Customer */}
-          <div>
-            <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Customer</h3>
-            <div className="bg-gray-50 rounded-xl p-4 flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0">
-                {(submission.customer_name || submission.customer_email || "?").charAt(0).toUpperCase()}
-              </div>
-              <div>
-                <p className="text-sm font-semibold text-gray-900">{submission.customer_name || "—"}</p>
-                <p className="text-sm text-gray-500">{submission.customer_email || "—"}</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Condition */}
-          <div>
-            <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Condition Description</h3>
-            <div className="bg-gray-50 rounded-xl p-4">
-              <p className="text-sm text-gray-700 leading-relaxed">{submission.condition_description}</p>
-            </div>
-          </div>
-
-          {/* Photos & Video */}
-          {submission.photos?.length > 0 && (
-            <div>
-              <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3 flex items-center gap-2">
-                <FaImage className="text-gray-400" /> Photos ({submission.photos.length})
-              </h3>
-              <div className="grid grid-cols-2 gap-3">
-                {submission.photos.map((photo) => (
-                  <a key={photo.id} href={photo.image} target="_blank" rel="noreferrer">
-                    <img src={photo.image} alt="Device" className="w-full h-36 object-cover rounded-xl border border-gray-200 hover:opacity-90 transition-opacity" />
-                  </a>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {submission.video && (
-            <div>
-              <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3 flex items-center gap-2">
-                <FaVideo className="text-gray-400" /> Video
-              </h3>
-              <video controls className="w-full rounded-xl border border-gray-200">
-                <source src={submission.video} />
-              </video>
-            </div>
-          )}
-
-          {/* Status update */}
-          <div>
-            <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Update Status</h3>
-            <div className="flex items-center gap-2 mb-3">
-              <span className="text-sm text-gray-500">Current:</span>
-              <Badge status={currentStatus} />
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {Object.entries(STATUS_CFG).map(([key, cfg]) => (
-                <button
-                  key={key}
-                  disabled={updating || currentStatus === key}
-                  onClick={() => updateStatus(key)}
-                  className={`px-4 py-2 rounded-lg text-sm font-semibold border transition-all
-                    ${currentStatus === key
-                      ? `${cfg.bg} ${cfg.text} border-transparent cursor-default`
-                      : "bg-white text-gray-700 border-gray-200 hover:border-gray-400 cursor-pointer"}`}
-                >
-                  {cfg.label}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
 
 // ════════════════════════════════════════════════════════════════════════════
 // MAIN COMPONENT
@@ -237,12 +66,6 @@ const StaffDashboard = () => {
 
   const handleStatusChange = (id, newStatus) => {
     setSubmissions(prev => prev.map(s => s.id === id ? { ...s, status: newStatus } : s));
-  };
-
-  const handleLogout = () => {
-    localStorage.removeItem("staffToken");
-    localStorage.removeItem("staffRefreshToken");
-    navigate("/staff/login");
   };
 
   // Filtered submissions
@@ -411,6 +234,8 @@ const StaffDashboard = () => {
             setSelected(prev => prev?.id === id ? { ...prev, status } : prev);
           }}
           token={token}
+          theme="blue"
+          imageBaseUrl=""
         />
       )}
     </div>
