@@ -166,7 +166,7 @@ class AdminTokenObtainPairSerializer(TokenObtainPairSerializer):
 
 
 class AdminLoginView(TokenObtainPairView):
-    """POST /api/users/admin/login/"""
+    """POST /api/users/admin/login/ — admin accounts only"""
     serializer_class   = AdminTokenObtainPairSerializer
     permission_classes = [AllowAny]
 
@@ -174,12 +174,27 @@ class AdminLoginView(TokenObtainPairView):
         response = super().post(request, *args, **kwargs)
         try:
             user = User.objects.get(email=request.data.get('email'))
-            if not user.is_staff:
+            if user.role != 'admin':
                 raise PermissionDenied("You are not authorized to access the admin panel.")
         except User.DoesNotExist:
             raise PermissionDenied("Invalid credentials.")
         return response
 
+
+class StaffLoginView(TokenObtainPairView):
+    """POST /api/users/staff/login/ — staff accounts only"""
+    serializer_class   = AdminTokenObtainPairSerializer
+    permission_classes = [AllowAny]
+
+    def post(self, request, *args, **kwargs):
+        response = super().post(request, *args, **kwargs)
+        try:
+            user = User.objects.get(email=request.data.get('email'))
+            if user.role != 'staff':
+                raise PermissionDenied("You are not authorized to access the staff panel.")
+        except User.DoesNotExist:
+            raise PermissionDenied("Invalid credentials.")
+        return response
 
 # ─── Password Reset ────────────────────────────────────────────────────────────
 class PasswordResetRequestView(APIView):

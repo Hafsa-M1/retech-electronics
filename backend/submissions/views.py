@@ -10,7 +10,12 @@ from django.db.models import Count
 from .models import DeviceSubmission, DeviceReservation
 from .serializers import DeviceSubmissionSerializer, AdminDeviceSubmissionSerializer, DeviceReservationSerializer
 from rest_framework.permissions import IsAuthenticated, BasePermission, AllowAny
+from rest_framework.pagination import PageNumberPagination
 
+class SubmissionsPagination(PageNumberPagination):
+    page_size = 10
+    page_size_query_param = 'page_size'
+    max_page_size = 100
 # ─────────────────────────────────────────────
 # Permission
 # ─────────────────────────────────────────────
@@ -164,6 +169,7 @@ class ReservationUpdateStatusView(APIView):
 class AdminSubmissionsListView(ListAPIView):
     serializer_class = AdminDeviceSubmissionSerializer
     permission_classes = [IsStaffOrAdmin]
+    pagination_class   = SubmissionsPagination
 
     def get_queryset(self):
         qs = DeviceSubmission.objects.select_related(
@@ -238,7 +244,7 @@ class DeviceDiagnosticsView(APIView):
         notes = request.data.get('notes', '')
         results = request.data.get('results', {})
 
-        # 🔍 DEBUG LOGS
+        # DEBUG LOGS
         print("=" * 50)
         print("DIAGNOSTICS REQUEST RECEIVED")
         print("ACTION:", action)
@@ -265,7 +271,7 @@ class DeviceDiagnosticsView(APIView):
 
         submission.save()
 
-        # 🔍 VERIFY WHAT WAS SAVED
+        # VERIFY WHAT WAS SAVED
         submission.refresh_from_db()
 
         print("SAVED diagnostic_results:", submission.diagnostic_results)
@@ -356,6 +362,7 @@ class AdminSubmissionStatsView(APIView):
             'refurbishment': qs.filter(status='REFURBISH').count(),
             'rejected': qs.filter(status='REJECTED').count(),
             'published_for_sale': qs.filter(status='PUBLISHED').count(),
+            'sold': qs.filter(status='SOLD').count(),
         })
 
 

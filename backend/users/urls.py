@@ -4,6 +4,7 @@ from .views import (
     CustomerSignupView,
     CurrentUserView,
     AdminLoginView,
+    StaffLoginView,
     AdminStaffListView,
     AdminStaffCreateView,
     AdminStaffToggleActiveView,
@@ -18,6 +19,9 @@ urlpatterns = [
 
     # ── Admin auth ────────────────────────────────────────────────────────────
     path('admin/login/', AdminLoginView.as_view(), name='admin-login'),
+
+    # ── Staff auth ────────────────────────────────────────────────────────────
+    path('staff/login/', StaffLoginView.as_view(), name='staff-login'),
 
     # ── Staff management ──────────────────────────────────────────────────────
     path('admin/staff/',                 AdminStaffListView.as_view(),         name='admin-staff-list'),
