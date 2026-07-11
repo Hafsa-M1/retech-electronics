@@ -26,7 +26,7 @@ const AdminLayout = () => {
     // Check authentication
     const token = localStorage.getItem('adminToken');
     if (!token) {
-      navigate('/admin-login');
+      navigate('/admin/login');
       return;
     }
 
@@ -40,7 +40,7 @@ const AdminLayout = () => {
   const handleLogout = () => {
     localStorage.removeItem('adminToken');
     localStorage.removeItem('adminInfo');
-    navigate('/admin-login');
+    navigate('/admin/login');
   };
 
   const navItems = [

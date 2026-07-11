@@ -1,6 +1,6 @@
 // src/pages/admin/AdminLogin.jsx
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 
 const AdminLogin = () => {
@@ -87,6 +87,28 @@ const AdminLogin = () => {
         boxShadow: '0 24px 80px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.06)',
         position: 'relative', zIndex: 1,
       }}>
+
+        {/* Back to Home */}
+        <div style={{ marginBottom: '24px' }}>
+          <Link
+            to="/"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '8px',
+              fontSize: '13px',
+              fontWeight: '500',
+              color: 'rgba(255,255,255,0.4)',
+              textDecoration: 'none',
+              transition: 'color 0.2s',
+              fontFamily: "'Segoe UI', sans-serif",
+            }}
+            onMouseEnter={e => e.target.style.color = 'rgba(74,222,128,0.9)'}
+            onMouseLeave={e => e.target.style.color = 'rgba(255,255,255,0.4)'}
+          >
+            ← Back to Home
+          </Link>
+        </div>
 
         {/* Logo / Brand */}
         <div style={{ textAlign: 'center', marginBottom: '36px' }}>

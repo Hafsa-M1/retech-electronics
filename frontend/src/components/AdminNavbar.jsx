@@ -11,7 +11,7 @@ const AdminNavbar = () => {
   const handleLogout = () => {
     localStorage.removeItem("adminToken");
     localStorage.removeItem("adminInfo");
-    navigate("/admin-login");
+    navigate("/admin/login");
   };
 
   // Common active link styles
@@ -94,7 +94,7 @@ const AdminNavbar = () => {
           ) : (
             <div className="flex items-center space-x-4">
               <NavLink
-                to="/admin-login"
+                to="/admin/login"
                 className={({ isActive }) =>
                   isActive ? activeLinkStyle : inactiveLinkStyle
                 }

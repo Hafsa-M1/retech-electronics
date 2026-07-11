@@ -12,6 +12,12 @@ import {
   FaSearch,
   FaFilter,
   FaTimes,
+  FaChevronLeft,
+  FaChevronRight,
+  FaAward,
+  FaTools,
+  FaBullhorn,
+  FaHandshake,
 } from "react-icons/fa";
 import { STATUS_CFG, Badge } from "../../components/shared/StatusBadge";
 import DetailModal from "../../components/shared/DetailModal";
@@ -34,26 +40,92 @@ const AdminSubmissions = () => {
   const [filter, setFilter] = useState("ALL");
   const [search, setSearch] = useState("");
 
+  // ─── Pagination state (drives the table only) ─────────────────────────────
+  const [page, setPage] = useState(1);
+  const [count, setCount] = useState(0);
+  const [hasNext, setHasNext] = useState(false);
+  const [hasPrevious, setHasPrevious] = useState(false);
+  const PAGE_SIZE = 10;
+
+  // ─── Stats state (drives the stat cards — always reflects the FULL dataset) ─
+  const [stats, setStats] = useState({
+    total_submissions: 0,
+    pending: 0,
+    under_review: 0,
+    approved: 0,
+    rejected: 0,
+    certified: 0,
+    refurbishment: 0,
+    published: 0,
+    sold: 0,
+  });
+
+  const fetchStats = useCallback(async () => {
+    try {
+      const { data } = await makeApi(token).get(
+        "/api/submissions/admin/stats/",
+      );
+      setStats({
+        total_submissions: data.total_submissions ?? 0,
+        pending: data.pending ?? 0,
+        under_review: data.under_review ?? 0,
+        approved: data.approved ?? 0,
+        rejected: data.rejected ?? 0,
+        certified: data.certified ?? 0,
+        refurbishment: data.refurbishment ?? 0,
+        published: data.published_for_sale ?? 0,
+        sold: data.sold ?? 0,
+      });
+    } catch (err) {
+      console.error("Failed to fetch stats:", err);
+    }
+  }, [token]);
+
   const fetchSubmissions = useCallback(async () => {
     setLoading(true);
     try {
-      const url =
-        filter === "ALL"
-          ? "/api/submissions/admin/all/"
-          : `/api/submissions/admin/all/?status=${filter}`;
+      const params = new URLSearchParams();
+      if (filter !== "ALL") params.set("status", filter);
+      params.set("page", page);
+
+      const url = `/api/submissions/admin/all/?${params.toString()}`;
       const { data } = await makeApi(token).get(url);
-      setSubmissions(Array.isArray(data) ? data : (data.results ?? []));
+
+      if (Array.isArray(data)) {
+        // Fallback in case pagination isn't active for some reason
+        setSubmissions(data);
+        setCount(data.length);
+        setHasNext(false);
+        setHasPrevious(false);
+      } else {
+        setSubmissions(data.results ?? []);
+        setCount(data.count ?? 0);
+        setHasNext(Boolean(data.next));
+        setHasPrevious(Boolean(data.previous));
+      }
     } catch (err) {
       console.error("Failed to fetch submissions:", err);
       setSubmissions([]);
+      setCount(0);
+      setHasNext(false);
+      setHasPrevious(false);
     } finally {
       setLoading(false);
     }
-  }, [token, filter]);
+  }, [token, filter, page]);
 
   useEffect(() => {
     fetchSubmissions();
   }, [fetchSubmissions]);
+
+  useEffect(() => {
+    fetchStats();
+  }, [fetchStats]);
+
+  // Reset to page 1 whenever the filter changes
+  useEffect(() => {
+    setPage(1);
+  }, [filter]);
 
   const handleStatusChange = (id, newStatus) => {
     setSubmissions((prev) =>
@@ -62,9 +134,17 @@ const AdminSubmissions = () => {
     if (selected?.id === id) {
       setSelected((prev) => ({ ...prev, status: newStatus }));
     }
+    // A status change affects the overall stats too, so refresh them
+    fetchStats();
   };
 
-  // Client-side search
+  // Refresh both the current page and the stats
+  const handleRefresh = () => {
+    fetchSubmissions();
+    fetchStats();
+  };
+
+  // Client-side search (within current page only)
   const filtered = submissions.filter((s) => {
     const q = search.toLowerCase();
     return (
@@ -76,13 +156,19 @@ const AdminSubmissions = () => {
     );
   });
 
-  // Summary counts from full list
+  const totalPages = Math.max(1, Math.ceil(count / PAGE_SIZE));
+
+  // Stat card counts now come from the stats endpoint — always full-dataset totals
   const counts = {
-    ALL: submissions.length,
-    PENDING: submissions.filter((s) => s.status === "PENDING").length,
-    UNDER_REVIEW: submissions.filter((s) => s.status === "UNDER_REVIEW").length,
-    APPROVED: submissions.filter((s) => s.status === "APPROVED").length,
-    REJECTED: submissions.filter((s) => s.status === "REJECTED").length,
+    ALL: stats.total_submissions,
+    PENDING: stats.pending,
+    UNDER_REVIEW: stats.under_review,
+    APPROVED: stats.approved,
+    REJECTED: stats.rejected,
+    CERTIFIED: stats.certified,
+    REFURBISH: stats.refurbishment,
+    PUBLISHED: stats.published,
+    SOLD: stats.sold,
   };
 
   const FILTER_TABS = [
@@ -121,6 +207,34 @@ const AdminSubmissions = () => {
       color: "text-red-700",
       bg: "bg-red-50",
     },
+    {
+      key: "CERTIFIED",
+      label: "Certified",
+      icon: <FaAward />,
+      color: "text-teal-700",
+      bg: "bg-teal-50",
+    },
+    {
+      key: "REFURBISH",
+      label: "Refurbishment",
+      icon: <FaTools />,
+      color: "text-orange-700",
+      bg: "bg-orange-50",
+    },
+    {
+      key: "PUBLISHED",
+      label: "Published",
+      icon: <FaBullhorn />,
+      color: "text-purple-700",
+      bg: "bg-purple-50",
+    },
+    {
+      key: "SOLD",
+      label: "Sold",
+      icon: <FaHandshake />,
+      color: "text-gray-700",
+      bg: "bg-gray-100",
+    },
   ];
 
   return (
@@ -139,7 +253,7 @@ const AdminSubmissions = () => {
               </p>
             </div>
             <button
-              onClick={fetchSubmissions}
+              onClick={handleRefresh}
               disabled={loading}
               className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg text-gray-600 hover:bg-gray-50 transition-colors text-sm font-medium shadow-sm disabled:opacity-50"
             >
@@ -148,8 +262,8 @@ const AdminSubmissions = () => {
             </button>
           </div>
 
-          {/* Stat filter chips */}
-          <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-6">
+          {/* Stat filter chips — always show FULL dataset counts from /stats/ */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 mb-6">
             {FILTER_TABS.map(({ key, label, icon, color, bg }) => (
               <button
                 key={key}
@@ -179,14 +293,14 @@ const AdminSubmissions = () => {
                   ? "All Submissions"
                   : `${STATUS_CFG[filter]?.label} Submissions`}
                 <span className="ml-2 text-sm font-normal text-gray-400">
-                  ({filtered.length})
+                  ({count} total)
                 </span>
               </h2>
               <div className="relative w-full sm:w-72">
                 <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm" />
                 <input
                   type="text"
-                  placeholder="Search device, customer…"
+                  placeholder="Search this page…"
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   className="w-full pl-9 pr-8 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-emerald-400 transition-colors"
@@ -308,6 +422,31 @@ const AdminSubmissions = () => {
                     ))}
                   </tbody>
                 </table>
+              </div>
+            )}
+
+            {/* Pagination controls */}
+            {!loading && count > 0 && (
+              <div className="px-6 py-4 border-t border-gray-100 flex items-center justify-between">
+                <p className="text-sm text-gray-500">
+                  Page {page} of {totalPages}
+                </p>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setPage((p) => Math.max(1, p - 1))}
+                    disabled={!hasPrevious}
+                    className="flex items-center gap-1 px-3 py-1.5 border border-gray-200 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                  >
+                    <FaChevronLeft size={11} /> Previous
+                  </button>
+                  <button
+                    onClick={() => setPage((p) => p + 1)}
+                    disabled={!hasNext}
+                    className="flex items-center gap-1 px-3 py-1.5 border border-gray-200 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                  >
+                    Next <FaChevronRight size={11} />
+                  </button>
+                </div>
               </div>
             )}
           </div>

@@ -3,7 +3,11 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import {
-  FaMobileAlt, FaUsers, FaCheckCircle, FaClock, FaEye,
+  FaMobileAlt,
+  FaUsers,
+  FaCheckCircle,
+  FaClock,
+  FaEye,
 } from "react-icons/fa";
 import AdminNavbar from "../../components/AdminNavbar";
 import { Badge } from "../../components/shared/StatusBadge";
@@ -29,7 +33,9 @@ const AdminDashboard = () => {
           api.get("/api/submissions/admin/all/"),
         ]);
         setStats(statsRes.data);
-        const all = Array.isArray(subsRes.data) ? subsRes.data : subsRes.data.results ?? [];
+        const all = Array.isArray(subsRes.data)
+          ? subsRes.data
+          : (subsRes.data.results ?? []);
         setRecentSubmissions(all.slice(0, 5));
       } catch (err) {
         console.error("Dashboard fetch error:", err);
@@ -41,10 +47,30 @@ const AdminDashboard = () => {
   }, [token]);
 
   const statCards = [
-    { title: "Total Submissions", value: stats?.total_submissions ?? "—", icon: <FaMobileAlt />, color: "bg-blue-500"   },
-    { title: "Pending Review",    value: stats?.pending          ?? "—", icon: <FaClock />,      color: "bg-yellow-500" },
-    { title: "Approved",          value: stats?.approved         ?? "—", icon: <FaCheckCircle />,color: "bg-green-500"  },
-    { title: "Staff Accounts",    value: stats?.staff_count      ?? "—", icon: <FaUsers />,      color: "bg-purple-500" },
+    {
+      title: "Total Submissions",
+      value: stats?.total_submissions ?? "—",
+      icon: <FaMobileAlt />,
+      color: "bg-blue-500",
+    },
+    {
+      title: "Pending Review",
+      value: stats?.pending ?? "—",
+      icon: <FaClock />,
+      color: "bg-yellow-500",
+    },
+    {
+      title: "Approved",
+      value: stats?.approved ?? "—",
+      icon: <FaCheckCircle />,
+      color: "bg-green-500",
+    },
+    {
+      title: "Staff Accounts",
+      value: stats?.total_staff ?? "—",
+      icon: <FaUsers />,
+      color: "bg-purple-500",
+    },
   ];
 
   if (loading) {
@@ -63,10 +89,11 @@ const AdminDashboard = () => {
       <AdminNavbar />
       <div className="min-h-screen bg-gray-50 pt-20">
         <div className="container mx-auto px-4 py-6">
-
           {/* Welcome */}
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900">Dashboard Overview</h1>
+            <h1 className="text-3xl font-bold text-gray-900">
+              Dashboard Overview
+            </h1>
             <p className="text-gray-500 mt-1">
               Welcome back! Here's what's happening with ReTech today.
             </p>
@@ -75,13 +102,20 @@ const AdminDashboard = () => {
           {/* Stat cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             {statCards.map((stat) => (
-              <div key={stat.title} className="bg-white rounded-xl shadow-sm p-6 border border-gray-100 hover:shadow-md transition-shadow">
+              <div
+                key={stat.title}
+                className="bg-white rounded-xl shadow-sm p-6 border border-gray-100 hover:shadow-md transition-shadow"
+              >
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm text-gray-500 mb-1">{stat.title}</p>
-                    <p className="text-3xl font-bold text-gray-900">{stat.value}</p>
+                    <p className="text-3xl font-bold text-gray-900">
+                      {stat.value}
+                    </p>
                   </div>
-                  <div className={`${stat.color} p-3 rounded-xl text-white text-lg`}>
+                  <div
+                    className={`${stat.color} p-3 rounded-xl text-white text-lg`}
+                  >
                     {stat.icon}
                   </div>
                 </div>
@@ -93,8 +127,12 @@ const AdminDashboard = () => {
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-8">
             <div className="px-6 py-4 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white flex justify-between items-center">
               <div>
-                <h2 className="text-xl font-bold text-gray-800">Recent Device Submissions</h2>
-                <p className="text-sm text-gray-500">Latest submissions awaiting review</p>
+                <h2 className="text-xl font-bold text-gray-800">
+                  Recent Device Submissions
+                </h2>
+                <p className="text-sm text-gray-500">
+                  Latest submissions awaiting review
+                </p>
               </div>
               <Link
                 to="/admin/submissions"
@@ -108,8 +146,17 @@ const AdminDashboard = () => {
               <table className="min-w-full divide-y divide-gray-100">
                 <thead className="bg-gray-50">
                   <tr>
-                    {["Device", "Customer", "Submitted", "Status", "Actions"].map((h) => (
-                      <th key={h} className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                    {[
+                      "Device",
+                      "Customer",
+                      "Submitted",
+                      "Status",
+                      "Actions",
+                    ].map((h) => (
+                      <th
+                        key={h}
+                        className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider"
+                      >
                         {h}
                       </th>
                     ))}
@@ -117,30 +164,49 @@ const AdminDashboard = () => {
                 </thead>
                 <tbody className="divide-y divide-gray-50">
                   {recentSubmissions.map((sub) => (
-                    <tr key={sub.id} className="hover:bg-gray-50 transition-colors">
+                    <tr
+                      key={sub.id}
+                      className="hover:bg-gray-50 transition-colors"
+                    >
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
                           <div className="w-10 h-10 bg-gradient-to-br from-emerald-100 to-teal-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                            <span className="text-emerald-700 font-bold">{sub.brand?.charAt(0)}</span>
+                            <span className="text-emerald-700 font-bold">
+                              {sub.brand?.charAt(0)}
+                            </span>
                           </div>
                           <div>
-                            <p className="text-sm font-semibold text-gray-900">{sub.brand} {sub.model}</p>
+                            <p className="text-sm font-semibold text-gray-900">
+                              {sub.brand} {sub.model}
+                            </p>
                             <p className="text-xs text-gray-400">
-                              {sub.photos?.length || 0} photo{sub.photos?.length !== 1 ? "s" : ""}
+                              {sub.photos?.length || 0} photo
+                              {sub.photos?.length !== 1 ? "s" : ""}
                             </p>
                           </div>
                         </div>
                       </td>
                       <td className="px-6 py-4">
-                        <p className="text-sm font-medium text-gray-900">{sub.customer_name || "—"}</p>
-                        <p className="text-xs text-gray-400">{sub.customer_email || "—"}</p>
+                        <p className="text-sm font-medium text-gray-900">
+                          {sub.customer_name || "—"}
+                        </p>
+                        <p className="text-xs text-gray-400">
+                          {sub.customer_email || "—"}
+                        </p>
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-500">
-                        {new Date(sub.submission_date).toLocaleDateString("en-GB", {
-                          day: "numeric", month: "short", year: "numeric",
-                        })}
+                        {new Date(sub.submission_date).toLocaleDateString(
+                          "en-GB",
+                          {
+                            day: "numeric",
+                            month: "short",
+                            year: "numeric",
+                          },
+                        )}
                       </td>
-                      <td className="px-6 py-4"><Badge status={sub.status} /></td>
+                      <td className="px-6 py-4">
+                        <Badge status={sub.status} />
+                      </td>
                       <td className="px-6 py-4">
                         <Link
                           to="/admin/submissions"
@@ -156,7 +222,9 @@ const AdminDashboard = () => {
               {recentSubmissions.length === 0 && (
                 <div className="text-center py-16">
                   <div className="text-5xl mb-3">📱</div>
-                  <p className="text-gray-500 font-medium">No submissions yet</p>
+                  <p className="text-gray-500 font-medium">
+                    No submissions yet
+                  </p>
                 </div>
               )}
             </div>
@@ -170,7 +238,9 @@ const AdminDashboard = () => {
             >
               <div className="text-3xl mb-3">📱</div>
               <h3 className="text-xl font-bold mb-2">Review Submissions</h3>
-              <p className="text-white/80 mb-4 text-sm">Review pending device submissions and update their status</p>
+              <p className="text-white/80 mb-4 text-sm">
+                Review pending device submissions and update their status
+              </p>
               <span className="text-sm font-semibold">Go to Submissions →</span>
             </Link>
 
@@ -180,11 +250,12 @@ const AdminDashboard = () => {
             >
               <div className="text-3xl mb-3">👥</div>
               <h3 className="text-xl font-bold mb-2">Manage Staff</h3>
-              <p className="text-white/80 mb-4 text-sm">Create and manage staff accounts with different roles</p>
+              <p className="text-white/80 mb-4 text-sm">
+                Create and manage staff accounts with different roles
+              </p>
               <span className="text-sm font-semibold">Manage Staff →</span>
             </Link>
           </div>
-
         </div>
       </div>
     </>
