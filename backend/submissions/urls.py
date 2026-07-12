@@ -7,6 +7,7 @@ from .views import (
     AdminSubmissionsListView,
     AdminSubmissionUpdateView,
     AdminSubmissionStatsView,
+    AdminAnalyticsView,              
     DeviceDiagnosticsView,
     DeviceCertificationView,
     DeviceReservationCreateView,
@@ -19,45 +20,18 @@ from .views import (
 
 urlpatterns = [
     # -------------------- Customer Routes --------------------
-    path(
-        '',
-        DeviceSubmissionCreateView.as_view(),
-        name='device-submission-create'
-    ),
-    path(
-        'my/',
-        MyDeviceSubmissionsListView.as_view(),
-        name='my-submissions-list'
-    ),
+    path('', DeviceSubmissionCreateView.as_view(), name='device-submission-create'),
+    path('my/', MyDeviceSubmissionsListView.as_view(), name='my-submissions-list'),
 
     # -------------------- Admin / Staff Routes --------------------
-    path(
-        'admin/all/',
-        AdminSubmissionsListView.as_view(),
-        name='admin-submissions-list'
-    ),
-    path(
-        'admin/stats/',
-        AdminSubmissionStatsView.as_view(),
-        name='admin-submissions-stats'
-    ),
-    path(
-        'admin/<int:pk>/update/',
-        AdminSubmissionUpdateView.as_view(),
-        name='admin-submission-update'
-    ),
+    path('admin/all/', AdminSubmissionsListView.as_view(), name='admin-submissions-list'),
+    path('admin/stats/', AdminSubmissionStatsView.as_view(), name='admin-submissions-stats'),
+    path('admin/analytics/', AdminAnalyticsView.as_view(), name='admin-analytics'),   # ← new path
+    path('admin/<int:pk>/update/', AdminSubmissionUpdateView.as_view(), name='admin-submission-update'),
 
     # -------------------- Diagnostics & Certification Routes --------------------
-    path(
-        '<int:pk>/diagnostics/',
-        DeviceDiagnosticsView.as_view(),
-        name='device-diagnostics'
-    ),
-    path(
-        '<int:pk>/certify/',
-        DeviceCertificationView.as_view(),
-        name='device-certification'
-    ),
+    path('<int:pk>/diagnostics/', DeviceDiagnosticsView.as_view(), name='device-diagnostics'),
+    path('<int:pk>/certify/', DeviceCertificationView.as_view(), name='device-certification'),
 
     # -------------------- Reservations --------------------
     path('public/catalog/<int:pk>/reserve/', DeviceReservationCreateView.as_view(), name='public-device-reserve'),

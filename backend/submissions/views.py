@@ -6,11 +6,13 @@ from rest_framework.generics import ListAPIView
 from django.contrib.auth import get_user_model
 import uuid
 from django.db.models import Count
-
 from .models import DeviceSubmission, DeviceReservation
 from .serializers import DeviceSubmissionSerializer, AdminDeviceSubmissionSerializer, DeviceReservationSerializer
 from rest_framework.permissions import IsAuthenticated, BasePermission, AllowAny
 from rest_framework.pagination import PageNumberPagination
+from django.db.models.functions import TruncDate, TruncWeek, TruncMonth
+from django.utils import timezone
+from datetime import timedelta
 
 class SubmissionsPagination(PageNumberPagination):
     page_size = 10
@@ -365,7 +367,65 @@ class AdminSubmissionStatsView(APIView):
             'sold': qs.filter(status='SOLD').count(),
         })
 
+# ─────────────────────────────────────────────
+# Analytics (trend + category breakdown)
+# ─────────────────────────────────────────────
 
+class AdminAnalyticsView(APIView):
+    permission_classes = [IsStaffOrAdmin]
+
+    def get(self, request):
+        period = request.query_params.get('period', 'week')
+        now = timezone.now()
+
+        # ── Trend data ──────────────────────────────────────────────
+        if period == 'week':
+            start_date = now - timedelta(days=6)
+            qs = DeviceSubmission.objects.filter(submission_date__gte=start_date)
+            trend_qs = (
+                qs.annotate(period=TruncDate('submission_date'))
+                  .values('period')
+                  .annotate(count=Count('id'))
+                  .order_by('period')
+            )
+            trend = [{'label': row['period'].strftime('%a'), 'count': row['count']} for row in trend_qs]
+
+        elif period == 'month':
+            start_date = now - timedelta(weeks=7)
+            qs = DeviceSubmission.objects.filter(submission_date__gte=start_date)
+            trend_qs = (
+                qs.annotate(period=TruncWeek('submission_date'))
+                  .values('period')
+                  .annotate(count=Count('id'))
+                  .order_by('period')
+            )
+            trend = [{'label': row['period'].strftime('%b %d'), 'count': row['count']} for row in trend_qs]
+
+        else:  # year
+            start_date = now - timedelta(days=365)
+            qs = DeviceSubmission.objects.filter(submission_date__gte=start_date)
+            trend_qs = (
+                qs.annotate(period=TruncMonth('submission_date'))
+                  .values('period')
+                  .annotate(count=Count('id'))
+                  .order_by('period')
+            )
+            trend = [{'label': row['period'].strftime('%b'), 'count': row['count']} for row in trend_qs]
+
+        # ── Category breakdown (all submissions; missing category → "Uncategorized") ──
+        category_qs = (
+            DeviceSubmission.objects.all()
+            .values('category')
+            .annotate(count=Count('id'))
+            .order_by('-count')
+        )
+        categories = [
+            {'name': row['category'] or 'Uncategorized', 'count': row['count']}
+            for row in category_qs
+        ]
+
+        return Response({'trend': trend, 'categories': categories})
+        
 # ─────────────────────────────────────────────
 # Public Catalog
 # ─────────────────────────────────────────────
