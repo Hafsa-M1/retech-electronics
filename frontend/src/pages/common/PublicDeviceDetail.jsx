@@ -150,7 +150,7 @@ export default function PublicDeviceDetail() {
                 : 'Contact for Price'}
             </div>
 
-            {/* 🔥 DIAGNOSTIC RESULTS (NEW IMPORTANT SECTION) */}
+            {/*  DIAGNOSTIC RESULTS  */}
             <div className="bg-white p-5 rounded-2xl mb-6 border">
               <h3 className="text-lg font-semibold mb-4">
                 Diagnostic Results
@@ -185,7 +185,7 @@ export default function PublicDeviceDetail() {
               )}
             </div>
 
-            {/* 🔥 STAFF DIAGNOSTIC NOTES */}
+            {/*  STAFF DIAGNOSTIC NOTES */}
             {device.diagnostic_notes && (
               <div className="bg-gray-50 p-5 rounded-2xl mb-6">
                 <h4 className="font-medium mb-2">Diagnostic Notes</h4>

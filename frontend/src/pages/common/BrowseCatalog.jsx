@@ -22,12 +22,12 @@ export default function Catalog() {
 
     try {
       const response = await axios.get(
-        "http://localhost:8000/api/submissions/public/catalog/"
+        "http://localhost:8000/api/submissions/public/catalog/",
       );
       setDevices(
         Array.isArray(response.data)
           ? response.data
-          : (response.data.results ?? [])
+          : (response.data.results ?? []),
       );
     } catch (err) {
       console.error("Failed to fetch catalog devices", err);
@@ -85,11 +85,14 @@ export default function Catalog() {
 
       <div className="container mx-auto px-6 py-8">
         <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
-          <h2 className="text-3xl font-bold text-gray-900">Available Devices</h2>
+          <h2 className="text-3xl font-bold text-gray-900">
+            Available Devices
+          </h2>
 
           {selectedCategory && (
             <p className="text-emerald-600 font-medium">
-              Showing <span className="font-semibold">{selectedCategory}s</span> •{" "}
+              Showing <span className="font-semibold">{selectedCategory}s</span>{" "}
+              •{" "}
               <button
                 onClick={() => window.history.back()}
                 className="text-gray-500 hover:text-gray-700 underline ml-2"
@@ -170,9 +173,8 @@ export default function Catalog() {
                   )}
 
                   <div className="text-3xl font-bold text-emerald-600 mb-5">
-                    ₹
                     {device.estimated_price
-                      ? Number(device.estimated_price).toLocaleString()
+                      ? `LKR ${Number(device.estimated_price).toLocaleString()}`
                       : "—"}
                   </div>
 

@@ -14,7 +14,7 @@ export default function CustomerLayout() {
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
       <CustomerNavbar />
-      <main className="flex-grow pt-20">    {/* pt-20 or pt-[5rem] to clear fixed navbar */}
+      <main className="flex-grow pt-20">    
         <div className="container mx-auto px-4 md:px-6 py-8">
           <Outlet />                        {/* ← child routes render here */}
         </div>

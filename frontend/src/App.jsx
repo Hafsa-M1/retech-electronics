@@ -23,8 +23,8 @@ import StaffRegistration  from './pages/staff/StaffRegistration';
 import StaffDiagnostics   from './pages/staff/StaffDiagnostics';
 import StaffCertification from './pages/staff/StaffCertification';
 import StaffReservations  from './pages/staff/StaffReservations';
-import ForgotPassword     from './pages/staff/ForgotPassword';   // ← New
-import ResetPassword      from './pages/staff/ResetPassword';    // ← New
+import ForgotPassword     from './pages/staff/ForgotPassword';   
+import ResetPassword      from './pages/staff/ResetPassword';    
 
 // Admin
 import AdminLogin       from './pages/admin/AdminLogin';

@@ -12,8 +12,15 @@ const makeApi = (token) =>
   });
 
 const DEVICE_CATEGORIES = [
-  "Smartphone", "Laptop", "Tablet", "Smartwatch", 
-  "Desktop", "Gaming Console", "Headphones", "Camera", "Other"
+  "Smartphone",
+  "Laptop",
+  "Tablet",
+  "Smartwatch",
+  "Desktop",
+  "Gaming Console",
+  "Headphones",
+  "Camera",
+  "Other",
 ];
 
 const StaffCertification = () => {
@@ -36,8 +43,10 @@ const StaffCertification = () => {
   useEffect(() => {
     const fetchCertified = async () => {
       try {
-        const { data } = await makeApi(token).get("/api/submissions/admin/all/?status=CERTIFIED");
-        setCertifiedDevices(Array.isArray(data) ? data : data.results ?? []);
+        const { data } = await makeApi(token).get(
+          "/api/submissions/admin/all/?status=CERTIFIED",
+        );
+        setCertifiedDevices(Array.isArray(data) ? data : (data.results ?? []));
       } catch (err) {
         console.error(err);
       } finally {
@@ -61,14 +70,15 @@ const StaffCertification = () => {
         final_notes: finalNotes,
       });
 
-      setSuccessMessage(`✅ ${selected.brand} ${selected.model} has been published to the catalog!`);
+      setSuccessMessage(
+        `✅ ${selected.brand} ${selected.model} has been published to the catalog!`,
+      );
 
-      setCertifiedDevices(prev => prev.filter(d => d.id !== selected.id));
+      setCertifiedDevices((prev) => prev.filter((d) => d.id !== selected.id));
       setSelected(null);
       setCategory("");
       setPrice("");
       setFinalNotes("");
-
     } catch (err) {
       alert(err.response?.data?.error || "Failed to publish to catalog");
     } finally {
@@ -83,8 +93,12 @@ const StaffCertification = () => {
       <main className="pt-20">
         <div className="container mx-auto px-6 py-8">
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900">Final Certification</h1>
-            <p className="text-gray-600">Review certified devices and publish them to the public catalog</p>
+            <h1 className="text-3xl font-bold text-gray-900">
+              Final Certification
+            </h1>
+            <p className="text-gray-600">
+              Review certified devices and publish them to the public catalog
+            </p>
           </div>
 
           {successMessage && (
@@ -98,24 +112,34 @@ const StaffCertification = () => {
             <div className="lg:col-span-5">
               <div className="bg-white rounded-2xl shadow border border-gray-100">
                 <div className="px-6 py-4 border-b bg-gray-50">
-                  <h2 className="font-semibold">Certified Devices ({certifiedDevices.length})</h2>
+                  <h2 className="font-semibold">
+                    Certified Devices ({certifiedDevices.length})
+                  </h2>
                 </div>
                 <div className="p-4 max-h-[70vh] overflow-y-auto">
                   {loading ? (
                     <div className="text-center py-12">Loading...</div>
                   ) : certifiedDevices.length === 0 ? (
-                    <div className="text-center py-12 text-gray-500">No certified devices pending</div>
+                    <div className="text-center py-12 text-gray-500">
+                      No certified devices pending
+                    </div>
                   ) : (
-                    certifiedDevices.map(device => (
+                    certifiedDevices.map((device) => (
                       <div
                         key={device.id}
                         onClick={() => setSelected(device)}
                         className={`p-4 mb-3 rounded-xl border cursor-pointer transition-all ${
-                          selected?.id === device.id ? "border-emerald-500 bg-emerald-50" : "border-gray-200 hover:border-gray-300"
+                          selected?.id === device.id
+                            ? "border-emerald-500 bg-emerald-50"
+                            : "border-gray-200 hover:border-gray-300"
                         }`}
                       >
-                        <p className="font-semibold">{device.brand} {device.model}</p>
-                        <p className="text-sm text-gray-500">Cert ID: {device.certificate_id}</p>
+                        <p className="font-semibold">
+                          {device.brand} {device.model}
+                        </p>
+                        <p className="text-sm text-gray-500">
+                          Cert ID: {device.certificate_id}
+                        </p>
                       </div>
                     ))
                   )}
@@ -132,21 +156,47 @@ const StaffCertification = () => {
                   </h2>
 
                   <div className="mb-6">
-                    <label className="block text-sm font-medium mb-2">Device Category</label>
-                    <select value={category} onChange={(e) => setCategory(e.target.value)} className="w-full p-4 border rounded-xl">
+                    <label className="block text-sm font-medium mb-2">
+                      Device Category
+                    </label>
+                    <select
+                      value={category}
+                      onChange={(e) => setCategory(e.target.value)}
+                      className="w-full p-4 border rounded-xl"
+                    >
                       <option value="">Select Category</option>
-                      {DEVICE_CATEGORIES.map(cat => <option key={cat} value={cat}>{cat}</option>)}
+                      {DEVICE_CATEGORIES.map((cat) => (
+                        <option key={cat} value={cat}>
+                          {cat}
+                        </option>
+                      ))}
                     </select>
                   </div>
 
                   <div className="mb-6">
-                    <label className="block text-sm font-medium mb-2">Estimated Resale Price (₹)</label>
-                    <input type="number" value={price} onChange={(e) => setPrice(e.target.value)} placeholder="45000" className="w-full p-4 border rounded-xl" />
+                    <label className="block text-sm font-medium mb-2">
+                      Estimated Resale Price (LKR)
+                    </label>
+                    <input
+                      type="number"
+                      value={price}
+                      onChange={(e) => setPrice(e.target.value)}
+                      placeholder="45000"
+                      className="w-full p-4 border rounded-xl"
+                    />
                   </div>
 
                   <div className="mb-8">
-                    <label className="block text-sm font-medium mb-2">Final Notes</label>
-                    <textarea value={finalNotes} onChange={(e) => setFinalNotes(e.target.value)} rows={4} className="w-full p-4 border rounded-xl" placeholder="Final remarks..." />
+                    <label className="block text-sm font-medium mb-2">
+                      Final Notes
+                    </label>
+                    <textarea
+                      value={finalNotes}
+                      onChange={(e) => setFinalNotes(e.target.value)}
+                      rows={4}
+                      className="w-full p-4 border rounded-xl"
+                      placeholder="Final remarks..."
+                    />
                   </div>
 
                   <button
@@ -159,7 +209,9 @@ const StaffCertification = () => {
                 </div>
               ) : (
                 <div className="h-96 flex items-center justify-center border-2 border-dashed border-gray-200 rounded-2xl">
-                  <p className="text-gray-500">Select a certified device to publish</p>
+                  <p className="text-gray-500">
+                    Select a certified device to publish
+                  </p>
                 </div>
               )}
             </div>

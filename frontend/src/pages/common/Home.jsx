@@ -533,7 +533,7 @@ export default function Home() {
         )}
       </nav>
 
-      {/* Hero Section - UPDATED COLORS */}
+      {/* Hero Section  */}
       <header className="relative min-h-screen pt-20 overflow-hidden">
         {/* Animated Background Gradient */}
         <div className="absolute inset-0 bg-gradient-to-br from-emerald-900/20 via-teal-800/10 to-cyan-900/5"></div>

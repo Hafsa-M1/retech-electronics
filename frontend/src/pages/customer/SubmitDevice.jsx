@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import CustomerNavbar from '../../components/CustomerNavbar'; // Adjust path if needed
+import CustomerNavbar from '../../components/CustomerNavbar'; 
 
 const SubmitDevice = () => {
   const navigate = useNavigate();

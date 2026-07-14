@@ -1,36 +1,65 @@
-import { Link, useNavigate } from 'react-router-dom';
-import { useState, useEffect } from 'react';
-import axios from 'axios';
-import { FaEnvelope, FaLock, FaEye, FaEyeSlash, FaArrowRight, FaLock as FaLockIcon, FaCheck, FaTimes } from 'react-icons/fa';
+import { Link, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import axios from "axios";
+import {
+  FaEnvelope,
+  FaLock,
+  FaEye,
+  FaEyeSlash,
+  FaArrowRight,
+  FaLock as FaLockIcon,
+  FaCheck,
+  FaTimes,
+} from "react-icons/fa";
 import logo from "../../assets/retech-logo.png";
 
 export default function CustomerLogin() {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-    rememberMe: false
+    email: "",
+    password: "",
+    rememberMe: false,
   });
 
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [loginError, setLoginError] = useState('');
+  const [loginError, setLoginError] = useState("");
   const [forgotPassword, setForgotPassword] = useState(false);
-  const [notification, setNotification] = useState({ show: false, type: '', message: '' });
+  const [notification, setNotification] = useState({
+    show: false,
+    type: "",
+    message: "",
+  });
 
   const benefits = [
-    { icon: "💰", title: "Best Prices", description: "Save up to 70% on certified devices" },
-    { icon: "✅", title: "Certified Quality", description: "50+ point diagnostic tests" },
-    { icon: "🛡️", title: "90-Day Warranty", description: "Full warranty on all purchases" },
-    { icon: "⚡", title: "Fast Access", description: "Instant access to inventory" }
+    {
+      icon: "💰",
+      title: "Best Prices",
+      description: "Save up to 70% on certified devices",
+    },
+    {
+      icon: "✅",
+      title: "Certified Quality",
+      description: "50+ point diagnostic tests",
+    },
+    {
+      icon: "🛡️",
+      title: "90-Day Warranty",
+      description: "Full warranty on all purchases",
+    },
+    {
+      icon: "⚡",
+      title: "Fast Access",
+      description: "Instant access to inventory",
+    },
   ];
 
   // Auto-hide notification after 5 seconds
   useEffect(() => {
     if (notification.show) {
       const timer = setTimeout(() => {
-        setNotification({ show: false, type: '', message: '' });
+        setNotification({ show: false, type: "", message: "" });
       }, 5000);
       return () => clearTimeout(timer);
     }
@@ -41,40 +70,43 @@ export default function CustomerLogin() {
   };
 
   const hideNotification = () => {
-    setNotification({ show: false, type: '', message: '' });
+    setNotification({ show: false, type: "", message: "" });
   };
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: type === "checkbox" ? checked : value,
     }));
-    if (loginError) setLoginError('');
+    if (loginError) setLoginError("");
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    setLoginError('');
+    setLoginError("");
 
     try {
       const response = await axios.post(
-        'http://localhost:8000/api/token/',  // your real JWT token endpoint
+        "http://localhost:8000/api/token/", // your real JWT token endpoint
         {
           email: formData.email,
           password: formData.password,
-        }
+        },
       );
 
-      const { access } = response.data;  // extract the access token (SimpleJWT default)
+      const { access } = response.data; // extract the access token (SimpleJWT default)
 
-      localStorage.setItem('customerToken', access);
-      localStorage.setItem('customerEmail', formData.email);
+      localStorage.setItem("customerToken", access);
+      localStorage.setItem("customerEmail", formData.email);
 
-      showNotification('success', 'Login successful! Redirecting to dashboard...');
+      showNotification(
+        "success",
+        "Login successful! Redirecting to dashboard...",
+      );
       setTimeout(() => {
-        navigate('/customer-dashboard');
+        navigate("/customer-dashboard");
       }, 1500);
     } catch (err) {
       const errorMsg =
@@ -82,9 +114,9 @@ export default function CustomerLogin() {
         err.response?.data?.non_field_errors?.[0] ||
         err.response?.data?.email?.[0] ||
         err.response?.data?.password?.[0] ||
-        'Invalid email or password. Please try again.';
+        "Invalid email or password. Please try again.";
       setLoginError(errorMsg);
-      showNotification('error', errorMsg);
+      showNotification("error", errorMsg);
     } finally {
       setIsSubmitting(false);
     }
@@ -103,7 +135,10 @@ export default function CustomerLogin() {
     setTimeout(() => {
       setIsSubmitting(false);
       setForgotPassword(false);
-      showNotification('success', 'Password reset link has been sent to your email!');
+      showNotification(
+        "success",
+        "Password reset link has been sent to your email!",
+      );
     }, 1500);
   };
 
@@ -111,15 +146,19 @@ export default function CustomerLogin() {
     <div className="min-h-screen font-sans bg-gradient-to-br from-gray-50 via-white to-emerald-50">
       {/* Custom Notification */}
       {notification.show && (
-        <div className={`fixed top-24 right-4 z-50 max-w-md ${
-          notification.type === 'success' 
-            ? 'bg-gradient-to-r from-green-500 to-emerald-600' 
-            : 'bg-gradient-to-r from-red-500 to-pink-500'
-        } text-white p-4 rounded-xl shadow-2xl animate-slide-in`}>
+        <div
+          className={`fixed top-24 right-4 z-50 max-w-md ${
+            notification.type === "success"
+              ? "bg-gradient-to-r from-green-500 to-emerald-600"
+              : "bg-gradient-to-r from-red-500 to-pink-500"
+          } text-white p-4 rounded-xl shadow-2xl animate-slide-in`}
+        >
           <div className="flex items-start justify-between">
             <div className="flex items-start space-x-3">
-              <div className={`mt-1 p-1 rounded-full ${notification.type === 'success' ? 'bg-emerald-600' : 'bg-red-600'}`}>
-                {notification.type === 'success' ? (
+              <div
+                className={`mt-1 p-1 rounded-full ${notification.type === "success" ? "bg-emerald-600" : "bg-red-600"}`}
+              >
+                {notification.type === "success" ? (
                   <FaCheck className="w-4 h-4" />
                 ) : (
                   <FaTimes className="w-4 h-4" />
@@ -127,7 +166,7 @@ export default function CustomerLogin() {
               </div>
               <div className="flex-1">
                 <p className="font-semibold">
-                  {notification.type === 'success' ? 'Success!' : 'Error!'}
+                  {notification.type === "success" ? "Success!" : "Error!"}
                 </p>
                 <p className="text-sm mt-1">{notification.message}</p>
               </div>
@@ -141,9 +180,9 @@ export default function CustomerLogin() {
           </div>
           {/* Progress bar */}
           <div className="mt-3 h-1 bg-white/20 rounded-full overflow-hidden">
-            <div 
-              className={`h-full ${notification.type === 'success' ? 'bg-emerald-300' : 'bg-red-300'} animate-progress`}
-              style={{ animationDuration: '5s' }}
+            <div
+              className={`h-full ${notification.type === "success" ? "bg-emerald-300" : "bg-red-300"} animate-progress`}
+              style={{ animationDuration: "5s" }}
             ></div>
           </div>
         </div>
@@ -172,9 +211,22 @@ export default function CustomerLogin() {
             {/* Left Side - Form */}
             <div className="bg-white rounded-3xl shadow-2xl p-8 md:p-12 border border-gray-100">
               <div className="mb-8">
-                <Link to="/" className="inline-flex items-center gap-2 text-gray-600 hover:text-emerald-600 transition-colors group">
-                  <svg className="w-4 h-4 transform group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                <Link
+                  to="/"
+                  className="inline-flex items-center gap-2 text-gray-600 hover:text-emerald-600 transition-colors group"
+                >
+                  <svg
+                    className="w-4 h-4 transform group-hover:-translate-x-1 transition-transform"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M10 19l-7-7m0 0l7-7m-7 7h18"
+                    />
                   </svg>
                   <span>Back to Home</span>
                 </Link>
@@ -183,10 +235,14 @@ export default function CustomerLogin() {
               {/* Form Header */}
               <div className="mb-10">
                 <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-                  Welcome <span className="bg-gradient-to-r from-emerald-500 to-teal-500 bg-clip-text text-transparent">Back</span>
+                  Welcome{" "}
+                  <span className="bg-gradient-to-r from-emerald-500 to-teal-500 bg-clip-text text-transparent">
+                    Back
+                  </span>
                 </h1>
                 <p className="text-gray-600 text-lg">
-                  Sign in to your account to continue trading refurbished electronics
+                  Sign in to your account to continue trading refurbished
+                  electronics
                 </p>
               </div>
 
@@ -194,10 +250,22 @@ export default function CustomerLogin() {
               {loginError && (
                 <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-2xl">
                   <div className="flex items-center">
-                    <svg className="w-5 h-5 text-red-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                    <svg
+                      className="w-5 h-5 text-red-600 mr-3"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.732 16.5c-.77.833.192 2.5 1.732 2.5z"
+                      />
                     </svg>
-                    <span className="text-red-800 font-medium">{loginError}</span>
+                    <span className="text-red-800 font-medium">
+                      {loginError}
+                    </span>
                   </div>
                 </div>
               )}
@@ -236,7 +304,11 @@ export default function CustomerLogin() {
                           onClick={() => setShowPassword(!showPassword)}
                           className="absolute right-4 top-4 text-gray-400 hover:text-gray-600"
                         >
-                          {showPassword ? <FaEyeSlash className="w-5 h-5" /> : <FaEye className="w-5 h-5" />}
+                          {showPassword ? (
+                            <FaEyeSlash className="w-5 h-5" />
+                          ) : (
+                            <FaEye className="w-5 h-5" />
+                          )}
                         </button>
                       </div>
                     </div>
@@ -268,9 +340,25 @@ export default function CustomerLogin() {
                     >
                       {isSubmitting ? (
                         <span className="flex items-center justify-center">
-                          <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                          <svg
+                            className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                          >
+                            <circle
+                              className="opacity-25"
+                              cx="12"
+                              cy="12"
+                              r="10"
+                              stroke="currentColor"
+                              strokeWidth="4"
+                            ></circle>
+                            <path
+                              className="opacity-75"
+                              fill="currentColor"
+                              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                            ></path>
                           </svg>
                           Logging in...
                         </span>
@@ -284,13 +372,17 @@ export default function CustomerLogin() {
                   </div>
                 </form>
               ) : (
-                // Forgot Password Form (unchanged)
+                // Forgot Password Form
                 <form onSubmit={handleResetPassword}>
                   <div className="space-y-6">
                     <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-6">
-                      <h3 className="text-lg font-bold text-emerald-800 mb-2">Reset Your Password</h3>
+                      <h3 className="text-lg font-bold text-emerald-800 mb-2">
+                        Password Reset Coming Soon
+                      </h3>
                       <p className="text-emerald-700 text-sm">
-                        Enter your email address and we'll send you a link to reset your password.
+                        Self-service password reset for customer accounts isn't
+                        available yet. Please contact support for help accessing
+                        your account.
                       </p>
                     </div>
                     <div className="relative">
@@ -316,7 +408,7 @@ export default function CustomerLogin() {
                         disabled={isSubmitting}
                         className="flex-1 px-6 py-4 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-medium rounded-2xl transition-all duration-300 transform hover:-translate-y-0.5 shadow-lg shadow-emerald-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
-                        {isSubmitting ? 'Sending...' : 'Reset Password'}
+                        {isSubmitting ? "Sending..." : "Reset Password"}
                       </button>
                     </div>
                   </div>
@@ -325,8 +417,11 @@ export default function CustomerLogin() {
 
               <div className="mt-8 pt-8 border-t border-gray-100 text-center">
                 <p className="text-gray-600">
-                  Don't have an account?{' '}
-                  <Link to="/customer-signup" className="text-emerald-600 hover:text-emerald-700 font-bold underline">
+                  Don't have an account?{" "}
+                  <Link
+                    to="/customer-signup"
+                    className="text-emerald-600 hover:text-emerald-700 font-bold underline"
+                  >
                     Create Account
                   </Link>
                 </p>
@@ -337,7 +432,7 @@ export default function CustomerLogin() {
             <div className="relative overflow-hidden rounded-3xl">
               {/* Background Pattern */}
               <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900"></div>
-              
+
               {/* Animated Background Elements */}
               <div className="absolute top-10 right-10 w-72 h-72 bg-emerald-500/15 rounded-full blur-3xl animate-pulse"></div>
               <div className="absolute bottom-10 left-10 w-80 h-80 bg-emerald-600/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
@@ -348,7 +443,7 @@ export default function CustomerLogin() {
                   <h2 className="text-4xl md:text-5xl font-bold mb-3 text-white">
                     Your Benefits
                   </h2>
-                  
+
                   <p className="text-gray-300 text-base">
                     Continue your journey with certified refurbished electronics
                   </p>
@@ -357,15 +452,19 @@ export default function CustomerLogin() {
                 {/* Benefits Grid */}
                 <div className="grid grid-cols-2 gap-4 mb-10">
                   {benefits.map((benefit, index) => (
-                    <div 
+                    <div
                       key={index}
                       className="bg-white/5 backdrop-blur-sm border border-gray-700/50 rounded-xl p-4 hover:bg-white/10 hover:border-emerald-500/30 transition-all duration-300 group"
                     >
                       <div className="text-2xl mb-2 group-hover:scale-110 transition-transform duration-300">
                         {benefit.icon}
                       </div>
-                      <h3 className="text-sm font-bold mb-1 text-white">{benefit.title}</h3>
-                      <p className="text-gray-400 text-xs">{benefit.description}</p>
+                      <h3 className="text-sm font-bold mb-1 text-white">
+                        {benefit.title}
+                      </h3>
+                      <p className="text-gray-400 text-xs">
+                        {benefit.description}
+                      </p>
                     </div>
                   ))}
                 </div>
@@ -374,19 +473,27 @@ export default function CustomerLogin() {
                 <div className="bg-gradient-to-r from-emerald-900/40 to-teal-900/40 backdrop-blur-sm rounded-xl p-6 border border-emerald-500/20 mb-8">
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
                     <div>
-                      <div className="text-2xl font-bold text-emerald-300">10K+</div>
+                      <div className="text-2xl font-bold text-emerald-300">
+                        10K+
+                      </div>
                       <div className="text-xs text-gray-400">Active Users</div>
                     </div>
                     <div>
-                      <div className="text-2xl font-bold text-emerald-300">98%</div>
+                      <div className="text-2xl font-bold text-emerald-300">
+                        98%
+                      </div>
                       <div className="text-xs text-gray-400">Satisfaction</div>
                     </div>
                     <div>
-                      <div className="text-2xl font-bold text-emerald-300">24/7</div>
+                      <div className="text-2xl font-bold text-emerald-300">
+                        24/7
+                      </div>
                       <div className="text-xs text-gray-400">Support</div>
                     </div>
                     <div>
-                      <div className="text-2xl font-bold text-emerald-300">70%</div>
+                      <div className="text-2xl font-bold text-emerald-300">
+                        70%
+                      </div>
                       <div className="text-xs text-gray-400">Avg Savings</div>
                     </div>
                   </div>
@@ -394,30 +501,40 @@ export default function CustomerLogin() {
 
                 {/* Quick Features */}
                 <div className="space-y-4">
-                  <h3 className="text-lg font-bold text-white mb-3">What happens when you sign in:</h3>
+                  <h3 className="text-lg font-bold text-white mb-3">
+                    What happens when you sign in:
+                  </h3>
                   <div className="flex items-center gap-3 text-sm">
                     <div className="w-6 h-6 bg-emerald-500/30 rounded-full flex items-center justify-center flex-shrink-0 border border-emerald-400/50">
                       <FaArrowRight className="w-3 h-3 text-emerald-300" />
                     </div>
-                    <span className="text-gray-300">Access your saved devices and wishlist</span>
+                    <span className="text-gray-300">
+                      Access your saved devices and wishlist
+                    </span>
                   </div>
                   <div className="flex items-center gap-3 text-sm">
                     <div className="w-6 h-6 bg-emerald-500/30 rounded-full flex items-center justify-center flex-shrink-0 border border-emerald-400/50">
                       <FaArrowRight className="w-3 h-3 text-emerald-300" />
                     </div>
-                    <span className="text-gray-300">View your order history and track shipments</span>
+                    <span className="text-gray-300">
+                      View your order history and track shipments
+                    </span>
                   </div>
                   <div className="flex items-center gap-3 text-sm">
                     <div className="w-6 h-6 bg-emerald-500/30 rounded-full flex items-center justify-center flex-shrink-0 border border-emerald-400/50">
                       <FaArrowRight className="w-3 h-3 text-emerald-300" />
                     </div>
-                    <span className="text-gray-300">Manage your account settings and preferences</span>
+                    <span className="text-gray-300">
+                      Manage your account settings and preferences
+                    </span>
                   </div>
                   <div className="flex items-center gap-3 text-sm">
                     <div className="w-6 h-6 bg-emerald-500/30 rounded-full flex items-center justify-center flex-shrink-0 border border-emerald-400/50">
                       <FaArrowRight className="w-3 h-3 text-emerald-300" />
                     </div>
-                    <span className="text-gray-300">Get personalized recommendations</span>
+                    <span className="text-gray-300">
+                      Get personalized recommendations
+                    </span>
                   </div>
                 </div>
 
@@ -429,7 +546,9 @@ export default function CustomerLogin() {
                     </div>
                     <div>
                       <div className="font-bold text-white">Secure Login</div>
-                      <div className="text-sm text-gray-400">Your data is protected with 256-bit encryption</div>
+                      <div className="text-sm text-gray-400">
+                        Your data is protected with 256-bit encryption
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -443,18 +562,27 @@ export default function CustomerLogin() {
       <div className="border-t border-gray-200 py-8">
         <div className="container mx-auto px-4 text-center">
           <p className="text-gray-600 text-sm">
-            By signing in, you agree to our{' '}
-            <Link to="/privacy-policy" className="text-emerald-600 hover:text-emerald-700 underline">
+            By signing in, you agree to our{" "}
+            <Link
+              to="/privacy-policy"
+              className="text-emerald-600 hover:text-emerald-700 underline"
+            >
               Terms of Service
-            </Link>{' '}
-            and{' '}
-            <Link to="/privacy-policy" className="text-emerald-600 hover:text-emerald-700 underline">
+            </Link>{" "}
+            and{" "}
+            <Link
+              to="/privacy-policy"
+              className="text-emerald-600 hover:text-emerald-700 underline"
+            >
               Privacy Policy
             </Link>
           </p>
           <p className="text-gray-500 text-sm mt-2">
-            Need help?{' '}
-            <Link to="/contact-us" className="text-emerald-600 hover:text-emerald-700 underline">
+            Need help?{" "}
+            <Link
+              to="/contact-us"
+              className="text-emerald-600 hover:text-emerald-700 underline"
+            >
               Contact Support
             </Link>
           </p>
