@@ -1,54 +1,64 @@
 // src/App.jsx
-import { BrowserRouter as Router, Routes, Route, Outlet } from 'react-router-dom';
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Outlet,
+} from "react-router-dom";
 
 // Common pages
-import Home            from './pages/common/Home';
-import AboutUs         from './pages/common/AboutUs';
-import ContactUs       from './pages/common/ContactUs';
-import PrivacyPolicy   from './pages/common/PrivacyPolicy';
-import BrowseCatalog   from './pages/common/BrowseCatalog';
-import PublicDeviceDetail from './pages/common/PublicDeviceDetail';
+import Home from "./pages/common/Home";
+import AboutUs from "./pages/common/AboutUs";
+import ContactUs from "./pages/common/ContactUs";
+import PrivacyPolicy from "./pages/common/PrivacyPolicy";
+import BrowseCatalog from "./pages/common/BrowseCatalog";
+import PublicDeviceDetail from "./pages/common/PublicDeviceDetail";
 
 // Customer pages
-import CustomerLogin     from './pages/customer/CustomerLogin';
-import CustomerSignup    from './pages/customer/CustomerSignup';
-import CustomerDashboard from './pages/customer/CustomerDashboard';
-import SubmitDevice      from './pages/customer/SubmitDevice';
-import MyDevices         from './pages/customer/MyDevices';
+import CustomerLogin from "./pages/customer/CustomerLogin";
+import CustomerSignup from "./pages/customer/CustomerSignup";
+import CustomerDashboard from "./pages/customer/CustomerDashboard";
+import SubmitDevice from "./pages/customer/SubmitDevice";
+import MyDevices from "./pages/customer/MyDevices";
 
 // Staff
-import StaffLogin         from './pages/staff/StaffLogin';
-import StaffDashboard     from './pages/staff/StaffDashboard';
-import StaffRegistration  from './pages/staff/StaffRegistration';
-import StaffDiagnostics   from './pages/staff/StaffDiagnostics';
-import StaffCertification from './pages/staff/StaffCertification';
-import StaffReservations  from './pages/staff/StaffReservations';
-import ForgotPassword     from './pages/staff/ForgotPassword';   
-import ResetPassword      from './pages/staff/ResetPassword';    
+import StaffLogin from "./pages/staff/StaffLogin";
+import StaffDashboard from "./pages/staff/StaffDashboard";
+import StaffRegistration from "./pages/staff/StaffRegistration";
+import StaffDiagnostics from "./pages/staff/StaffDiagnostics";
+import StaffCertification from "./pages/staff/StaffCertification";
+import StaffReservations from "./pages/staff/StaffReservations";
+import ForgotPassword from "./pages/staff/ForgotPassword";
+import ResetPassword from "./pages/staff/ResetPassword";
 
 // Admin
-import AdminLogin       from './pages/admin/AdminLogin';
-import AdminDashboard   from './pages/admin/AdminDashboard';
-import AdminSubmissions from './pages/admin/AdminSubmissions';
-import AdminStatistics  from './pages/admin/AdminStatistics';
-import AdminStaff       from './pages/admin/AdminStaff';
+import AdminLogin from "./pages/admin/AdminLogin";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import AdminSubmissions from "./pages/admin/AdminSubmissions";
+import AdminStatistics from "./pages/admin/AdminStatistics";
+import AdminStaff from "./pages/admin/AdminStaff";
 
 // Components
-import Footer         from './components/Footer';
-import CustomerNavbar from './components/CustomerNavbar';
-import PublicNavbar   from './components/PublicNavbar';
-import StaffNavbar    from './components/StaffNavbar';
-import AdminRoute     from './components/AdminRoute';
+import Footer from "./components/Footer";
+import CustomerNavbar from "./components/CustomerNavbar";
+import PublicNavbar from "./components/PublicNavbar";
+import StaffNavbar from "./components/StaffNavbar";
+import AdminRoute from "./components/AdminRoute";
+import CustomerRoute from "./components/CustomerRoute";
 
 // ── Staff Route Guard ──────────────────────────────────────────────────────────
 const StaffRoute = ({ children }) => {
-  const token = localStorage.getItem('staffToken');
+  const token = localStorage.getItem("staffToken");
   if (!token) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
-          <p className="text-gray-600 mb-4">Please log in to access the staff portal.</p>
-          <a href="/staff/login" className="text-blue-600 underline">Go to Staff Login</a>
+          <p className="text-gray-600 mb-4">
+            Please log in to access the staff portal.
+          </p>
+          <a href="/staff/login" className="text-blue-600 underline">
+            Go to Staff Login
+          </a>
         </div>
       </div>
     );
@@ -58,9 +68,13 @@ const StaffRoute = ({ children }) => {
 
 // ── Layouts ────────────────────────────────────────────────────────────────────
 function MainLayout() {
-  const isStaffLoggedIn    = localStorage.getItem('staffToken');
-  const isCustomerLoggedIn = localStorage.getItem('customerToken');
-  const Navbar = isStaffLoggedIn ? StaffNavbar : isCustomerLoggedIn ? CustomerNavbar : PublicNavbar;
+  const isStaffLoggedIn = localStorage.getItem("staffToken");
+  const isCustomerLoggedIn = localStorage.getItem("customerToken");
+  const Navbar = isStaffLoggedIn
+    ? StaffNavbar
+    : isCustomerLoggedIn
+      ? CustomerNavbar
+      : PublicNavbar;
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
@@ -107,67 +121,144 @@ function App() {
   return (
     <Router>
       <Routes>
-
         {/* Public pages */}
         <Route element={<MainLayout />}>
-          <Route path="/"               element={<Home />} />
-          <Route path="/about-us"       element={<AboutUs />} />
-          <Route path="/contact-us"     element={<ContactUs />} />
+          <Route path="/" element={<Home />} />
+          <Route path="/about-us" element={<AboutUs />} />
+          <Route path="/contact-us" element={<ContactUs />} />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-          <Route path="/catalog"        element={<BrowseCatalog />} />
-          <Route path="/device/:id"     element={<PublicDeviceDetail />} />
+          <Route path="/catalog" element={<BrowseCatalog />} />
+          <Route path="/device/:id" element={<PublicDeviceDetail />} />
         </Route>
 
         {/* Customer protected pages */}
         <Route element={<CustomerLayout />}>
-          <Route path="/customer-dashboard"     element={<CustomerDashboard />} />
-          <Route path="/customer-submit-device" element={<SubmitDevice />} />
-          <Route path="/customer-my-devices"    element={<MyDevices />} />
+          <Route
+            path="/customer-dashboard"
+            element={
+              <CustomerRoute>
+                <CustomerDashboard />
+              </CustomerRoute>
+            }
+          />
+          <Route
+            path="/customer-submit-device"
+            element={
+              <CustomerRoute>
+                <SubmitDevice />
+              </CustomerRoute>
+            }
+          />
+          <Route
+            path="/customer-my-devices"
+            element={
+              <CustomerRoute>
+                <MyDevices />
+              </CustomerRoute>
+            }
+          />
         </Route>
 
         {/* Auth — no navbar */}
-        <Route path="/customer-login"  element={<CustomerLogin />} />
+        <Route path="/customer-login" element={<CustomerLogin />} />
         <Route path="/customer-signup" element={<CustomerSignup />} />
 
         {/* Staff auth — no navbar */}
-        <Route path="/staff/login"                      element={<StaffLogin />} />
-        <Route path="/forgot-password"                  element={<ForgotPassword />} />
-        <Route path="/reset-password/:uid/:token"       element={<ResetPassword />} />
+        <Route path="/staff/login" element={<StaffLogin />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password/:uid/:token" element={<ResetPassword />} />
 
         {/* Staff protected pages — with StaffNavbar */}
         <Route element={<StaffLayout />}>
-          <Route path="/staff/dashboard"     element={<StaffDashboard />} />
-          <Route path="/staff/registration"  element={<StaffRegistration />} />
-          <Route path="/staff/diagnostics"   element={<StaffDiagnostics />} />
-          <Route path="/staff/certification" element={<StaffCertification />} />
-          <Route path="/staff/reservations"  element={<StaffReservations />} />
+          <Route
+            path="/staff/dashboard"
+            element={
+              <StaffRoute>
+                <StaffDashboard />
+              </StaffRoute>
+            }
+          />
+          <Route
+            path="/staff/registration"
+            element={
+              <StaffRoute>
+                <StaffRegistration />
+              </StaffRoute>
+            }
+          />
+          <Route
+            path="/staff/diagnostics"
+            element={
+              <StaffRoute>
+                <StaffDiagnostics />
+              </StaffRoute>
+            }
+          />
+          <Route
+            path="/staff/certification"
+            element={
+              <StaffRoute>
+                <StaffCertification />
+              </StaffRoute>
+            }
+          />
+          <Route
+            path="/staff/reservations"
+            element={
+              <StaffRoute>
+                <StaffReservations />
+              </StaffRoute>
+            }
+          />
         </Route>
 
         {/* Admin */}
         <Route path="/admin/login" element={<AdminLogin />} />
-        <Route path="/admin/dashboard" element={
-          <AdminRoute><AdminDashboard /></AdminRoute>
-        } />
-        <Route path="/admin/submissions" element={
-          <AdminRoute><AdminSubmissions /></AdminRoute>
-        } />
-        <Route path="/admin/statistics" element={
-          <AdminRoute><AdminStatistics /></AdminRoute>
-        } />
-        <Route path="/admin/staff" element={
-          <AdminRoute><AdminStaff /></AdminRoute>
-        } />
+        <Route
+          path="/admin/dashboard"
+          element={
+            <AdminRoute>
+              <AdminDashboard />
+            </AdminRoute>
+          }
+        />
+        <Route
+          path="/admin/submissions"
+          element={
+            <AdminRoute>
+              <AdminSubmissions />
+            </AdminRoute>
+          }
+        />
+        <Route
+          path="/admin/statistics"
+          element={
+            <AdminRoute>
+              <AdminStatistics />
+            </AdminRoute>
+          }
+        />
+        <Route
+          path="/admin/staff"
+          element={
+            <AdminRoute>
+              <AdminStaff />
+            </AdminRoute>
+          }
+        />
 
         {/* 404 */}
-        <Route path="*" element={
-          <div className="min-h-screen flex items-center justify-center bg-gray-50">
-            <div className="text-center">
-              <h1 className="text-6xl font-bold text-gray-800">404</h1>
-              <p className="mt-4 text-xl text-gray-600">Page not found</p>
+        <Route
+          path="*"
+          element={
+            <div className="min-h-screen flex items-center justify-center bg-gray-50">
+              <div className="text-center">
+                <h1 className="text-6xl font-bold text-gray-800">404</h1>
+                <p className="mt-4 text-xl text-gray-600">Page not found</p>
+              </div>
             </div>
-          </div>
-        } />
-
+          }
+        />
       </Routes>
     </Router>
   );
