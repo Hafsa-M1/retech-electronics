@@ -92,7 +92,7 @@ class DeviceSubmission(models.Model):
     )
 
     # ─────────────────────────────────────────────
-    # 🔥 Diagnostic data 
+    #  Diagnostic data 
     # ─────────────────────────────────────────────
 
     diagnostic_results = models.JSONField(

@@ -74,7 +74,7 @@ class DeviceSubmissionSerializer(serializers.ModelSerializer):
 
 
 # ─────────────────────────────────────────────
-# 🔥 ADMIN + PUBLIC CATALOG SERIALIZER (FIXED)
+#  ADMIN + PUBLIC CATALOG SERIALIZER 
 # ─────────────────────────────────────────────
 
 class AdminDeviceSubmissionSerializer(serializers.ModelSerializer):
@@ -92,7 +92,7 @@ class AdminDeviceSubmissionSerializer(serializers.ModelSerializer):
 
     video = serializers.SerializerMethodField()
 
-    # 🔥 diagnostics (IMPORTANT FOR YOUR FIX)
+    #  diagnostics 
     diagnostic_results = serializers.JSONField(read_only=True, allow_null=True)
     diagnostic_notes = serializers.CharField(read_only=True, allow_blank=True, allow_null=True)
 
@@ -111,11 +111,11 @@ class AdminDeviceSubmissionSerializer(serializers.ModelSerializer):
             'status',
             'submission_date',
 
-            # media (🔥 THIS FIXES YOUR IMAGE ISSUE)
+            # media
             'photos',
             'video',
 
-            # certification data (IMPORTANT FOR CATALOG)
+            # certification data 
             'category',
             'estimated_price',
             'final_notes',
