@@ -312,7 +312,8 @@ export default function CustomerLogin() {
                         </button>
                       </div>
                     </div>
-
+                    
+                    {/* 
                     <div className="flex items-center justify-between">
                       <label className="flex items-center gap-3 cursor-pointer">
                         <input
@@ -332,7 +333,8 @@ export default function CustomerLogin() {
                         Forgot password?
                       </button>
                     </div>
-
+                    */}
+                    
                     <button
                       type="submit"
                       disabled={isSubmitting}
