@@ -31,9 +31,7 @@ export default function CustomerSignup() {
 
   const benefits = [
     { icon: "💰", title: "Exclusive Deals", description: "Get special prices on certified refurbished devices" },
-    { icon: "🔧", title: "Quality Certification", description: "50+ point diagnostic tests ensure device reliability" },
-    { icon: "🛡️", title: "Warranty", description: "90-day warranty on all refurbished products" },
-    { icon: "📱", title: "Early Access", description: "Be first to see new inventory" }
+    { icon: "🔧", title: "Quality Certification", description: "Diagnostic tests ensure device reliability" },
   ];
 
   // Auto-hide notification after 5 seconds
@@ -54,6 +52,26 @@ export default function CustomerSignup() {
     setNotification({ show: false, type: '', message: '' });
   };
 
+  const validateField = (name, value) => {
+    switch (name) {
+      case 'email': {
+        const trimmedValue = value?.trim() || '';
+        if (!trimmedValue) return 'Email is required';
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedValue)) return 'Email is invalid';
+        return '';
+      }
+      case 'phone': {
+        const trimmedValue = value?.trim() || '';
+        if (!/^\d*$/.test(trimmedValue)) return 'Phone number must contain only digits';
+        if (!trimmedValue) return 'Phone number is required';
+        if (trimmedValue.length > 10) return 'Phone number must be at most 10 digits';
+        return '';
+      }
+      default:
+        return '';
+    }
+  };
+
   const validateStep = () => {
     const newErrors = {};
 
@@ -61,12 +79,10 @@ export default function CustomerSignup() {
       case 1:
         if (!formData.firstName.trim()) newErrors.firstName = 'First name is required';
         if (!formData.lastName.trim()) newErrors.lastName = 'Last name is required';
-        if (!formData.email.trim()) {
-          newErrors.email = 'Email is required';
-        } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-          newErrors.email = 'Email is invalid';
-        }
-        if (!formData.phone.trim()) newErrors.phone = 'Phone number is required';
+        const emailError = validateField('email', formData.email);
+        if (emailError) newErrors.email = emailError;
+        const phoneError = validateField('phone', formData.phone);
+        if (phoneError) newErrors.phone = phoneError;
         break;
       case 2:
         if (!formData.password) {
@@ -91,13 +107,24 @@ export default function CustomerSignup() {
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
+    const fieldValue = type === 'checkbox' ? checked : value;
+
     setFormData(prev => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: fieldValue
     }));
-    
-    // Clear error when user starts typing
-    if (errors[name]) {
+
+    if (name === 'email' || name === 'phone') {
+      const nextValue = name === 'phone' ? fieldValue.replace(/\D/g, '').slice(0, 10) : fieldValue;
+      setFormData(prev => ({
+        ...prev,
+        [name]: nextValue
+      }));
+      setErrors(prev => ({
+        ...prev,
+        [name]: validateField(name, nextValue)
+      }));
+    } else if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
     }
   };
@@ -620,10 +647,6 @@ export default function CustomerSignup() {
               {/* Content */}
               <div className="relative z-10 h-full p-8 md:p-10 flex flex-col justify-center">
                 <div className="mb-8">
-                  <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full mb-4">
-                    <FaCheck className="w-4 h-4 text-emerald-300" />
-                    <span className="text-sm font-medium text-emerald-100">Join 10,000+ Customers</span>
-                  </div>
                   
                   <h2 className="text-3xl md:text-4xl font-bold text-white mb-3">
                     Why Join <span className="text-emerald-300">ReTech?</span>
@@ -648,37 +671,11 @@ export default function CustomerSignup() {
                   ))}
                 </div>
 
-                {/* Stats - Compact Layout */}
-                <div className="bg-gradient-to-r from-emerald-900/30 to-teal-900/30 backdrop-blur-sm rounded-xl p-6 border border-emerald-500/20 mb-6">
-                  <div className="grid grid-cols-4 gap-4 text-center">
-                    <div>
-                      <div className="text-2xl font-bold text-emerald-300">10K+</div>
-                      <div className="text-xs text-gray-400">Devices</div>
-                    </div>
-                    <div>
-                      <div className="text-2xl font-bold text-emerald-300">98%</div>
-                      <div className="text-xs text-gray-400">Happy</div>
-                    </div>
-                    <div>
-                      <div className="text-2xl font-bold text-emerald-300">24h</div>
-                      <div className="text-xs text-gray-400">Support</div>
-                    </div>
-                    <div>
-                      <div className="text-2xl font-bold text-emerald-300">70%</div>
-                      <div className="text-xs text-gray-400">Savings</div>
-                    </div>
-                  </div>
-                </div>
-
                 {/* What You Get - Minimal */}
                 <div className="space-y-3">
                   <div className="flex items-center gap-3 text-sm">
                     <FaCheck className="w-4 h-4 text-emerald-400 flex-shrink-0" />
                     <span className="text-gray-300">Certified refurbished devices</span>
-                  </div>
-                  <div className="flex items-center gap-3 text-sm">
-                    <FaCheck className="w-4 h-4 text-emerald-400 flex-shrink-0" />
-                    <span className="text-gray-300">90-day warranty included</span>
                   </div>
                   <div className="flex items-center gap-3 text-sm">
                     <FaCheck className="w-4 h-4 text-emerald-400 flex-shrink-0" />

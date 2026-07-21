@@ -36,7 +36,7 @@ export default function Footer() {
         {/* Contact */}
         <div className="md:col-span-1">
           <h4 className="text-lg font-semibold text-white mb-4">Contact</h4>
-          <p className="text-gray-400">Email: support@retech.com</p>
+          <p className="text-gray-400">Email: uomvms@gmail.com</p>
           <p className="text-gray-400 mt-1">Phone: +94 XX XXX XXXX</p>
           <p className="text-gray-400 mt-1">Sri Lanka</p>
         </div>

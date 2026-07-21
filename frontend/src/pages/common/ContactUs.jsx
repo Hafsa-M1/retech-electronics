@@ -14,11 +14,9 @@ export default function ContactUs() {
   }, []);
 
   const serviceAreas = [
-    { area: "Device Collection",    description: "Schedule pickup from your shop or home" },
+    { area: "Device Collection",    description: "Collect devices for refurbishment and resale" },
     { area: "Quality Certification", description: "Get devices certified for resale" },
-    { area: "Inventory Management", description: "Manage your refurbished inventory" },
     { area: "Business Dashboard",   description: "Monitor sales and customer data" },
-    { area: "Technical Training",   description: "Learn refurbishment best practices" },
     { area: "Marketing Support",    description: "Promote your refurbished products" },
   ];
 
@@ -137,20 +135,7 @@ export default function ContactUs() {
                     <p className="text-sm font-semibold text-gray-700">Location</p>
                     <p className="text-sm text-gray-500">Sri Lanka</p>
                   </div>
-                </div>
-
-                {/* Hours */}
-                <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-xl">
-                  <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold text-gray-700">Business Hours</p>
-                    <p className="text-sm text-gray-500">Monday – Friday, 9:00 AM – 6:00 PM</p>
-                  </div>
-                </div>
+                </div>      
               </div>
 
               {/* How It Works */}
@@ -198,7 +183,7 @@ export default function ContactUs() {
                   {[
                     "Additional revenue stream from device collection",
                     "Access to nationwide refurbished electronics market",
-                    "Technical training and certification support",
+                    "Device certification support",
                   ].map((benefit) => (
                     <li key={benefit} className="flex items-start gap-3">
                       <svg className="w-5 h-5 text-green-300 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">

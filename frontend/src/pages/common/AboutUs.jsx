@@ -32,12 +32,10 @@ export default function AboutUs() {
   ];
 
   const keyFeatures = [
-    "Advanced product catalog with search & filters",
-    "Secure user authentication & profiles",
-    "Order tracking & management",
+    "Advanced product catalog",
+    "Secure user authentication",
     "Customer support system",
     "Device certification process",
-    "Warranty management"
   ];
 
   const technologies = [
@@ -353,20 +351,7 @@ export default function AboutUs() {
                 <p className="text-lg text-gray-700 mb-6 leading-relaxed">
                   ReTech is a comprehensive e-commerce platform dedicated to refurbished electronics. We connect buyers with certified, high-quality refurbished devices while promoting sustainability and reducing electronic waste.
                 </p>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className={`bg-white p-4 rounded-xl shadow-sm hover-lift scroll-item-hidden scroll-item-1 ${visibleSections['intro'] ? 'scroll-item-visible' : ''}`}>
-                    <div className="font-bold text-gray-900">10,000+</div>
-                    <div className="text-green-600 font-medium">Devices Sold</div>
-                  </div>
-                  <div className={`bg-white p-4 rounded-xl shadow-sm hover-lift scroll-item-hidden scroll-item-2 ${visibleSections['intro'] ? 'scroll-item-visible' : ''}`}>
-                    <div className="font-bold text-gray-900">98%</div>
-                    <div className="text-green-600 font-medium">Satisfaction Rate</div>
-                  </div>
-                  <div className={`bg-white p-4 rounded-xl shadow-sm hover-lift scroll-item-hidden scroll-item-3 ${visibleSections['intro'] ? 'scroll-item-visible' : ''}`}>
-                    <div className="font-bold text-gray-900">70%</div>
-                    <div className="text-green-600 font-medium">Average Savings</div>
-                  </div>
-                </div>
+                
               </div>
               <div className={`md:w-1/3 ${visibleSections['intro'] ? 'animate-fade-in-right delay-200' : ''}`}>
                 <div className="bg-gradient-to-br from-green-600 to-emerald-600 text-white p-8 rounded-2xl text-center shadow-lg hover-lift animate-bounce-in delay-300">
@@ -503,26 +488,6 @@ export default function AboutUs() {
                         ))}
                       </div>
                       
-                      <div className="bg-gradient-to-r from-purple-50 to-violet-50 p-6 rounded-xl hover-lift animate-fade-in-up delay-600">
-                        <h3 className="text-xl font-bold text-gray-900 mb-3">Customer Experience:</h3>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                          <div className="text-center p-4">
-                            <div className="text-2xl mb-2">🛡️</div>
-                            <h4 className="font-bold text-gray-900">Warranty</h4>
-                            <p className="text-sm text-gray-600">90-day minimum on all devices</p>
-                          </div>
-                          <div className="text-center p-4">
-                            <div className="text-2xl mb-2">📦</div>
-                            <h4 className="font-bold text-gray-900">Easy Returns</h4>
-                            <p className="text-sm text-gray-600">30-day return policy</p>
-                          </div>
-                          <div className="text-center p-4">
-                            <div className="text-2xl mb-2">💬</div>
-                            <h4 className="font-bold text-gray-900">Support</h4>
-                            <p className="text-sm text-gray-600">24/7 customer service</p>
-                          </div>
-                        </div>
-                      </div>
                     </div>
                   </div>
                 )}
@@ -571,7 +536,7 @@ export default function AboutUs() {
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-4">Shop With Confidence</h3>
               <p className="text-gray-600">
-                All devices are certified, tested, and backed by warranties. Your satisfaction is our priority.
+                All devices are certified and tested. Your satisfaction is our priority.
               </p>
             </div>
           </div>
