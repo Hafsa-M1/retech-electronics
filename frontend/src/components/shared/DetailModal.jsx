@@ -37,6 +37,12 @@ const DetailModal = ({
   const [currentStatus, setCurrentStatus] = useState(submission.status);
   const t = THEME_CFG[theme] || THEME_CFG.emerald;
 
+  const resolveMediaUrl = (url) => {
+    if (!url) return "";
+    if (/^https?:\/\//i.test(url)) return url;
+    return `${imageBaseUrl}${url}`;
+  };
+
   const updateStatus = async (newStatus) => {
     setUpdating(true);
     try {
@@ -145,15 +151,14 @@ const DetailModal = ({
               </h3>
               <div className="grid grid-cols-2 gap-3">
                 {submission.photos.map((photo) => (
-                <a
-                  
+                  <a
                     key={photo.id}
-                    href={`${imageBaseUrl}${photo.image}`}
+                    href={resolveMediaUrl(photo.image)}
                     target="_blank"
                     rel="noreferrer"
                   >
                     <img
-                      src={`${imageBaseUrl}${photo.image}`}
+                      src={resolveMediaUrl(photo.image)}
                       alt="Device"
                       className="w-full h-36 object-cover rounded-xl border border-gray-200 hover:opacity-90 transition-opacity"
                     />
@@ -171,7 +176,7 @@ const DetailModal = ({
                 Video
               </h3>
               <video controls className="w-full rounded-xl border border-gray-200">
-                <source src={`${imageBaseUrl}${submission.video}`} />
+                <source src={resolveMediaUrl(submission.video)} />
               </video>
             </div>
           )}

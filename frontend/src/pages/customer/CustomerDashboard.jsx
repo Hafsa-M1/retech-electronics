@@ -326,49 +326,6 @@ const CustomerDashboard = () => {
               </li>
             </ul>
           </div>
-
-          {/* Why Choose ReTech */}
-          <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
-            <h3 className="text-xl font-bold text-gray-800 mb-4">Why Choose ReTech?</h3>
-            <div className="space-y-4">
-              <div className="flex items-start">
-                <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-3 flex-shrink-0">
-                  <span className="text-green-600 text-xl">✓</span>
-                </div>
-                <div>
-                  <p className="font-medium text-gray-900">Certified Quality</p>
-                  <p className="text-sm text-gray-600">50+ point diagnostic testing on every device</p>
-                </div>
-              </div>
-              <div className="flex items-start">
-                <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3 flex-shrink-0">
-                  <span className="text-blue-600 text-xl">✓</span>
-                </div>
-                <div>
-                  <p className="font-medium text-gray-900">90-Day Warranty</p>
-                  <p className="text-sm text-gray-600">Peace of mind with every purchase</p>
-                </div>
-              </div>
-              <div className="flex items-start">
-                <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center mr-3 flex-shrink-0">
-                  <span className="text-purple-600 text-xl">✓</span>
-                </div>
-                <div>
-                  <p className="font-medium text-gray-900">Sustainable Choice</p>
-                  <p className="text-sm text-gray-600">Reduce e-waste and carbon footprint</p>
-                </div>
-              </div>
-              <div className="flex items-start">
-                <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center mr-3 flex-shrink-0">
-                  <span className="text-orange-600 text-xl">✓</span>
-                </div>
-                <div>
-                  <p className="font-medium text-gray-900">Best Prices</p>
-                  <p className="text-sm text-gray-600">Up to 70% off retail prices</p>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </div>
